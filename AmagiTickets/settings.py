@@ -123,3 +123,11 @@ STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 AUTH_PROFILE_MODULE = 'TicketsApp.UserProfile'
+
+EMAIL_HOST = "172.16.48.77"
+EMAIL_PORT = "587"
+EMAIL_HOST_USER = "cfarinha@amagi.com.ve"
+EMAIL_HOST_PASSWORD = "Cafc-0910270"
+EMAIL_USE_TLS = True
+
+LOGIN_URL ='auth'
