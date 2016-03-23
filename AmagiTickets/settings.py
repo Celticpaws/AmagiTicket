@@ -130,4 +130,5 @@ EMAIL_HOST_USER = "cfarinha@amagi.com.ve"
 EMAIL_HOST_PASSWORD = "Cafc-0910270"
 EMAIL_USE_TLS = True
 
+LOGIN_REDIRECT_URL ='auth'
 LOGIN_URL ='auth'
