@@ -14,7 +14,7 @@ class Phone(models.Model):
 class Company(models.Model):
 	c_id = models.IntegerField(unique=True)
 	c_name = models.CharField(max_length=100)
-	c_owner = models.ForeignKey('auth.User')
+	c_owner = models.ForeignKey('auth.User',default=0)
 
 
 	def __str__(self):
@@ -24,7 +24,7 @@ class Company(models.Model):
 class Management(models.Model):
 	m_id = models.IntegerField(unique=True)
 	m_name = models.CharField(max_length=100)
-	m_manager = models.ForeignKey('auth.User')
+	m_manager = models.ForeignKey('auth.User',default=0)
 
 	def __str__(self):
 		return self.m_name
@@ -33,25 +33,75 @@ class Management(models.Model):
 class Department(models.Model):
 	d_id = models.IntegerField(unique=True)
 	d_name = models.CharField(max_length=100)
-	d_manager = models.ForeignKey('auth.User')
+	d_manager = models.ForeignKey('auth.User',default=0)
 
 	def __str__(self):
 		return self.d_name
 
+class Disk(models.Model):
+	dsk_id = models.IntegerField()
+	dsk_name = models.CharField(max_length=20)
+	dsk_capacity = models.IntegerField()
+	dsk_usage = models.IntegerField()
+	dsk_srv = models.ForeignKey('Server',default=0)
+
+	def __str__(self):
+		return self.dsk_id
+
+
+class Server(models.Model):
+	srv_name = models.CharField(max_length=50)
+	srv_ip = models.GenericIPAddressField()
+	srv_gateway = models.GenericIPAddressField()
+	srv_so = models.CharField(max_length=100)
+	srv_memory = models.IntegerField() 
+
+	def __str__(self):
+		return self.srv_name
+
+class Service(models.Model):
+	svc_id = models.IntegerField()
+	svc_name = models.CharField(max_length=50)
+	svc_server = models.ForeignKey('Server',default=0)
+	svc_ison = models.BooleanField() 
+
+	def __str__(self):
+		return self.svc_name
+
 
 class UserProfile(models.Model):
-	u_user = models.OneToOneField('auth.User', on_delete=models.CASCADE, primary_key=True)
+	u_user = models.OneToOneField('auth.User', on_delete=models.CASCADE, primary_key=True,default=0)
 	u_secondname = models.CharField(max_length=30)
 	u_secondlastname = models.CharField(max_length=30)
 	u_id = models.IntegerField()
 	u_phone = models.ForeignKey('Phone')
 	u_jobtitle = models.CharField(max_length=100)
-	u_department = models.ForeignKey('Department')
-	u_management = models.ForeignKey('Management')
-	u_company = models.ForeignKey('Company')
-	#u_image = models.ImageField ---------AQUI ME QUEDE
+	u_department = models.ForeignKey('Department',default=0)
+	u_management = models.ForeignKey('Management',default=0)
+	u_company = models.ForeignKey('Company',default=0)
 
 	def __str__(self):
 		return self.u_secondname
 
+
+class Ticket(models.Model):
+	t_id = models.IntegerField()
+	t_isincident = models.BooleanField()
+	t_useraffected = models.ForeignKey('auth.User',related_name='t_useraffected',default=0)
+	t_category = models.CharField(max_length=20)
+	t_description = models.CharField(max_length=200)
+	t_server =models.ForeignKey('Server')
+	t_service = models.ForeignKey('Service')
+	t_impact = models.IntegerField()
+	t_priority = models.IntegerField()
+	t_sla = models.DateTimeField()
+	t_userreporter = models.ForeignKey('auth.User',related_name='t_userreporter',default=0)
+	t_reportmadeon = models.DateTimeField()
+	t_department = models.ForeignKey('Department')
+	t_usersolver = models.ForeignKey('auth.User',related_name='t_usersolver',default=0)
+	t_state = models.CharField(max_length=10)
+	t_issolved = models.BooleanField()
+
+	def __str__(self):
+		return self.t_id
 

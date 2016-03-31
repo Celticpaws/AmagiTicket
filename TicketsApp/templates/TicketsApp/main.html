@@ -76,7 +76,7 @@
           <!-- menu prile quick info -->
           <div class="profile">
             <div class="profile_pic">
-              <img src="{%static "img/usr.png"%}" alt="..." class="img-circle profile_img">
+              <img src="{%static "" %}img/userphoto/{{user.username}}.jpg" alt="..." class="img-circle profile_img">
             </div>
             <div class="profile_info">
               <span>Bienvenido</span>
@@ -179,7 +179,7 @@
             <ul class="nav navbar-nav navbar-right">
               <li class="">
                 <a href="javascript:;" class="user-profile dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                  <img src="{% static "img/usr.png"%}" alt="">{{user.first_name}} {{user.last_name}}
+                  <img src="{%static "" %}img/userphoto/{{user.username}}.jpg" alt="">{{user.first_name}} {{user.last_name}}
                   <span class=" fa fa-angle-down"></span>
                 </a>
                 <ul class="dropdown-menu dropdown-usermenu animated fadeInDown pull-right">
