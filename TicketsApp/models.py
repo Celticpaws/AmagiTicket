@@ -12,7 +12,7 @@ class Phone(models.Model):
 
 
 class Company(models.Model):
-	c_id = models.IntegerField(unique=True)
+	c_id = models.IntegerField(unique=True,primary_key=True)
 	c_name = models.CharField(max_length=100)
 	c_owner = models.ForeignKey('auth.User',default=0)
 
@@ -22,9 +22,10 @@ class Company(models.Model):
 
 
 class Management(models.Model):
-	m_id = models.IntegerField(unique=True)
+	m_id = models.IntegerField(unique=True,primary_key=True)
 	m_name = models.CharField(max_length=100)
 	m_manager = models.ForeignKey('auth.User',default=0)
+	m_company = models.ForeignKey('Company',default=0)
 
 	def __str__(self):
 		return self.m_name
@@ -32,14 +33,18 @@ class Management(models.Model):
 
 class Department(models.Model):
 	d_id = models.IntegerField(unique=True)
-	d_name = models.CharField(max_length=100)
+	d_name = models.CharField(max_length=100,primary_key=True)
 	d_manager = models.ForeignKey('auth.User',default=0)
+	d_management = models.ForeignKey('Management',default=0)
 
 	def __str__(self):
 		return self.d_name
 
+	def get_did(str):
+		return Department.objects.get(d_name=str)
+
 class Disk(models.Model):
-	dsk_id = models.IntegerField()
+	dsk_id = models.IntegerField(primary_key=True)
 	dsk_name = models.CharField(max_length=20)
 	dsk_capacity = models.IntegerField()
 	dsk_usage = models.IntegerField()
@@ -50,7 +55,7 @@ class Disk(models.Model):
 
 
 class Server(models.Model):
-	srv_name = models.CharField(max_length=50)
+	srv_name = models.CharField(max_length=50,primary_key=True)
 	srv_ip = models.GenericIPAddressField()
 	srv_gateway = models.GenericIPAddressField()
 	srv_so = models.CharField(max_length=100)
@@ -60,7 +65,7 @@ class Server(models.Model):
 		return self.srv_name
 
 class Service(models.Model):
-	svc_id = models.IntegerField()
+	svc_id = models.IntegerField(primary_key=True)
 	svc_name = models.CharField(max_length=50)
 	svc_server = models.ForeignKey('Server',default=0)
 	svc_ison = models.BooleanField() 
@@ -73,7 +78,6 @@ class UserProfile(models.Model):
 	u_user = models.OneToOneField('auth.User', on_delete=models.CASCADE, primary_key=True,default=0)
 	u_secondname = models.CharField(max_length=30)
 	u_secondlastname = models.CharField(max_length=30)
-	u_id = models.IntegerField()
 	u_phone = models.ForeignKey('Phone')
 	u_jobtitle = models.CharField(max_length=100)
 	u_department = models.ForeignKey('Department',default=0)
@@ -83,9 +87,21 @@ class UserProfile(models.Model):
 	def __str__(self):
 		return self.u_secondname
 
+	def get_UserProfile(User):
+		up = UserProfile.objects.get(u_user=User)
+		return up
+
+	def get_jobtitle(User):
+		up = UserProfile.objects.get(u_user=User)
+		return up.u_jobtitle
+
+	def get_department(User):
+		return (UserProfile.objects.get(u_user=User)).u_department
+
+
 
 class Ticket(models.Model):
-	t_id = models.IntegerField()
+	t_id = models.IntegerField(primary_key=True)
 	t_isincident = models.BooleanField()
 	t_useraffected = models.ForeignKey('auth.User',related_name='t_useraffected',default=0)
 	t_category = models.CharField(max_length=20)
@@ -103,5 +119,44 @@ class Ticket(models.Model):
 	t_issolved = models.BooleanField()
 
 	def __str__(self):
-		return self.t_id
+		return self.t_description
 
+	def personal_solicitude_count(User):
+		psolicitude = Ticket.objects.filter(t_isincident=False,t_usersolver=User)
+		return psolicitude.count()
+
+	def personal_incident_count(User):
+		pincidents = Ticket.objects.filter(t_isincident=True,t_usersolver=User)
+		return pincidents.count()
+
+	def group_solicitude_count(User):
+		depuser = UserProfile.get_department(User)
+		did = Department.get_did(depuser)
+		gsolicitude = Ticket.objects.filter(t_isincident=False,t_department=did)
+		return gsolicitude.count()
+
+	def group_incident_count(User):
+		depuser = UserProfile.get_department(User)
+		did = Department.get_did(depuser)
+		gincidents = Ticket.objects.filter(t_isincident=True,t_department=did)
+		return gincidents.count()
+
+	def personal_solicitudes(User):
+		psolicitudes = Ticket.objects.filter(t_isincident=False,t_usersolver=User)
+		return psolicitudes
+
+	def group_solicitudes(User):
+		depuser = UserProfile.get_department(User)
+		did = Department.get_did(depuser)
+		gsolicitudes = Ticket.objects.filter(t_isincident=False,t_department=did)
+		return gsolicitudes
+
+	def personal_incidents(User):
+		psolicitudes = Ticket.objects.filter(t_isincident=True,t_usersolver=User)
+		return psolicitudes
+
+	def group_incidents(User):
+		depuser = UserProfile.get_department(User)
+		did = Department.get_did(depuser)
+		gsolicitudes = Ticket.objects.filter(t_isincident=True,t_department=did)
+		return gsolicitudes

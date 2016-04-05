@@ -1,0 +1,114 @@
+{% extends 'TicketsApp/main.html' %}
+
+    {% block title %} 
+    Ticket
+    {% endblock %}
+ <script src="js/jquery.min.js"></script>
+ 
+{% block content %}
+    <div class="right_col" role="main">
+        <div class="">
+          <div class="page-title">
+            <div class="title_left">
+              <h1>
+                    Ticket # {{ticketpk.t_id}}
+                    
+                </h1>
+            </div>
+          </div>
+        </div>
+      <!--User Affected info -->  
+      <div class="x_panel">
+        <div class="x_title">
+          <h2>Detalle del usuario afectado</h2>
+          <ul class="nav navbar-right panel_toolbox">
+            <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+            </li>
+          </ul>
+          <div class="clearfix"></div>
+        </div>
+        <div class="x_content">
+          <section class="content invoice">
+            <!-- info row -->
+            <div class="row invoice-info">
+              <div class="col-sm-4 invoice-col">
+                <strong>Usuario final afectado: </strong> {{ticketpk.t_useraffected.get_full_name}}<br>
+                <strong>Cuenta de usuario: </strong> {{ticketpk.t_useraffected}}<br>
+              </div>
+              <!-- /.col -->
+              <div class="col-sm-4 invoice-col">
+                <strong>Departamento: </strong> {{useraffected.u_department}}<br>
+                <strong>Gerencia: </strong> {{useraffected.u_management}}<br>
+              </div>
+              <!-- /.col -->
+              <div class="col-sm-4 invoice-col">
+                <strong>Correo: </strong> {{ticketpk.t_useraffected.email}}<br>
+                <strong>Telefono: </strong> {{useraffected.u_phone.phone_number}}<br>
+              </div>
+              <!-- /.col -->
+                </div>
+            <!-- /.row -->
+          </section>
+        </div>
+      </div>
+    
+
+    <!-- Ticket Info -->
+    <div class="x_panel">
+        <div class="x_title">
+          <h2>Detalle del ticket</h2>
+          <ul class="nav navbar-right panel_toolbox">
+            <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+            </li>
+          </ul>
+          <div class="clearfix"></div>
+        </div>
+        <div class="x_content">
+          <section class="content invoice">
+            <!-- info row -->
+            <div class="row invoice-info">
+              <div class="col-sm-4 invoice-col">
+                <strong>Tipo: </strong> <span id="sol"></span>
+                  <script>
+                      var b = "{{ticketpk.t_isincident}}" 
+                      var text;  
+                       if ( b=="True") {
+                          text = "Incidente"
+                       }else{
+                          text = "Solicitud"
+                       }
+                      document.getElementById("sol").innerHTML = text;
+                
+                  </script>
+                    <br>
+                <strong>Categoría: </strong> {{ticketpk.t_useraffected}}<br>
+                <strong>Servidor afectado: </strong> {{ticketpk.t_useraffected}}<br>
+                <strong>Servicio afectado: </strong> {{ticketpk.t_useraffected}}<br>
+                
+
+              </div>
+              <!-- /.col -->
+              <div class="col-sm-4 invoice-col">
+                <strong>Departamento: </strong> {{useraffected.u_department}}<br>
+                <strong>Departamento: </strong> {{useraffected.u_management}}<br>
+              </div>
+              <!-- /.col -->
+              <div class="col-sm-4 invoice-col">
+                <strong>Correo: </strong> {{ticketpk.t_useraffected.email}}<br>
+                <strong>Telefono: </strong> {{useraffected.u_phone.phone_number}}<br>
+              </div>
+              <!-- /.col -->
+                </div>
+            <!-- /.row -->
+          </section>
+        </div>
+      </div>
+    </div>
+                    
+</div>
+ 
+
+
+
+
+{% endblock %}

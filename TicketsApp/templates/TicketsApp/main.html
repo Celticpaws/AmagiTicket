@@ -68,7 +68,7 @@
         <div class="left_col scroll-view">
 
           <div class="navbar nav_title" style="border: 0;">
-            <a href="index.html" class="site_title"><span><img src="{%static "img/Logo.png"%}" width="70%"></span></a>
+            <a href="{% url 'index' %}" class="site_title"><span><img src="{%static "img/Logo.png"%}" width="70%"></span></a>
           </div>
           <div class="clearfix"></div>
 
@@ -80,7 +80,8 @@
             </div>
             <div class="profile_info">
               <span>Bienvenido</span>
-              <h2>{{user.first_name}} {{user.last_name}}</h2>
+              <h2>{{user.first_name}} {{user.last_name}}<br>{{userjob}}
+              </h2>
             </div>
           </div>
           <!-- /menu prile quick info -->
@@ -91,34 +92,34 @@
           <div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
 
             <div class="menu_section">
-              <br><h3>General</h3>
+              <br><br><h3>General</h3>
               <ul class="nav side-menu">
                 <li><a><i class="fa fa-home"></i> Home <span class="fa fa-chevron-down"></span></a>
                   <ul class="nav child_menu" style="display: none">
-                    <li><a href="index.html">Dashboard </a>
+                    <li><a href="{% url 'index' %}">Dashboard </a>
                     </li>
                   </ul>
                 </li>
                 <li><a><i class="fa fa-edit"></i> Solicitudes <span class="fa fa-chevron-down"></span></a>
                   <ul class="nav child_menu" style="display: none">
-                    <li><a href="form_advanced.html">Solicitudes Personales
-                      <span class="label label-primary pull-right">2 </span>
+                    <li><a href="{% url 'solicitudp' %}">Solicitudes Personales
+                      <span class="label label-primary pull-right">{{psolicitude}} </span>
                     </a>
                     </li>
-                    <li><a href="form_validation.html">Solicitudes al Grupo
-                      <span class="label label-primary pull-right">8 </span>
+                    <li><a href="{% url 'solicitudg' %}">Solicitudes al Grupo
+                      <span class="label label-primary pull-right">{{gsolicitude}} </span>
                     </a>
                     </li>
                   </ul>
                 </li>
                 <li><a><i class="fa fa-exclamation-triangle"></i> Incidentes <span class="fa fa-chevron-down"></span></a>
                   <ul class="nav child_menu" style="display: none">
-                    <li><a href="calender.html">Incidentes Personales
-                      <span class="label label-danger pull-right">1 </span>
+                    <li><a href="{% url 'incidentp' %}">Incidentes Personales
+                      <span class="label label-danger pull-right">{{pincident}} </span>
                     </a>
                     </li>
-                    <li><a href="calender.html">Incidentes al Grupo
-                        <span class="label label-danger pull-right">23 </span>
+                    <li><a href="{% url 'incidentg' %}">Incidentes al Grupo
+                        <span class="label label-danger pull-right">{{gincident}} </span>
                     </a>
                     </li>                    
                   </ul>
@@ -662,6 +663,7 @@
     });
   </script>
   <!-- /datepicker -->
+
 </body>
 
 </html>
