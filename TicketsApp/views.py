@@ -4,6 +4,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.core.urlresolvers import reverse
 from django.utils import timezone
 from .models import *
+import datetime
 
 
 # Create your views here.
@@ -119,9 +120,35 @@ def incidentg(request):
          })
 
 def ticket(request,pk):
+    userjob = UserProfile.get_jobtitle(request.user)
+    userdepartment = UserProfile.get_department(request.user)
+    psolicitude = Ticket.personal_solicitude_count(request.user)
+    gsolicitude = Ticket.group_solicitude_count(request.user)
+    pincident = Ticket.personal_incident_count(request.user)
+    gincident = Ticket.group_incident_count(request.user)
     ticketpk = Ticket.objects.get(pk=pk)
     useraffected = UserProfile.get_UserProfile(ticketpk.t_useraffected)
     usersolver = UserProfile.get_UserProfile(ticketpk.t_usersolver)
-    return render(request,'TicketsApp/ticketid.html',{'ticketpk':ticketpk,'useraffected':useraffected,'usersolver':usersolver})
+    sla = ticketpk.t_sla-timezone.now()
+    slahour = sla.seconds//3600
+    slaminute = (sla.seconds //60)%60
+    attacheds = Archive.archives_of_a_ticket(ticketpk)
+    sons = Ticket.get_sons(ticketpk)
+    activities = Activity.activities_of_a_ticket(ticketpk)
+    return render(request,'TicketsApp/ticketid.html',{
+         'userjob':userjob,
+         'psolicitude':psolicitude,
+         'pincident':pincident,
+         'gsolicitude':gsolicitude,
+         'gincident':gincident,
+        'ticketpk':ticketpk,
+        'useraffected':useraffected,
+        'usersolver':usersolver,
+        'sla':sla,
+        'slahour':slahour,
+        'slaminute':slaminute,
+        'attacheds':attacheds,
+        'sons':sons,
+        'activities':activities})
 
 

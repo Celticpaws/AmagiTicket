@@ -1,7 +1,7 @@
 {% extends 'TicketsApp/main.html' %}
 
     {% block title %} 
-    Ticket
+    Ticket 
     {% endblock %}
  <script src="js/jquery.min.js"></script>
  
@@ -99,7 +99,7 @@
                 <strong>Reportado por: </strong> {{ticketpk.t_userreporter.get_full_name}}<br>
                 <strong>Impacto: </strong> {{ticketpk.t_impact}}<br>
                 <strong>SLA: </strong> {{ticketpk.t_sla}}<br>
-                <strong>Tiempo de vida: </strong> {{ticketpk.t_usersolver.get_full_name}}<br>
+                <strong>Tiempo de vida: </strong>{{sla.days}}d {{slahour}}h {{slaminute}}m<br>
               </div>
               <!-- /.col -->
                 </div>
@@ -107,6 +107,133 @@
           </section>
         </div>
       </div>
+
+
+      <!-- Tablero del ticket -->
+              <div class="x_panel">
+                
+                <div class="x_content">
+
+
+                  <div class="" role="tabpanel" data-example-id="togglable-tabs">
+                    <ul id="myTab" class="nav nav-tabs bar_tabs" role="tablist">
+                      <li role="presentation" class="active"><a href="#tab_content1" id="home-tab" role="tab" data-toggle="tab" aria-expanded="true">Actividades</a>
+                      </li>
+                      <li role="presentation" class=""><a href="#tab_content2" role="tab" id="profile-tab" data-toggle="tab" aria-expanded="false">Padre/Hijo</a>
+                      </li>
+                      <li role="presentation" class=""><a href="#tab_content3" role="tab" id="profile-tab2" data-toggle="tab" aria-expanded="false">Archivos Adjuntos</a>
+                      </li>
+                    </ul>
+                    <div id="myTabContent" class="tab-content">
+                      <div role="tabpanel" class="tab-pane fade active in" id="tab_content1" aria-labelledby="home-tab">
+                           <table id="example" class="table table-striped responsive-utilities jambo_table">
+                                    <thead>
+                                      <tr class="headings">
+                                        <th>Tipo </th>
+                                        <th>Creado por </th>
+                                        <th>Fecha </th>
+                                        <th>Tiempo invertido </th>
+                                        <th class=" no-link last"><span class="nobr">Descripción</span>
+                                      </tr>
+                                    </thead>
+
+                                    <tbody>
+                                    {% for activity in activities %}
+                                      <tr class="even pointer">
+                                        <td class=" ">{{activity.at_tipe}}</td>
+                                        <td class=" ">{{activity.at_createdby}}</td>
+                                        <td class=" ">{{activity.at_date}}</td>
+                                        <td class=" ">{{activity.at_timeinverted}}</td>
+                                        <td class="last" style="width:10%"><div style="white-space: nowrap;text-overflow: ellipsis; width: 300px;display: block;overflow: hidden"> {{activity.at_description}}</div></td>
+                                      </tr>
+                                    {% endfor %}
+
+                                    <script> $( "td:odd" ).css( "class", "odd pointer" );</script>                      
+                                    </tbody>
+
+                                  </table>
+                      </div>
+                      <div role="tabpanel" class="tab-pane fade" id="tab_content2" aria-labelledby="profile-tab">
+                            <div class="col-sm-4 invoice-col">
+                              <h2> Padre: #{{ticketpk.t_mother.t_id}}</h2>
+                            </div>
+                            <div class="col-sm-4 invoice-col">
+                              <h2> Estado: {{ticketpk.t_mother.t_state}}</h2>
+                            </div>
+                            <div class="col-sm-4 invoice-col">
+                              <h2> Asignatario: {{ticketpk.t_mother.t_usersolver}}</h2>
+                            </div>
+                            <br>
+                            <div class="col-sm-4 invoice-col">
+                              <h2> Lista de hijos: </h2>
+                            </div>
+                            
+                                <table id="example" class="table table-striped responsive-utilities jambo_table">
+                                    <thead>
+                                      <tr class="headings">
+                                        <th>Nº </th>
+                                        <th>Fecha de la Solicitud </th>
+                                        <th>Categoria </th>
+                                        <th>Prioridad </th>
+                                        <th>Resumen </th>
+                                        <th>Estado </th>
+                                        <th>Departamento </th>
+                                        <th class=" no-link last"><span class="nobr">Asignatario</span>
+                                      </tr>
+                                    </thead>
+
+                                    <tbody>
+                                    {% for son in sons %}
+                                      <tr class="even pointer">
+                                        <td class=" "><a href="{% url 'TicketsApp.views.ticket' pk=son.pk %}">{{son.t_id}}</a></td>
+                                        <td class=" ">{{son.t_reportmadeon}}</td>
+                                        <td class=" ">{{son.t_category}}</td>
+                                        <td class=" ">{{son.t_priority}}</td>
+                                        <td class=" " style="width:10%"><div style="white-space: nowrap;text-overflow: ellipsis; width: 300px;display: block;overflow: hidden"> {{son.t_description}}</div></td>
+                                        <td class="a-right a-right ">{{son.t_state}}</td>
+                                        <td class="a-right a-right ">{{son.t_department}}</td>
+                                        <td class=" last">{{son.t_usersolver}}</td>
+                                      </tr>
+                                    {% endfor %}
+
+                                    <script> $( "td:odd" ).css( "class", "odd pointer" );</script>                      
+                                    </tbody>
+
+                                  </table>
+                     </div>
+                      <div role="tabpanel" class="tab-pane fade" id="tab_content3" aria-labelledby="profile-tab">
+                        <table id="example" class="table table-striped responsive-utilities jambo_table">
+                                    <thead>
+                                      <tr class="headings">
+                                        <th>Documento </th>
+                                        <th>Descripción </th>
+                                        <th>Adjunto el </th>
+                                        <th class=" no-link last"><span class="nobr">Usuario que adjunta</span>
+                                        </th>
+                                      </tr>
+                                    </thead>
+
+                                    <tbody>
+                                    {% for attached in attacheds %}
+                                      <tr class="even pointer">
+                                        <td class=" "><a href="{{ attached.a_route.url }}">{{attached.a_name}}</a></td>
+                                        <td class=" " style="width:10%"><div style="white-space: nowrap;text-overflow: ellipsis; width: 300px;display: block;overflow: hidden">{{attached.a_description}}</div></td>
+                                        <td class=" ">{{attached.a_dateattached}}</td>
+                                        <td class="last">{{attached.a_userattacher}}</td>
+                                      </tr>
+                                    {% endfor %}
+
+                                    <script> $( "td:odd" ).css( "class", "odd pointer" );</script>                      
+                                    </tbody>
+
+                                  </table>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+
     </div>
                     
 </div>

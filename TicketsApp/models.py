@@ -102,10 +102,11 @@ class UserProfile(models.Model):
 
 class Ticket(models.Model):
 	t_id = models.IntegerField(primary_key=True)
+	t_mother = models.ForeignKey('Ticket',related_name='t_mother_of',default=0,null=True,blank=True)
 	t_isincident = models.BooleanField()
 	t_useraffected = models.ForeignKey('auth.User',related_name='t_useraffected',default=0)
 	t_category = models.CharField(max_length=20)
-	t_description = models.CharField(max_length=200)
+	t_description = models.CharField(max_length=1000)
 	t_server =models.ForeignKey('Server')
 	t_service = models.ForeignKey('Service')
 	t_impact = models.IntegerField()
@@ -160,3 +161,38 @@ class Ticket(models.Model):
 		did = Department.get_did(depuser)
 		gsolicitudes = Ticket.objects.filter(t_isincident=True,t_department=did)
 		return gsolicitudes
+
+	def get_sons(Ticke):
+		sons = Ticket.objects.filter(t_mother=Ticke)
+		return sons
+
+class Archive(models.Model):
+	a_id = models.IntegerField(primary_key=True)
+	a_ticket = models.ForeignKey('Ticket',on_delete=models.CASCADE,default=0)
+	a_name = models.CharField(max_length=100)
+	a_route = models.FileField(upload_to ='items')
+	a_description = models.CharField(max_length=1000)
+	a_dateattached = models.DateTimeField()
+	a_userattacher = models.ForeignKey('auth.User',related_name='a_userattacher',default=0)
+
+	def __str__(self):
+		return self.a_name
+
+	def archives_of_a_ticket(Ticket):
+		archives = Archive.objects.filter(a_ticket=Ticket)
+		return archives
+
+
+class Activity(models.Model):
+	at_id = models.IntegerField(primary_key=True)
+	at_ticket = models.ForeignKey('Ticket', on_delete=models.CASCADE,default=0)
+	at_tipe = models.CharField(max_length=100)
+	at_createdby = models.ForeignKey('auth.User',related_name='at_createdby',default=0)
+	at_date = models.DateTimeField()
+	at_timeinverted = models.DateTimeField()
+	at_description = models.CharField(max_length=500)
+
+
+	def activities_of_a_ticket(Ticket):
+		activities = Activity.objects.filter(at_ticket=Ticket)
+		return activities
