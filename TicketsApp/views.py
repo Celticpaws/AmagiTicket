@@ -121,6 +121,7 @@ def incidentg(request):
 def ticket(request,pk):
     ticketpk = Ticket.objects.get(pk=pk)
     useraffected = UserProfile.get_UserProfile(ticketpk.t_useraffected)
-    return render(request,'TicketsApp/ticketid.html',{'ticketpk':ticketpk,'useraffected':useraffected})
+    usersolver = UserProfile.get_UserProfile(ticketpk.t_usersolver)
+    return render(request,'TicketsApp/ticketid.html',{'ticketpk':ticketpk,'useraffected':useraffected,'usersolver':usersolver})
 
 
