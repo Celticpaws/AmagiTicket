@@ -1,8 +1,11 @@
 from django.db import models
+from django.conf import settings
+from django.db.models import Count
 from django.utils import timezone
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.core.validators import RegexValidator
+import os
 
 # Create your models here.
 
@@ -15,7 +18,6 @@ class Company(models.Model):
 	c_id = models.IntegerField(unique=True,primary_key=True)
 	c_name = models.CharField(max_length=100)
 	c_owner = models.ForeignKey('auth.User',default=0)
-
 
 	def __str__(self):
 		return self.c_name
@@ -43,6 +45,12 @@ class Department(models.Model):
 	def get_did(str):
 		return Department.objects.get(d_name=str)
 
+	def from_user_get_depusers(User):
+		depuser = UserProfile.get_department(User)
+		did = Department.get_did(depuser)
+		users = UserProfile.objects.filter(u_department=did)
+		return users
+
 class Disk(models.Model):
 	dsk_id = models.IntegerField(primary_key=True)
 	dsk_name = models.CharField(max_length=20)
@@ -64,6 +72,10 @@ class Server(models.Model):
 	def __str__(self):
 		return self.srv_name
 
+	def server_count():
+		servers = Server.objects.all()
+		return servers.count()
+
 class Service(models.Model):
 	svc_id = models.IntegerField(primary_key=True)
 	svc_name = models.CharField(max_length=50)
@@ -72,6 +84,10 @@ class Service(models.Model):
 
 	def __str__(self):
 		return self.svc_name
+
+	def service_count():
+		servers = Service.objects.all()
+		return servers.count()
 
 
 class UserProfile(models.Model):
@@ -106,6 +122,7 @@ class Ticket(models.Model):
 	t_isincident = models.BooleanField()
 	t_useraffected = models.ForeignKey('auth.User',related_name='t_useraffected',default=0)
 	t_category = models.CharField(max_length=20)
+	t_title = models.CharField(max_length = 100)
 	t_description = models.CharField(max_length=1000)
 	t_server =models.ForeignKey('Server')
 	t_service = models.ForeignKey('Service')
@@ -166,11 +183,19 @@ class Ticket(models.Model):
 		sons = Ticket.objects.filter(t_mother=Ticke)
 		return sons
 
+	def count_types(User):
+		types = Ticket.objects.filter(t_usersolver=User).values('t_state').annotate(dcount=Count('t_state'))
+		arrayoftypes=[]
+		for t in types:
+			arrayoftypes+=[[t['t_state'],t['dcount'],'color:green']]
+		return arrayoftypes
+
+
 class Archive(models.Model):
 	a_id = models.IntegerField(primary_key=True)
 	a_ticket = models.ForeignKey('Ticket',on_delete=models.CASCADE,default=0)
 	a_name = models.CharField(max_length=100)
-	a_route = models.FileField(upload_to ='items')
+	a_route = models.FileField()
 	a_description = models.CharField(max_length=1000)
 	a_dateattached = models.DateTimeField()
 	a_userattacher = models.ForeignKey('auth.User',related_name='a_userattacher',default=0)
@@ -181,8 +206,7 @@ class Archive(models.Model):
 	def archives_of_a_ticket(Ticket):
 		archives = Archive.objects.filter(a_ticket=Ticket)
 		return archives
-
-
+	
 class Activity(models.Model):
 	at_id = models.IntegerField(primary_key=True)
 	at_ticket = models.ForeignKey('Ticket', on_delete=models.CASCADE,default=0)
@@ -194,5 +218,24 @@ class Activity(models.Model):
 
 
 	def activities_of_a_ticket(Ticket):
-		activities = Activity.objects.filter(at_ticket=Ticket)
+		activities = Activity.objects.filter(at_ticket=Ticket).order_by('-at_date')
 		return activities
+
+	def last_modified(Ticket):
+		activities = Activity.objects.filter(at_ticket=Ticket).order_by('-at_date')
+		if (activities.count() == 0):
+			activitylast='No hay una ultima modificación'
+		else:
+		    activitylast = activities[0].at_date
+		return activitylast
+
+	def date_of_event(Ticket,String):
+		activity = Activity.objects.filter(at_ticket=Ticket,at_tipe=String)
+		if (activity.count() == 0):
+			if (String == 'Resuelto'):
+				solved='No ha sido resuelto'
+			if (String == 'Cerrado'):
+				solved = 'No ha sido cerrado'
+		else:
+		    solved=activity[0].at_date
+		return solved

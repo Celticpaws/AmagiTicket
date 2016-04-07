@@ -1,4 +1,5 @@
 from django.conf.urls import include, url
+from django.conf import settings
 from . import views
 
 urlpatterns = [
@@ -12,6 +13,7 @@ urlpatterns = [
         url(r'^incidentp$', views.incidentp, name='incidentp'),
         url(r'^incidentg$', views.incidentg, name='incidentg'),
         url(r'^ticket/(?P<pk>[0-9]+)/$', views.ticket),
+        url(r'^ticket_edit/(?P<pk>[0-9]+)/$', views.ticket_edit),      
         url(r'^auth/$', views.auth, name='auth'),
         url(r'^management/logout/$', 'django.contrib.auth.views.logout'),
        # url(r'accounts/login', views.auth, name="auth"),

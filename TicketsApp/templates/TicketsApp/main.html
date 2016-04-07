@@ -26,6 +26,15 @@
   <link href="{%static "css/icheck/flat/green.css"%}" rel="stylesheet">
   <link href="{%static "css/floatexamples.css"%}" rel="stylesheet" />
 
+ <!-- editor -->
+  <link href="http://netdna.bootstrapcdn.com/font-awesome/3.0.2/css/font-awesome.css" rel="stylesheet">
+  <link href="css/editor/external/google-code-prettify/prettify.css" rel="stylesheet">
+  <link href="css/editor/index.css" rel="stylesheet">
+  <!-- select2 -->
+  <link href="css/select/select2.min.css" rel="stylesheet">
+  <!-- switchery -->
+  <link rel="stylesheet" href="css/switchery/switchery.min.css" />
+
   <script src="{%static "js/jquery.min.js"%}"></script>
  <!-- <script>
      var time = new Date().getTime();
@@ -135,11 +144,11 @@
                 <li><a><i class="fa fa-bar-chart-o"></i> Estado del Sistema <span class="fa fa-chevron-down"></span></a>
                   <ul class="nav child_menu" style="display: none">
                     <li><a href="chartjs.html">Servidores 
-                    <span class="label label-warning pull-right"> 1</span>
+                    <span class="label label-warning pull-right"> {{servers}}</span>
                     </a>
                     </li>
                     <li><a href="chartjs2.html">Servicios
-                    <span class="label label-danger pull-right"> 7</span>
+                    <span class="label label-danger pull-right">{{services}}</span>
                     </a>
                     </li>
                   </ul>

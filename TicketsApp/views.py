@@ -4,6 +4,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.core.urlresolvers import reverse
 from django.utils import timezone
 from .models import *
+from .forms import *
 import datetime
 
 
@@ -21,6 +22,9 @@ def index(request):
     gsolicitude = Ticket.group_solicitude_count(request.user)
     pincident = Ticket.personal_incident_count(request.user)
     gincident = Ticket.group_incident_count(request.user)
+    types = Ticket.count_types(request.user)
+    servers = Server.server_count()
+    services = Service.service_count()
     return render(request, 'TicketsApp/index.html', 
         {'userjob':userjob,
          'psolicitude':psolicitude,
@@ -29,6 +33,9 @@ def index(request):
          'gincident':gincident,
          'svalues': [[request.user, psolicitude], [userdepartment, gsolicitude-psolicitude]],
          'ivalues': [[request.user, pincident], [userdepartment, gincident-pincident]],
+         'bvalues': types,
+         'servers': servers,
+         'services' : services
          })
 
 def auth(request):
@@ -66,12 +73,16 @@ def solicitudp(request):
     pincident = Ticket.personal_incident_count(request.user)
     gincident = Ticket.group_incident_count(request.user)
     psolicitudes = Ticket.personal_solicitudes(request.user)
+    servers = Server.server_count()
+    services = Service.service_count()
     return render(request, 'TicketsApp/personal_solicitude.html', {'userjob':userjob,
          'psolicitude':psolicitude,
          'pincident':pincident,
          'gsolicitude':gsolicitude,
          'gincident':gincident,
          'psolicitudes':psolicitudes,
+         'servers':servers,
+         'services':services,
          })
 
 def solicitudg(request):
@@ -81,12 +92,16 @@ def solicitudg(request):
     pincident = Ticket.personal_incident_count(request.user)
     gincident = Ticket.group_incident_count(request.user)
     gsolicitudes = Ticket.group_solicitudes(request.user)
+    servers = Server.server_count()
+    services = Service.service_count()
     return render(request, 'TicketsApp/group_solicitude.html', {'userjob':userjob,
          'psolicitude':psolicitude,
          'pincident':pincident,
          'gsolicitude':gsolicitude,
          'gincident':gincident,
          'gsolicitudes':gsolicitudes,
+         'servers':servers,
+         'services':services,
          })
 
 def incidentp(request):
@@ -96,12 +111,16 @@ def incidentp(request):
     pincident = Ticket.personal_incident_count(request.user)
     gincident = Ticket.group_incident_count(request.user)
     pincidents = Ticket.personal_incidents(request.user)
+    servers = Server.server_count()
+    services = Service.service_count()
     return render(request, 'TicketsApp/personal_incidents.html', {'userjob':userjob,
          'psolicitude':psolicitude,
          'pincident':pincident,
          'gsolicitude':gsolicitude,
          'gincident':gincident,
          'pincidents':pincidents,
+         'servers':servers,
+         'services':services,
          })
 
 def incidentg(request):
@@ -111,12 +130,16 @@ def incidentg(request):
     pincident = Ticket.personal_incident_count(request.user)
     gincident = Ticket.group_incident_count(request.user)
     gincidents = Ticket.group_incidents(request.user)
+    servers = Server.server_count()
+    services = Service.service_count()
     return render(request, 'TicketsApp/group_incidents.html', {'userjob':userjob,
          'psolicitude':psolicitude,
          'pincident':pincident,
          'gsolicitude':gsolicitude,
          'gincident':gincident,
          'gincidents':gincidents,
+         'servers':servers,
+         'services':services,
          })
 
 def ticket(request,pk):
@@ -126,6 +149,8 @@ def ticket(request,pk):
     gsolicitude = Ticket.group_solicitude_count(request.user)
     pincident = Ticket.personal_incident_count(request.user)
     gincident = Ticket.group_incident_count(request.user)
+    servers = Server.server_count()
+    services = Service.service_count()
     ticketpk = Ticket.objects.get(pk=pk)
     useraffected = UserProfile.get_UserProfile(ticketpk.t_useraffected)
     usersolver = UserProfile.get_UserProfile(ticketpk.t_usersolver)
@@ -135,6 +160,9 @@ def ticket(request,pk):
     attacheds = Archive.archives_of_a_ticket(ticketpk)
     sons = Ticket.get_sons(ticketpk)
     activities = Activity.activities_of_a_ticket(ticketpk)
+    lastactivity = Activity.last_modified(ticketpk)
+    datesolved = Activity.date_of_event(ticketpk,'Resuelto')
+    dateclosed = Activity.date_of_event(ticketpk,'Cerrado')
     return render(request,'TicketsApp/ticketid.html',{
          'userjob':userjob,
          'psolicitude':psolicitude,
@@ -149,6 +177,61 @@ def ticket(request,pk):
         'slaminute':slaminute,
         'attacheds':attacheds,
         'sons':sons,
-        'activities':activities})
+        'activities':activities,
+        'lastactivity':lastactivity,
+        'datesolved':datesolved,
+        'dateclosed':dateclosed,
+        'servers':servers,
+        'services':services,})
+
+def ticket_edit(request,pk):
+    formTicket = EditTicketStateForm()
+    formActivity = AddingTicketActivityDescriptionForm()
+    userjob = UserProfile.get_jobtitle(request.user)
+    userdepartment = UserProfile.get_department(request.user)
+    psolicitude = Ticket.personal_solicitude_count(request.user)
+    gsolicitude = Ticket.group_solicitude_count(request.user)
+    pincident = Ticket.personal_incident_count(request.user)
+    gincident = Ticket.group_incident_count(request.user)
+    servers = Server.server_count()
+    services = Service.service_count()
+    ticketpk = Ticket.objects.get(pk=pk)
+    useraffected = UserProfile.get_UserProfile(ticketpk.t_useraffected)
+    usersolver = UserProfile.get_UserProfile(ticketpk.t_usersolver)
+    sla = ticketpk.t_sla-timezone.now()
+    slahour = sla.seconds//3600
+    slaminute = (sla.seconds //60)%60
+    attacheds = Archive.archives_of_a_ticket(ticketpk)
+    sons = Ticket.get_sons(ticketpk)
+    activities = Activity.activities_of_a_ticket(ticketpk)
+    lastactivity = Activity.last_modified(ticketpk)
+    datesolved = Activity.date_of_event(ticketpk,'Resuelto')
+    dateclosed = Activity.date_of_event(ticketpk,'Cerrado')
+    usersofdep = Department.from_user_get_depusers(request.user)
+    return render(request,'TicketsApp/ticketid_edit.html',{
+         'userjob':userjob,
+         'psolicitude':psolicitude,
+         'pincident':pincident,
+         'gsolicitude':gsolicitude,
+         'gincident':gincident,
+        'ticketpk':ticketpk,
+        'useraffected':useraffected,
+        'usersolver':usersolver,
+        'sla':sla,
+        'slahour':slahour,
+        'slaminute':slaminute,
+        'attacheds':attacheds,
+        'sons':sons,
+        'activities':activities,
+        'lastactivity':lastactivity,
+        'datesolved':datesolved,
+        'dateclosed':dateclosed,
+        'servers':servers,
+        'services':services,
+        'usersofdep':usersofdep,
+        'formTicket':formTicket,
+        'formActivity':formActivity})
+
+
 
 
