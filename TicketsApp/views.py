@@ -5,7 +5,7 @@ from django.core.urlresolvers import reverse
 from django.utils import timezone
 from .models import *
 from .forms import *
-import datetime
+from datetime import datetime
 
 
 # Create your views here.
@@ -185,8 +185,6 @@ def ticket(request,pk):
         'services':services,})
 
 def ticket_edit(request,pk):
-    formTicket = EditTicketStateForm()
-    formActivity = AddingTicketActivityDescriptionForm()
     userjob = UserProfile.get_jobtitle(request.user)
     userdepartment = UserProfile.get_department(request.user)
     psolicitude = Ticket.personal_solicitude_count(request.user)
@@ -196,7 +194,6 @@ def ticket_edit(request,pk):
     servers = Server.server_count()
     services = Service.service_count()
     ticketpk = Ticket.objects.get(pk=pk)
-    useraffected = UserProfile.get_UserProfile(ticketpk.t_useraffected)
     usersolver = UserProfile.get_UserProfile(ticketpk.t_usersolver)
     sla = ticketpk.t_sla-timezone.now()
     slahour = sla.seconds//3600
@@ -208,6 +205,39 @@ def ticket_edit(request,pk):
     datesolved = Activity.date_of_event(ticketpk,'Resuelto')
     dateclosed = Activity.date_of_event(ticketpk,'Cerrado')
     usersofdep = Department.from_user_get_depusers(request.user)
+    useraffected = UserProfile.get_UserProfile(ticketpk.t_useraffected)
+    if request.method =="POST":
+        formTicket = EditTicketStateForm(request.POST, instance = ticketpk)
+        newactivity = Activity.insert(ticketpk,
+            "Cambio de estado",
+            request.user,datetime.now(),
+            "El estado ha sido cambiado de "+ticketpk.t_state+" a "+request.POST.get('t_state'))
+        newactivity.save()
+        ticketpk = formTicket.save(commit=False)
+        ticketpk.usersolver=request.user
+        ticketpk.save()
+        return render(request,'TicketsApp/ticketid.html',{
+         'userjob':userjob,
+         'psolicitude':psolicitude,
+         'pincident':pincident,
+         'gsolicitude':gsolicitude,
+         'gincident':gincident,
+        'ticketpk':ticketpk,
+        'useraffected':useraffected,
+        'usersolver':usersolver,
+        'sla':sla,
+        'slahour':slahour,
+        'slaminute':slaminute,
+        'attacheds':attacheds,
+        'sons':sons,
+        'activities':activities,
+        'lastactivity':lastactivity,
+        'datesolved':datesolved,
+        'dateclosed':dateclosed,
+        'servers':servers,
+        'services':services,})
+    else:
+        formTicket = EditTicketStateForm(instance=ticketpk)
     return render(request,'TicketsApp/ticketid_edit.html',{
          'userjob':userjob,
          'psolicitude':psolicitude,
@@ -229,8 +259,88 @@ def ticket_edit(request,pk):
         'servers':servers,
         'services':services,
         'usersofdep':usersofdep,
-        'formTicket':formTicket,
-        'formActivity':formActivity})
+        'formTicket':formTicket,})
+
+
+def ticket_attach(request,pk):
+    userjob = UserProfile.get_jobtitle(request.user)
+    userdepartment = UserProfile.get_department(request.user)
+    psolicitude = Ticket.personal_solicitude_count(request.user)
+    gsolicitude = Ticket.group_solicitude_count(request.user)
+    pincident = Ticket.personal_incident_count(request.user)
+    gincident = Ticket.group_incident_count(request.user)
+    servers = Server.server_count()
+    services = Service.service_count()
+    ticketpk = Ticket.objects.get(pk=pk)
+    usersolver = UserProfile.get_UserProfile(ticketpk.t_usersolver)
+    sla = ticketpk.t_sla-timezone.now()
+    slahour = sla.seconds//3600
+    slaminute = (sla.seconds //60)%60
+    attacheds = Archive.archives_of_a_ticket(ticketpk)
+    sons = Ticket.get_sons(ticketpk)
+    activities = Activity.activities_of_a_ticket(ticketpk)
+    lastactivity = Activity.last_modified(ticketpk)
+    datesolved = Activity.date_of_event(ticketpk,'Resuelto')
+    dateclosed = Activity.date_of_event(ticketpk,'Cerrado')
+    usersofdep = Department.from_user_get_depusers(request.user)
+    useraffected = UserProfile.get_UserProfile(ticketpk.t_useraffected)
+    if request.method =="POST":
+        formArchive = AddArchiveForm(request.POST)
+        newactivity = Activity.insert(ticketpk,
+            "Archivo adjunto",
+            request.user,datetime.now(),
+            "Se ha adjuntado el archivo "+request.POST.get('a_name'))
+        if formArchive.is_valid():
+            formArchive.a_ticket=ticketpk
+            formArchive.a_dateattached = datetime.now()
+            formArchive.a_userattacher=request.user
+            formArchive.save()
+            newactivity.save()
+            return render(request,'TicketsApp/ticketid.html',{
+             'userjob':userjob,
+             'psolicitude':psolicitude,
+             'pincident':pincident,
+             'gsolicitude':gsolicitude,
+             'gincident':gincident,
+            'ticketpk':ticketpk,
+            'useraffected':useraffected,
+            'usersolver':usersolver,
+            'sla':sla,
+            'slahour':slahour,
+            'slaminute':slaminute,
+            'attacheds':attacheds,
+            'sons':sons,
+            'activities':activities,
+            'lastactivity':lastactivity,
+            'datesolved':datesolved,
+            'dateclosed':dateclosed,
+            'servers':servers,
+            'services':services,
+            'formArchive':formArchive,})
+    else:
+        formArchive = AddArchiveForm(instance=ticketpk)
+    return render(request,'TicketsApp/ticketid_attach.html',{
+         'userjob':userjob,
+         'psolicitude':psolicitude,
+         'pincident':pincident,
+         'gsolicitude':gsolicitude,
+         'gincident':gincident,
+        'ticketpk':ticketpk,
+        'useraffected':useraffected,
+        'usersolver':usersolver,
+        'sla':sla,
+        'slahour':slahour,
+        'slaminute':slaminute,
+        'attacheds':attacheds,
+        'sons':sons,
+        'activities':activities,
+        'lastactivity':lastactivity,
+        'datesolved':datesolved,
+        'dateclosed':dateclosed,
+        'servers':servers,
+        'services':services,
+        'usersofdep':usersofdep,
+        'formArchive':formArchive,})
 
 
 

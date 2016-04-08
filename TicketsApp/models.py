@@ -5,6 +5,7 @@ from django.utils import timezone
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.core.validators import RegexValidator
+from datetime import datetime
 import os
 
 # Create your models here.
@@ -207,13 +208,23 @@ class Archive(models.Model):
 		archives = Archive.objects.filter(a_ticket=Ticket)
 		return archives
 	
+	@classmethod
+	def insert(cls,ticket,name,description,date,userattacher):
+		archive = cls(
+			at_ticket=ticket,
+			at_name = name,
+			at_description=description,
+			at_dateattached=date,
+			at_userattacher=userattacher) 
+		return archive
+
 class Activity(models.Model):
 	at_id = models.IntegerField(primary_key=True)
 	at_ticket = models.ForeignKey('Ticket', on_delete=models.CASCADE,default=0)
 	at_tipe = models.CharField(max_length=100)
 	at_createdby = models.ForeignKey('auth.User',related_name='at_createdby',default=0)
 	at_date = models.DateTimeField()
-	at_timeinverted = models.DateTimeField()
+	at_timeinverted = models.DateTimeField(default=datetime.now())
 	at_description = models.CharField(max_length=500)
 
 
@@ -239,3 +250,14 @@ class Activity(models.Model):
 		else:
 		    solved=activity[0].at_date
 		return solved
+
+	@classmethod
+	def insert(cls,ticket,tipe,createdby,date,description):
+		activity = cls(
+			at_ticket=ticket,
+			at_tipe=tipe,
+			at_createdby=createdby,
+			at_date=date,
+			at_description=description) 
+		return activity
+
