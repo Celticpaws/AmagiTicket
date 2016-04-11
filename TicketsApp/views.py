@@ -285,38 +285,40 @@ def ticket_attach(request,pk):
     usersofdep = Department.from_user_get_depusers(request.user)
     useraffected = UserProfile.get_UserProfile(ticketpk.t_useraffected)
     if request.method =="POST":
-        formArchive = AddArchiveForm(request.POST)
+        formArchive = AddArchiveForm(request.POST,request.FILES)
         newactivity = Activity.insert(ticketpk,
             "Archivo adjunto",
             request.user,datetime.now(),
             "Se ha adjuntado el archivo "+request.POST.get('a_name'))
-        if formArchive.is_valid():
-            formArchive.a_ticket=ticketpk
-            formArchive.a_dateattached = datetime.now()
-            formArchive.a_userattacher=request.user
-            formArchive.save()
-            newactivity.save()
-            return render(request,'TicketsApp/ticketid.html',{
-             'userjob':userjob,
-             'psolicitude':psolicitude,
-             'pincident':pincident,
-             'gsolicitude':gsolicitude,
-             'gincident':gincident,
-            'ticketpk':ticketpk,
-            'useraffected':useraffected,
-            'usersolver':usersolver,
-            'sla':sla,
-            'slahour':slahour,
-            'slaminute':slaminute,
-            'attacheds':attacheds,
-            'sons':sons,
-            'activities':activities,
-            'lastactivity':lastactivity,
-            'datesolved':datesolved,
-            'dateclosed':dateclosed,
-            'servers':servers,
-            'services':services,
-            'formArchive':formArchive,})
+        archiveattached = Archive.insert(ticketpk,
+            request.POST.get('a_name'),
+            request.FILES['a_route'],
+            request.POST.get('a_description'),
+            datetime.now(),
+            request.user)
+        archiveattached.save()
+        newactivity.save()
+        return render(request,'TicketsApp/ticketid.html',{
+         'userjob':userjob,
+         'psolicitude':psolicitude,
+         'pincident':pincident,
+         'gsolicitude':gsolicitude,
+         'gincident':gincident,
+        'ticketpk':ticketpk,
+        'useraffected':useraffected,
+        'usersolver':usersolver,
+        'sla':sla,
+        'slahour':slahour,
+        'slaminute':slaminute,
+        'attacheds':attacheds,
+        'sons':sons,
+        'activities':activities,
+        'lastactivity':lastactivity,
+        'datesolved':datesolved,
+        'dateclosed':dateclosed,
+        'servers':servers,
+        'services':services,
+        'archiveattached':archiveattached,})
     else:
         formArchive = AddArchiveForm(instance=ticketpk)
     return render(request,'TicketsApp/ticketid_attach.html',{

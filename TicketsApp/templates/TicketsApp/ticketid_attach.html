@@ -52,7 +52,7 @@
                 </div>
                 <div class="x_content">
                   <br />
-                  <form method="post" class="post-form"  data-parsley-validate class="form-horizontal form-label-left">
+                  <form method="post" class="post-form" enctype="multipart/form-data" data-parsley-validate class="form-horizontal form-label-left">
                         {% csrf_token %}
                         <div class="fieldWrapper">
                           {{formArchive.as_p}}

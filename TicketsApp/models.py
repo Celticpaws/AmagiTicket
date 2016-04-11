@@ -209,13 +209,14 @@ class Archive(models.Model):
 		return archives
 	
 	@classmethod
-	def insert(cls,ticket,name,description,date,userattacher):
+	def insert(cls,ticket,name,route,description,date,userattacher):
 		archive = cls(
-			at_ticket=ticket,
-			at_name = name,
-			at_description=description,
-			at_dateattached=date,
-			at_userattacher=userattacher) 
+			a_ticket=ticket,
+			a_name = name,
+			a_route = route,
+			a_description=description,
+			a_dateattached=date,
+			a_userattacher=userattacher) 
 		return archive
 
 class Activity(models.Model):
