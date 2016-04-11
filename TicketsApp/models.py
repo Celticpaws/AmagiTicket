@@ -186,9 +186,11 @@ class Ticket(models.Model):
 
 	def count_types(User):
 		types = Ticket.objects.filter(t_usersolver=User).values('t_state').annotate(dcount=Count('t_state'))
+		order = ['Iniciado','Asignado','En Proceso','En Espera','Reabierto','Resuelto','Cerrado']
+		typesordered = sorted(types, key = lambda p: order.index(p['t_state']))
 		arrayoftypes=[]
-		for t in types:
-			arrayoftypes+=[[t['t_state'],t['dcount'],'color:green']]
+		for t in typesordered:
+			arrayoftypes+=[[t['t_state'],t['dcount']]]
 		return arrayoftypes
 
 
