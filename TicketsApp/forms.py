@@ -19,8 +19,6 @@ class EditTicketStateForm(forms.ModelForm):
             't_state': forms.Select(choices=CHOICES_STATE,attrs={'class':'form-control'}),
         }
 
-
-
 class AddArchiveForm(forms.ModelForm):
     class Meta:
         model = Archive
@@ -36,4 +34,15 @@ class AddArchiveForm(forms.ModelForm):
             'a_description': forms.Textarea(attrs={'class':'form-control'}),
             'a_route': forms.FileInput(attrs={'class':'btn btn-primary'}),
             
+        }
+
+class EditScaleForm(forms.ModelForm):
+    class Meta:
+        model = Ticket
+        fields = ('t_priority',)
+        labels = {
+            't_priority': (''),
+        }    
+        widgets = {
+            't_priority': forms.NumberInput(attrs={'class':'form-control'}),
         }

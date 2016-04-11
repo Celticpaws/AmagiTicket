@@ -76,12 +76,8 @@ def solicitudp(request):
     servers = Server.server_count()
     services = Service.service_count()
     return render(request, 'TicketsApp/personal_solicitude.html', {'userjob':userjob,
-         'psolicitude':psolicitude,
-         'pincident':pincident,
-         'gsolicitude':gsolicitude,
-         'gincident':gincident,
-         'psolicitudes':psolicitudes,
-         'servers':servers,
+         'psolicitude':psolicitude,         'pincident':pincident,         'gsolicitude':gsolicitude,
+         'gincident':gincident,         'psolicitudes':psolicitudes,         'servers':servers,
          'services':services,
          })
 
@@ -95,12 +91,8 @@ def solicitudg(request):
     servers = Server.server_count()
     services = Service.service_count()
     return render(request, 'TicketsApp/group_solicitude.html', {'userjob':userjob,
-         'psolicitude':psolicitude,
-         'pincident':pincident,
-         'gsolicitude':gsolicitude,
-         'gincident':gincident,
-         'gsolicitudes':gsolicitudes,
-         'servers':servers,
+         'psolicitude':psolicitude,         'pincident':pincident,         'gsolicitude':gsolicitude,
+         'gincident':gincident,         'gsolicitudes':gsolicitudes,         'servers':servers,
          'services':services,
          })
 
@@ -114,12 +106,8 @@ def incidentp(request):
     servers = Server.server_count()
     services = Service.service_count()
     return render(request, 'TicketsApp/personal_incidents.html', {'userjob':userjob,
-         'psolicitude':psolicitude,
-         'pincident':pincident,
-         'gsolicitude':gsolicitude,
-         'gincident':gincident,
-         'pincidents':pincidents,
-         'servers':servers,
+         'psolicitude':psolicitude,         'pincident':pincident,         'gsolicitude':gsolicitude,
+         'gincident':gincident,         'pincidents':pincidents,         'servers':servers,
          'services':services,
          })
 
@@ -133,12 +121,8 @@ def incidentg(request):
     servers = Server.server_count()
     services = Service.service_count()
     return render(request, 'TicketsApp/group_incidents.html', {'userjob':userjob,
-         'psolicitude':psolicitude,
-         'pincident':pincident,
-         'gsolicitude':gsolicitude,
-         'gincident':gincident,
-         'gincidents':gincidents,
-         'servers':servers,
+         'psolicitude':psolicitude,         'pincident':pincident,         'gsolicitude':gsolicitude,
+         'gincident':gincident,         'gincidents':gincidents,         'servers':servers,
          'services':services,
          })
 
@@ -164,24 +148,12 @@ def ticket(request,pk):
     datesolved = Activity.date_of_event(ticketpk,'Resuelto')
     dateclosed = Activity.date_of_event(ticketpk,'Cerrado')
     return render(request,'TicketsApp/ticketid.html',{
-         'userjob':userjob,
-         'psolicitude':psolicitude,
-         'pincident':pincident,
-         'gsolicitude':gsolicitude,
-         'gincident':gincident,
-        'ticketpk':ticketpk,
-        'useraffected':useraffected,
-        'usersolver':usersolver,
-        'sla':sla,
-        'slahour':slahour,
-        'slaminute':slaminute,
-        'attacheds':attacheds,
-        'sons':sons,
-        'activities':activities,
-        'lastactivity':lastactivity,
-        'datesolved':datesolved,
-        'dateclosed':dateclosed,
-        'servers':servers,
+         'userjob':userjob,         'psolicitude':psolicitude,         'pincident':pincident,
+         'gsolicitude':gsolicitude,         'gincident':gincident,        'ticketpk':ticketpk,
+        'useraffected':useraffected,        'usersolver':usersolver,        'sla':sla,
+        'slahour':slahour,        'slaminute':slaminute,        'attacheds':attacheds,
+        'sons':sons,        'activities':activities,        'lastactivity':lastactivity,
+        'datesolved':datesolved,        'dateclosed':dateclosed,        'servers':servers,
         'services':services,})
 
 def ticket_edit(request,pk):
@@ -217,49 +189,23 @@ def ticket_edit(request,pk):
         ticketpk.usersolver=request.user
         ticketpk.save()
         return render(request,'TicketsApp/ticketid.html',{
-         'userjob':userjob,
-         'psolicitude':psolicitude,
-         'pincident':pincident,
-         'gsolicitude':gsolicitude,
-         'gincident':gincident,
-        'ticketpk':ticketpk,
-        'useraffected':useraffected,
-        'usersolver':usersolver,
-        'sla':sla,
-        'slahour':slahour,
-        'slaminute':slaminute,
-        'attacheds':attacheds,
-        'sons':sons,
-        'activities':activities,
-        'lastactivity':lastactivity,
-        'datesolved':datesolved,
-        'dateclosed':dateclosed,
-        'servers':servers,
+        'userjob':userjob,         'psolicitude':psolicitude,         'pincident':pincident,
+        'gsolicitude':gsolicitude,         'gincident':gincident,        'ticketpk':ticketpk,
+        'useraffected':useraffected,        'usersolver':usersolver,        'sla':sla,
+        'slahour':slahour,        'slaminute':slaminute,        'attacheds':attacheds,
+        'sons':sons,        'activities':activities,        'lastactivity':lastactivity,
+        'datesolved':datesolved,        'dateclosed':dateclosed,        'servers':servers,   
         'services':services,})
     else:
         formTicket = EditTicketStateForm(instance=ticketpk)
     return render(request,'TicketsApp/ticketid_edit.html',{
-         'userjob':userjob,
-         'psolicitude':psolicitude,
-         'pincident':pincident,
-         'gsolicitude':gsolicitude,
-         'gincident':gincident,
-        'ticketpk':ticketpk,
-        'useraffected':useraffected,
-        'usersolver':usersolver,
-        'sla':sla,
-        'slahour':slahour,
-        'slaminute':slaminute,
-        'attacheds':attacheds,
-        'sons':sons,
-        'activities':activities,
-        'lastactivity':lastactivity,
-        'datesolved':datesolved,
-        'dateclosed':dateclosed,
-        'servers':servers,
-        'services':services,
-        'usersofdep':usersofdep,
-        'formTicket':formTicket,})
+        'userjob':userjob,         'psolicitude':psolicitude,         'pincident':pincident,
+        'gsolicitude':gsolicitude,         'gincident':gincident,        'ticketpk':ticketpk,
+        'useraffected':useraffected,        'usersolver':usersolver,        'sla':sla,
+        'slahour':slahour,        'slaminute':slaminute,        'attacheds':attacheds,    
+        'sons':sons,        'activities':activities,        'lastactivity':lastactivity,
+        'datesolved':datesolved,        'dateclosed':dateclosed,        'servers':servers, 
+        'services':services,        'usersofdep':usersofdep,        'formTicket':formTicket,})
 
 
 def ticket_attach(request,pk):
@@ -299,51 +245,73 @@ def ticket_attach(request,pk):
         archiveattached.save()
         newactivity.save()
         return render(request,'TicketsApp/ticketid.html',{
-         'userjob':userjob,
-         'psolicitude':psolicitude,
-         'pincident':pincident,
-         'gsolicitude':gsolicitude,
-         'gincident':gincident,
-        'ticketpk':ticketpk,
-        'useraffected':useraffected,
-        'usersolver':usersolver,
-        'sla':sla,
-        'slahour':slahour,
-        'slaminute':slaminute,
-        'attacheds':attacheds,
-        'sons':sons,
-        'activities':activities,
-        'lastactivity':lastactivity,
-        'datesolved':datesolved,
-        'dateclosed':dateclosed,
-        'servers':servers,
-        'services':services,
-        'archiveattached':archiveattached,})
+         'userjob':userjob,         'psolicitude':psolicitude,         'pincident':pincident,
+         'gsolicitude':gsolicitude,         'gincident':gincident,        'ticketpk':ticketpk,
+        'useraffected':useraffected,        'usersolver':usersolver,        'sla':sla,
+        'slahour':slahour,        'slaminute':slaminute,        'attacheds':attacheds,
+        'sons':sons,        'activities':activities,        'lastactivity':lastactivity,
+        'datesolved':datesolved,        'dateclosed':dateclosed,        'servers':servers,
+        'services':services,        'archiveattached':archiveattached,})
     else:
         formArchive = AddArchiveForm(instance=ticketpk)
     return render(request,'TicketsApp/ticketid_attach.html',{
-         'userjob':userjob,
-         'psolicitude':psolicitude,
-         'pincident':pincident,
-         'gsolicitude':gsolicitude,
-         'gincident':gincident,
-        'ticketpk':ticketpk,
-        'useraffected':useraffected,
-        'usersolver':usersolver,
-        'sla':sla,
-        'slahour':slahour,
-        'slaminute':slaminute,
-        'attacheds':attacheds,
-        'sons':sons,
-        'activities':activities,
-        'lastactivity':lastactivity,
-        'datesolved':datesolved,
-        'dateclosed':dateclosed,
-        'servers':servers,
-        'services':services,
-        'usersofdep':usersofdep,
-        'formArchive':formArchive,})
+         'userjob':userjob,         'psolicitude':psolicitude,         'pincident':pincident,
+         'gsolicitude':gsolicitude,         'gincident':gincident,        'ticketpk':ticketpk,
+        'useraffected':useraffected,        'usersolver':usersolver,        'sla':sla,
+        'slahour':slahour,        'slaminute':slaminute,        'attacheds':attacheds,
+        'sons':sons,        'activities':activities,        'lastactivity':lastactivity,
+        'datesolved':datesolved,        'dateclosed':dateclosed,        'servers':servers,
+        'services':services,        'usersofdep':usersofdep,        'formArchive':formArchive,})
 
 
+def ticket_scale(request,pk):
+    userjob = UserProfile.get_jobtitle(request.user)
+    userdepartment = UserProfile.get_department(request.user)
+    psolicitude = Ticket.personal_solicitude_count(request.user)
+    gsolicitude = Ticket.group_solicitude_count(request.user)
+    pincident = Ticket.personal_incident_count(request.user)
+    gincident = Ticket.group_incident_count(request.user)
+    servers = Server.server_count()
+    services = Service.service_count()
+    ticketpk = Ticket.objects.get(pk=pk)
+    usersolver = UserProfile.get_UserProfile(ticketpk.t_usersolver)
+    sla = ticketpk.t_sla-timezone.now()
+    slahour = sla.seconds//3600
+    slaminute = (sla.seconds //60)%60
+    attacheds = Archive.archives_of_a_ticket(ticketpk)
+    sons = Ticket.get_sons(ticketpk)
+    activities = Activity.activities_of_a_ticket(ticketpk)
+    lastactivity = Activity.last_modified(ticketpk)
+    datesolved = Activity.date_of_event(ticketpk,'Resuelto')
+    dateclosed = Activity.date_of_event(ticketpk,'Cerrado')
+    usersofdep = Department.from_user_get_depusers(request.user)
+    useraffected = UserProfile.get_UserProfile(ticketpk.t_useraffected)
+    if request.method =="POST":
+        formTicket = EditScaleForm(request.POST, instance = ticketpk)
+        newactivity = Activity.insert(ticketpk,
+            "Escalamiento",
+            request.user,datetime.now(),
+            "El ticket ha sido escalado de prioridad "+str(ticketpk.t_priority)+" a prioridad"+str(request.POST.get('t_priority')))
+        newactivity.save()
+        ticketpk = formTicket.save(commit=False)
+        ticketpk.save()
+        return render(request,'TicketsApp/ticketid.html',{
+        'userjob':userjob,         'psolicitude':psolicitude,         'pincident':pincident,
+        'gsolicitude':gsolicitude,         'gincident':gincident,        'ticketpk':ticketpk,
+        'useraffected':useraffected,        'usersolver':usersolver,        'sla':sla,
+        'slahour':slahour,        'slaminute':slaminute,        'attacheds':attacheds,
+        'sons':sons,        'activities':activities,        'lastactivity':lastactivity,
+        'datesolved':datesolved,        'dateclosed':dateclosed,        'servers':servers,   
+        'services':services,})
+    else:
+        formTicket = EditScaleForm(instance=ticketpk)
+    return render(request,'TicketsApp/ticketid_scale.html',{
+        'userjob':userjob,         'psolicitude':psolicitude,         'pincident':pincident,
+        'gsolicitude':gsolicitude,         'gincident':gincident,        'ticketpk':ticketpk,
+        'useraffected':useraffected,        'usersolver':usersolver,        'sla':sla,
+        'slahour':slahour,        'slaminute':slaminute,        'attacheds':attacheds,    
+        'sons':sons,        'activities':activities,        'lastactivity':lastactivity,
+        'datesolved':datesolved,        'dateclosed':dateclosed,        'servers':servers, 
+        'services':services,        'usersofdep':usersofdep,        'formTicket':formTicket,})
 
 
