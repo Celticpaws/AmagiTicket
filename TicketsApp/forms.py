@@ -9,7 +9,8 @@ class EditTicketStateForm(forms.ModelForm):
                          ('En Proceso','En Proceso'),
                          ('En Espera','En Espera'),
                          ('Resuelto','Resuelto'),
-                         ('Cerrado','Cerrado'))
+                         ('Cerrado','Cerrado'),
+                         ('Re-abierto','Re-abierto'))
         model = Ticket
         fields = ('t_state',)
         labels = {
