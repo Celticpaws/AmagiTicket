@@ -47,3 +47,48 @@ class EditScaleForm(forms.ModelForm):
         widgets = {
             't_priority': forms.NumberInput(attrs={'class':'form-control'}),
         }
+
+class TransferForm(forms.ModelForm):
+    class Meta:
+        model = Activity
+        fields = ('at_description',)
+        labels = {
+            'at_description': (''),
+        }    
+        widgets = {
+            'at_description': forms.Textarea(attrs={'class':'form-control'}),
+        }
+
+class CreateTicketForm(forms.ModelForm):
+    class Meta:
+        model = Ticket
+        fields = ('t_priority','t_mother','t_useraffected','t_category','t_title','t_description',
+            't_server','t_service','t_impact','t_priority','t_sla','t_department',)
+
+        labels = {
+            't_mother': ('Ticket Padre:'),
+            't_useraffected': ('Usuario afectado:'),
+            't_category': ('Categoria:'),
+            't_title': ('Titulo:'),
+            't_description': ('Descripción:'),
+            't_server': ('Servidor afectado:'),
+            't_service': ('Servicio afectado:'),
+            't_impact': ('Impacto:'),
+            't_priority': ('Prioridad:'),
+            't_sla': ('Tiempo de respuesta (SLA):'),
+            't_department': ('Departamento solucionador:'),
+        }    
+
+        widgets = {
+            't_mother': forms.Select(attrs={'class':'form-control'}),
+            't_useraffected': forms.Select(attrs={'class':'form-control'}),
+            't_category': forms.TextInput(attrs={'class':'form-control'}),
+            't_title': forms.TextInput(attrs={'class':'form-control'}),
+            't_description': forms.Textarea(attrs={'class':'form-control'}),
+            't_server': forms.Select(attrs={'class':'form-control'}),
+            't_service': forms.Select(attrs={'class':'form-control'}),
+            't_impact':  forms.NumberInput(attrs={'class':'form-control'}),
+            't_priority':  forms.NumberInput(attrs={'class':'form-control'}),
+            't_sla': forms.Select(attrs={'class':'form-control'}),
+            't_department': forms.Select(attrs={'class':'form-control'}),
+        }

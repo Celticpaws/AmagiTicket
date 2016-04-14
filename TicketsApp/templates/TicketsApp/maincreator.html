@@ -34,7 +34,6 @@
   <link href="css/select/select2.min.css" rel="stylesheet">
   <!-- switchery -->
   <link rel="stylesheet" href="css/switchery/switchery.min.css" />
-
   <script src="{%static "js/jquery.min.js"%}"></script>
  <!-- <script>
      var time = new Date().getTime();
@@ -77,7 +76,7 @@
         <div class="left_col scroll-view">
 
           <div class="navbar nav_title" style="border: 0;">
-            <a href="{% url 'TicketsApp.views.index' %}" class="site_title"><span><img src="{%static "img/Logo.png"%}" width="70%"></span></a>
+            <a href="{% url 'index' %}" class="site_title"><span><img src="{%static "img/Logo.png"%}" width="70%"></span></a>
           </div>
           <div class="clearfix"></div>
 
@@ -105,32 +104,38 @@
               <ul class="nav side-menu">
                 <li><a><i class="fa fa-home"></i> Home <span class="fa fa-chevron-down"></span></a>
                   <ul class="nav child_menu" style="display: none">
-                    <li><a href="{% url 'TicketsApp.views.index' %}">Dashboard </a>
+                    <li><a href="{% url 'index' %}">Dashboard </a>
                     </li>
                   </ul>
                 </li>
                 <li><a><i class="fa fa-edit"></i> Solicitudes <span class="fa fa-chevron-down"></span></a>
                   <ul class="nav child_menu" style="display: none">
-                    <li><a href="{% url 'solicitudps' %}">Solicitudes Personales
+                    <li><a href="{% url 'TicketsApp.views.ticket_create' %}">Crear una Solicitud
+                    </a>
+                    </li>
+                    <li><a href="{% url 'TicketsApp.views.solicitudp' %}">Mis solicitudes reportadas
                       <span class="label label-primary pull-right">{{psolicitude}} </span>
                     </a>
                     </li>
-                    <li><a href="{% url 'solicitudgs' %}">Solicitudes al Grupo
+                    <li><a href="{% url 'TicketsApp.views.solicitudg' %}">Solicitudes reportadas
                       <span class="label label-primary pull-right">{{gsolicitude}} </span>
                     </a>
-                    </li>
+                    </li>                    
                   </ul>
                 </li>
                 <li><a><i class="fa fa-exclamation-triangle"></i> Incidentes <span class="fa fa-chevron-down"></span></a>
                   <ul class="nav child_menu" style="display: none">
-                    <li><a href="{% url 'incidentps' %}">Incidentes Personales
-                      <span class="label label-danger pull-right">{{pincident}} </span>
+                    <li><a href="#">Crear un Incidente
                     </a>
                     </li>
-                    <li><a href="{% url 'incidentgs' %}">Incidentes al Grupo
-                        <span class="label label-danger pull-right">{{gincident}} </span>
+                    <li><a href="{% url 'TicketsApp.views.incidentp' %}">Mis incidentes reportados
+                      <span class="label label-danger pull-right">{{pincident}} </span>
                     </a>
-                    </li>                    
+                    </li> 
+                    <li><a href="{% url 'TicketsApp.views.incidentp' %}">Incidentes reportados
+                      <span class="label label-danger pull-right">{{gincident}} </span>
+                    </a>
+                    </li>                 
                   </ul>
                 </li>
                 <li><a><i class="fa fa-calendar"></i> Calendario <span class="fa fa-chevron-down"></span></a>

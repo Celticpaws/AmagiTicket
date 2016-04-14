@@ -5,7 +5,7 @@ from django.utils import timezone
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.core.validators import RegexValidator
-from datetime import datetime
+from datetime import datetime, timedelta
 import os
 
 # Create your models here.
@@ -100,13 +100,17 @@ class UserProfile(models.Model):
 	u_department = models.ForeignKey('Department',default=0)
 	u_management = models.ForeignKey('Management',default=0)
 	u_company = models.ForeignKey('Company',default=0)
+	u_cancreatetickets = models.BooleanField(default=False)
 
 	def __str__(self):
 		return self.u_secondname
 
 	def get_UserProfile(User):
-		up = UserProfile.objects.get(u_user=User)
-		return up
+		if User == None:
+			return None
+		else:
+			up = UserProfile.objects.get(u_user=User)
+			return up
 
 	def get_jobtitle(User):
 		up = UserProfile.objects.get(u_user=User)
@@ -116,11 +120,29 @@ class UserProfile(models.Model):
 		return (UserProfile.objects.get(u_user=User)).u_department
 
 
+class SLA(models.Model):
+	s_number = models.IntegerField()
+	s_measure = models.CharField(max_length=20)
+
+	def __str__(self):
+		return str(self.s_number)+" "+self.s_measure
+
+	def ToDeltaTime(self):
+		if (self.s_measure=="dias"):
+			return timedelta(days=self.s_number)
+		if (self.s_measure=="horas"):
+			return timedelta(hours=self.s_number)
+		if (self.s_measure=="minutos"):
+			return timedelta(minutes=self.s_number)
+		else:
+			return timedelta(seconds=self.s_number)
+		
+
 
 class Ticket(models.Model):
 	t_id = models.IntegerField(primary_key=True)
 	t_mother = models.ForeignKey('Ticket',related_name='t_mother_of',default=0,null=True,blank=True)
-	t_isincident = models.BooleanField()
+	t_isincident = models.BooleanField(default=False)
 	t_useraffected = models.ForeignKey('auth.User',related_name='t_useraffected',default=0)
 	t_category = models.CharField(max_length=20)
 	t_title = models.CharField(max_length = 100)
@@ -129,16 +151,16 @@ class Ticket(models.Model):
 	t_service = models.ForeignKey('Service')
 	t_impact = models.IntegerField()
 	t_priority = models.IntegerField()
-	t_sla = models.DateTimeField()
+	t_sla = models.ForeignKey('SLA',related_name='sla')
 	t_userreporter = models.ForeignKey('auth.User',related_name='t_userreporter',default=0)
-	t_reportmadeon = models.DateTimeField()
+	t_reportmadeon = models.DateTimeField(default=datetime.now())
 	t_department = models.ForeignKey('Department')
-	t_usersolver = models.ForeignKey('auth.User',related_name='t_usersolver',default=0)
+	t_usersolver = models.ForeignKey('auth.User',related_name='t_usersolver',default=0,null=True)
 	t_state = models.CharField(max_length=10)
-	t_issolved = models.BooleanField()
+	t_issolved = models.BooleanField(default=False)
 
 	def __str__(self):
-		return self.t_description
+		return '# '+str(self.t_id)
 
 	def personal_solicitude_count(User):
 		psolicitude = Ticket.objects.filter(t_isincident=False,t_usersolver=User)

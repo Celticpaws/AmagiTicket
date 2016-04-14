@@ -1,0 +1,153 @@
+{% extends 'TicketsApp/maincreator.html' %}
+
+    {% block title %} 
+    Dashboard
+    {% endblock %}
+
+{% block content %}
+
+  {% load googlecharts %}
+    {% googlecharts %}
+      {% data ivalues "out_data" %}
+        {% col "string" "Name" %}"{{ val }}"{% endcol %}
+        {% col "number" "Value" %}{{ val }}{% endcol %}
+      {% enddata %}
+      {% data svalues "out_data2" %}
+        {% col "string" "Name" %}"{{ val }}"{% endcol %}
+        {% col "number" "Value" %}{{ val }}{% endcol %}
+      {% enddata %}
+      {% data bvalues "out_data3" %}
+        {% col "string" "Name" %}"{{ val }}"{% endcol %}
+        {% col "number" "Cantidad" %}{{ val }}{% endcol %}
+      {% enddata %}
+      {% options "out_options" %}
+        kind: "PieChart",
+        options: {chartArea:{left:5,top:5,width:'100%',height:'100%'},
+                  colors: ['#1ABB9C','#73879C'],
+                  fontSize:15,
+                  legend:{position:'none'},
+                  pieHole:0.4,
+                  pieSliceTextStyle:{fontSize: 14},
+                }
+      {% endoptions %}
+      {% options "out_options1" %}
+        kind: "PieChart",
+        options: {chartArea:{left:5,top:5,width:'100%',height:'100%'},
+                  colors: ['#E74C3C','#A94442'],
+                  fontSize:15,
+                  legend:{position:'none'},
+                  pieHole:0.4,
+                  pieSliceTextStyle:{fontSize: 14},
+                }
+      {% endoptions %}
+      {% options "out_options2" %}
+        kind: "ColumnChart",
+        options: {chartArea:{left:5,top:5,width:'100%',height:'75%'},
+                  colors: [['#73879C'],['#FFFF00'],['#00FF00']],
+                  fontSize:12,
+                }
+      {% endoptions %}
+
+      {% graph "out" "out_data2" "out_options" %}
+      {% graph "out2" "out_data" "out_options1" %}
+      {% graph "out3" "out_data3" "out_options2" %}
+    {% endgooglecharts %}
+
+
+      <!-- page content -->
+      <div class="right_col" role="main">
+
+        <br />
+        <div class="">
+
+          <div class="row top_tiles">
+            <div class="animated flipInY col-lg-3 col-md-3 col-sm-6 col-xs-12">
+              <div class="tile-stats">
+                <div class="icon"><i class="fa fa-edit"></i>
+                </div>
+                <div class="count">{{gsolicitude}}</div>
+
+                <h3>Solicitudes </h3>
+                <p>Creadas</p>
+              </div>
+            </div>
+            <div class="animated flipInY col-lg-3 col-md-3 col-sm-6 col-xs-12">
+              <div class="tile-stats">
+                <div class="icon"><i class="fa fa-exclamation-triangle"></i>
+                </div>
+                <div class="count">{{gincident}}</div>
+
+                <h3>Incidentes</h3>
+                <p>Creados</p>
+              </div>
+            </div>
+            <div class="animated flipInY col-lg-3 col-md-3 col-sm-6 col-xs-12">
+              <div class="tile-stats">
+                <div class="icon"><i class="fa fa-envelope-o"></i>
+                </div>
+                <div class="count">179</div>
+
+                <h3>Mensajes</h3>
+                <p>Privados</p>
+              </div>
+            </div>
+            <div class="animated flipInY col-lg-3 col-md-3 col-sm-6 col-xs-12">
+              <div class="tile-stats">
+                <div class="icon"><i class="fa fa-check-square-o"></i>
+                </div>
+                <div class="count">179</div>
+
+                <h3>Tareas</h3>
+                <p>Pendientes</p>
+              </div>
+            </div>
+          </div>
+
+<div class="row top_tiles">
+  <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+    <div class ="tile-stats">
+      <p>Solicitudes grupales</p>
+            <div id="out"></div>
+            <div class="clearfix"></div>
+    </div>
+  </div>
+<div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+    <div class ="tile-stats">
+      <p>Incidentes grupales</p>
+            <div id="out2"></div>
+            <div class="clearfix"></div>
+    </div>
+  </div>
+<div class="col-lg-6 col-md-3 col-sm-6 col-xs-12">
+    <div class ="tile-stats">
+      <p>Tickets Personales</p>
+            <div id="out3"></div>
+            <div class="clearfix"></div>
+    </div>
+  </div>
+</div>
+
+
+<div class="row top_tiles">
+  <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+    
+  </div>
+</div>
+
+
+
+
+
+        <!-- footer content -->
+        <footer>
+          <div class="copyright-info">
+            <p class="pull-right">Carlos Farinha - Amagi</p>
+          </div>
+          <div class="clearfix"></div>
+        </footer>
+        <!-- /footer content -->
+
+      </div>
+      <!-- /page content -->
+
+{% endblock %}

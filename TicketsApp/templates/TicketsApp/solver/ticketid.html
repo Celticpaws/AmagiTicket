@@ -27,19 +27,19 @@
             </div>
           </div>
            <div class="x_content">
-                    <a href="{% url 'TicketsApp.views.ticket_edit' pk=ticketpk.pk %}" class="btn btn-default btn-dark">
+                    <a href="{% url 'TicketsApp.views.ticket_edits' pk=ticketpk.pk %}" class="btn btn-default btn-dark">
                                         <i class="fa fa-edit"></i> Actualizar estado
                     </a> 
                   
-                    <a href="{% url 'TicketsApp.views.ticket_attach' pk=ticketpk.pk %}" class="btn btn-default btn-dark">
+                    <a href="{% url 'TicketsApp.views.ticket_attachs' pk=ticketpk.pk %}" class="btn btn-default btn-dark">
                                         <i class="fa fa-paperclip"></i> Adjuntar documento
                     </a> 
                 
-                   <a href="{% url 'TicketsApp.views.ticket_scale' pk=ticketpk.pk %}" class="btn btn-default btn-dark">
+                   <a href="{% url 'TicketsApp.views.ticket_scales' pk=ticketpk.pk %}" class="btn btn-default btn-dark">
                                         <i class="fa fa-bar-chart"></i> Escalar
                    </a> 
                 
-                   <a class="btn btn-default btn-dark">
+                   <a href="{% url 'TicketsApp.views.ticket_transfers' pk=ticketpk.pk %}" class="btn btn-default btn-dark">
                                         <i class="fa fa-mail-reply"></i> Transferir Ticket
                    </a> 
                   
@@ -69,7 +69,7 @@
               </div>
               <!-- /.col -->
               <div class="col-sm-4 invoice-col">
-                <strong>Apertura: </strong> {{ticketpk.t_usersolver.get_full_name}}<br>
+                <strong>Apertura: </strong> {{dateopen}}<br>
                 <strong>Fecha de Cierre: </strong> {{dateclosed}}<br>
               </div>
               <!-- /.col -->
@@ -259,7 +259,7 @@
                                     <tbody>
                                     {% for son in sons %}
                                       <tr class="even pointer">
-                                        <td class=" "><a href="{% url 'TicketsApp.views.ticket' pk=son.pk %}">{{son.t_id}}</a></td>
+                                        <td class=" "><a href="{% url 'TicketsApp.views.tickets' pk=son.pk %}">{{son.t_id}}</a></td>
                                         <td class=" ">{{son.t_reportmadeon}}</td>
                                         <td class=" ">{{son.t_category}}</td>
                                         <td class=" ">{{son.t_priority}}</td>

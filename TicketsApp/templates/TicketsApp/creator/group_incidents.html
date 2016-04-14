@@ -1,4 +1,4 @@
-{% extends 'TicketsApp/main.html' %}
+{% extends 'TicketsApp/maincreator.html' %}
 
     {% block title %} 
     Solicitudes Grupales
@@ -12,7 +12,7 @@
           <div class="page-title">
             <div class="title_left">
               <h3>
-                    Incidentes personales
+                    Solicitudes grupales
                     
                 </h3>
             </div>
@@ -43,9 +43,7 @@
                   <table id="example" class="table table-striped responsive-utilities jambo_table">
                     <thead>
                       <tr class="headings">
-                        <th>
-                          <input type="checkbox" class="tableflat">
-                        </th>
+                        
                         <th>Nº </th>
                         <th>Fecha del Incidente </th>
                         <th>Categoria </th>
@@ -59,19 +57,17 @@
                     </thead>
 
                     <tbody>
-                    {% for pincident in pincidents %}
+                    {% for gincident in gincidents %}
                       <tr class="even pointer">
-                        <td class="a-center ">
-                        <input type="checkbox" class="tableflat">
-                        </td>
-                        <td class=" "><a href="{% url 'TicketsApp.views.ticket' pk=pincident.pk %}">{{pincident.t_id}}</a></td>
-                        <td class=" ">{{pincident.t_reportmadeon}}</td>
-                        <td class=" ">{{pincident.t_category}}</td>
-                        <td class=" ">{{pincident.t_priority}}</td>
-                        <td class=" " style="width:10%"><div style="white-space: nowrap;text-overflow: ellipsis; width: 300px;display: block;overflow: hidden"> {{pincident.t_description}}</div></td>
-                        <td class="a-right a-right ">{{pincident.t_state}}</td>
-                        <td class="a-right a-right ">{{pincident.t_department}}</td>
-                        <td class=" last">{{pincident.t_usersolver}}</td>
+                       
+                        <td class=" "><a href="{% url 'TicketsApp.views.ticket' pk=gincident.pk %}">{{gincident.t_id}}</a></td>
+                        <td class=" ">{{gincident.t_reportmadeon}}</td>
+                        <td class=" ">{{gincident.t_category}}</td>
+                        <td class=" ">{{gincident.t_priority}}</td>
+                        <td class=" " style="width:10%"><div style="white-space: nowrap;text-overflow: ellipsis; width: 300px;display: block;overflow: hidden"> {{gincident.t_description}}</div></td>
+                        <td class="a-right a-right ">{{gincident.t_state}}</td>
+                        <td class="a-right a-right ">{{gincident.t_department}}</td>
+                        <td class=" last">{{gincident.t_usersolver}}</td>
                       </tr>
                     {% endfor %}
 

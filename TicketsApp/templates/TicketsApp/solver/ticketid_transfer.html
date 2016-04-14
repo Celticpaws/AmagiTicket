@@ -79,9 +79,9 @@
 
               <div class="x_panel">
                 <div class="x_title">
-                  <h2>Actualizar Estado</h2>
+                  <h2>Transferir Ticket</h2>
                   <ul class="nav navbar-right panel_toolbox">
-                    <li><a href="{% url 'TicketsApp.views.ticket' pk=ticketpk.pk %}" class="close-link"><i class="fa fa-close"></i></a>
+                    <li><a href="{% url 'TicketsApp.views.tickets' pk=ticketpk.pk %}" class="close-link"><i class="fa fa-close"></i></a>
                     </li>
                   </ul>
                   <div class="clearfix"></div>
@@ -93,13 +93,13 @@
                         <div class="fieldWrapper">
                           <div class="form-group">
                           <label for="t_state" class="control-label col-md-3 col-sm-3 col-xs-12"> 
-                            <h2>Nuevo estado:</h2> 
+                            <h2>Razon de la transferencia:</h2> 
                           </label>
                           {{formTicket.as_p}}
                       </div>
                     </div>
                     <div class="col-md-6 col-sm-6 col-xs-12 col-md-offset-10">
-                      <a href="{% url 'TicketsApp.views.ticket' pk=ticketpk.pk %}" class="btn btn-danger">Cancel</button>
+                      <a href="{% url 'TicketsApp.views.tickets' pk=ticketpk.pk %}" class="btn btn-danger">Cancel</button>
                       </a>
                         <button type="submit" class="btn btn-success">Aceptar</button>
                       </form>
