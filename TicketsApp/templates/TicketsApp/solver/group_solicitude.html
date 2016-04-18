@@ -60,7 +60,7 @@
                     {% for gsol in gsolicitudes %}
                       <tr class="even pointer">
                         
-                        <td class=" "><a href="{% url 'TicketsApp.views.tickets' pk=gsol.pk %}">{{gsol.t_id}}</a></td>
+                        <td class=" "><a href="{% url 'TicketsApp.views.ticket' pk=gsol.pk %}">{{gsol.t_id}}</a></td>
                         <td class=" ">{{gsol.t_reportmadeon}}</td>
                         <td class=" ">{{gsol.t_category}}</td>
                         <td class=" ">{{gsol.t_priority}}</td>

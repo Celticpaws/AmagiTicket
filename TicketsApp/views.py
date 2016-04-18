@@ -181,7 +181,7 @@ def ticket(request,pk):
     ticketpk = Ticket.objects.get(pk=pk)
     useraffected = UserProfile.get_UserProfile(ticketpk.t_useraffected)
     usersolver = UserProfile.get_UserProfile(ticketpk.t_usersolver)
-    sla = ticketpk.t_sla-timezone.now()
+    sla = (ticketpk.t_reportmadeon-timezone.now())+ticketpk.t_sla.ToDeltaTime()
     slahour = sla.seconds//3600
     slaminute = (sla.seconds //60)%60
     attacheds = Archive.archives_of_a_ticket(ticketpk)
@@ -227,11 +227,10 @@ def ticket_create(request):
         ticketpk.t_state = "Iniciado"
         ticketpk.isincident = False
         ticketpk.t_reportmadeon = datetime.now()
+        ticketpk.t_usersolver = None
         ticketpk.save()
         usersolver = UserProfile.get_UserProfile(request.user)
-        sla = ticketpk.t_reportmadeon-timezone.now() +ticketpk.t_sla.ToDeltaTime()
-        slahour = sla.seconds//3600
-        slaminute = (sla.seconds //60)%60
+        
         attacheds = Archive.archives_of_a_ticket(ticketpk)
         sons = Ticket.get_sons(ticketpk)
         activities = Activity.activities_of_a_ticket(ticketpk)
@@ -240,14 +239,7 @@ def ticket_create(request):
         dateclosed = Activity.date_of_event(ticketpk,'Cerrado')
         useraffected = UserProfile.get_UserProfile(ticketpk.t_useraffected)
 
-        return render(request,'TicketsApp/creator/ticketid.html',{
-        'userjob':userjob,         'psolicitude':psolicitude,         'pincident':pincident,
-        'gsolicitude':gsolicitude,         'gincident':gincident,        'ticketpk':ticketpk,
-        'useraffected':useraffected,        'usersolver':usersolver,        'sla':sla,
-        'slahour':slahour,        'slaminute':slaminute,        'attacheds':attacheds,
-        'sons':sons,        'activities':activities,        'lastactivity':lastactivity,
-        'datesolved':datesolved,        'dateclosed':dateclosed,        'servers':servers,   
-        'services':services,})
+        return redirect(reverse('index'))
     else:
         formTicket = CreateTicketForm()
         return render(request,'TicketsApp/creator/ticketid_create.html',{
@@ -269,7 +261,7 @@ def ticket_edit(request,pk):
     services = Service.service_count()
     ticketpk = Ticket.objects.get(pk=pk)
     usersolver = UserProfile.get_UserProfile(ticketpk.t_usersolver)
-    sla = ticketpk.t_sla-timezone.now()
+    sla = (ticketpk.t_reportmadeon-timezone.now())+ticketpk.t_sla.ToDeltaTime()
     slahour = sla.seconds//3600
     slaminute = (sla.seconds //60)%60
     attacheds = Archive.archives_of_a_ticket(ticketpk)
@@ -350,7 +342,7 @@ def ticket_attach(request,pk):
     services = Service.service_count()
     ticketpk = Ticket.objects.get(pk=pk)
     usersolver = UserProfile.get_UserProfile(ticketpk.t_usersolver)
-    sla = ticketpk.t_sla-timezone.now()
+    sla = (ticketpk.t_reportmadeon-timezone.now())+ticketpk.t_sla.ToDeltaTime()
     slahour = sla.seconds//3600
     slaminute = (sla.seconds //60)%60
     attacheds = Archive.archives_of_a_ticket(ticketpk)
@@ -439,7 +431,7 @@ def ticket_scale(request,pk):
     services = Service.service_count()
     ticketpk = Ticket.objects.get(pk=pk)
     usersolver = UserProfile.get_UserProfile(ticketpk.t_usersolver)
-    sla = ticketpk.t_sla-timezone.now()
+    sla = (ticketpk.t_reportmadeon-timezone.now())+ticketpk.t_sla.ToDeltaTime()
     slahour = sla.seconds//3600
     slaminute = (sla.seconds //60)%60
     attacheds = Archive.archives_of_a_ticket(ticketpk)
@@ -518,7 +510,7 @@ def ticket_transfer(request,pk):
     services = Service.service_count()
     ticketpk = Ticket.objects.get(pk=pk)
     usersolver = UserProfile.get_UserProfile(ticketpk.t_usersolver)
-    sla = ticketpk.t_sla-timezone.now()
+    sla = (ticketpk.t_reportmadeon-timezone.now())+ticketpk.t_sla.ToDeltaTime()
     slahour = sla.seconds//3600
     slaminute = (sla.seconds //60)%60
     attacheds = Archive.archives_of_a_ticket(ticketpk)
@@ -588,5 +580,56 @@ def ticket_transfer(request,pk):
             'datesolved':datesolved,        'dateclosed':dateclosed,        'servers':servers, 
             'services':services,        'usersofdep':usersofdep,        'formTicket':formTicket,})
 
-
-
+def ticket_assign(request,pk):
+    userjob = UserProfile.get_jobtitle(request.user)
+    userdepartment = UserProfile.get_department(request.user)
+    psolicitude = Ticket.personal_solicitude_count(request.user)
+    gsolicitude = Ticket.group_solicitude_count(request.user)
+    pincident = Ticket.personal_incident_count(request.user)
+    gincident = Ticket.group_incident_count(request.user)
+    servers = Server.server_count()
+    services = Service.service_count()
+    ticketpk = Ticket.objects.get(pk=pk)
+    usersolver = UserProfile.get_UserProfile(ticketpk.t_usersolver)
+    sla = (ticketpk.t_reportmadeon-timezone.now())+ticketpk.t_sla.ToDeltaTime()
+    slahour = sla.seconds//3600
+    slaminute = (sla.seconds //60)%60
+    attacheds = Archive.archives_of_a_ticket(ticketpk)
+    sons = Ticket.get_sons(ticketpk)
+    activities = Activity.activities_of_a_ticket(ticketpk)
+    lastactivity = Activity.last_modified(ticketpk)
+    datesolved = Activity.date_of_event(ticketpk,'Resuelto')
+    dateclosed = Activity.date_of_event(ticketpk,'Cerrado')
+    usersofdep = Department.from_user_get_depusers(request.user)
+    useraffected = UserProfile.get_UserProfile(ticketpk.t_useraffected)
+    if request.method =="POST":
+        formActivity = AsignateSolverTicketForm(request.POST, instance = ticketpk)
+        formActivity.fields['t_usersolver'].queryset = UserProfile.get_users_hierarchy(request.user)
+        newactivity = Activity.insert(ticketpk,
+            "Asignado",
+            request.user,datetime.now(),
+            "El ticket ha sido asignado de "+ticketpk.t_usersolver.get_full_name()+" a "+str(request.POST.get('t_usersolver')) +" \n")
+        newactivity.save()
+        ticketpk.t_usersolver = request.POST.get('t_usersolver')
+        ticketpk.t_department = UserProfile.get_department(request.POST.get('t_usersolver'))
+        ticketpk.t_state = "Asignado"
+        ticketpk.save()
+        return render(request,'TicketsApp/creator/ticketid.html',{
+        'userjob':userjob,         'psolicitude':psolicitude,         'pincident':pincident,
+        'gsolicitude':gsolicitude,         'gincident':gincident,        'ticketpk':ticketpk,
+        'useraffected':useraffected,        'usersolver':usersolver,        'sla':sla,
+        'slahour':slahour,        'slaminute':slaminute,        'attacheds':attacheds,
+        'sons':sons,        'activities':activities,        'lastactivity':lastactivity,
+        'datesolved':datesolved,        'dateclosed':dateclosed,        'servers':servers,   
+        'services':services,})
+    else:
+        formTicket = AsignateSolverTicketForm(instance=ticketpk)
+        formTicket.fields['t_usersolver'].queryset = UserProfile.get_users_hierarchy(request.user)
+    return render(request,'TicketsApp/solver/ticketid_assign.html',{
+        'userjob':userjob,         'psolicitude':psolicitude,         'pincident':pincident,
+        'gsolicitude':gsolicitude,         'gincident':gincident,        'ticketpk':ticketpk,
+        'useraffected':useraffected,        'usersolver':usersolver,        'sla':sla,
+        'slahour':slahour,        'slaminute':slaminute,        'attacheds':attacheds,    
+        'sons':sons,        'activities':activities,        'lastactivity':lastactivity,
+        'datesolved':datesolved,        'dateclosed':dateclosed,        'servers':servers, 
+        'services':services,        'usersofdep':usersofdep,        'formTicket':formTicket,})

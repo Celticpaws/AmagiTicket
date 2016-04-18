@@ -59,7 +59,7 @@
                     <tbody>
                     {% for pincident in pincidents %}
                       <tr class="even pointer">
-                        <td class=" "><a href="{% url 'TicketsApp.views.tickets' pk=pincident.pk %}">{{pincident.t_id}}</a></td>
+                        <td class=" "><a href="{% url 'TicketsApp.views.ticket' pk=pincident.pk %}">{{pincident.t_id}}</a></td>
                         <td class=" ">{{pincident.t_reportmadeon}}</td>
                         <td class=" ">{{pincident.t_category}}</td>
                         <td class=" ">{{pincident.t_priority}}</td>

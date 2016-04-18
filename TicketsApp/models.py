@@ -33,6 +33,18 @@ class Management(models.Model):
 	def __str__(self):
 		return self.m_name
 
+	def get_man(str):
+		return Management.objects.get(m_name=str)
+
+	def from_user_get_manusers(User):
+		manuser = UserProfile.get_management(User)
+		man = Management.get_man(manuser)
+		users = UserProfile.objects.filter(u_management=man)
+		return users
+
+	def leader_of_management(self):
+		return self.m_manager
+
 
 class Department(models.Model):
 	d_id = models.IntegerField(unique=True)
@@ -51,6 +63,9 @@ class Department(models.Model):
 		did = Department.get_did(depuser)
 		users = UserProfile.objects.filter(u_department=did)
 		return users
+
+	def leader_of_department(self):
+		return self.d_manager
 
 class Disk(models.Model):
 	dsk_id = models.IntegerField(primary_key=True)
@@ -103,7 +118,7 @@ class UserProfile(models.Model):
 	u_cancreatetickets = models.BooleanField(default=False)
 
 	def __str__(self):
-		return self.u_secondname
+		return self.u_user.get_full_name()
 
 	def get_UserProfile(User):
 		if User == None:
@@ -112,12 +127,23 @@ class UserProfile(models.Model):
 			up = UserProfile.objects.get(u_user=User)
 			return up
 
+	def get_User(self):
+		return self.u_user
+
 	def get_jobtitle(User):
 		up = UserProfile.objects.get(u_user=User)
 		return up.u_jobtitle
 
 	def get_department(User):
 		return (UserProfile.objects.get(u_user=User)).u_department
+
+	def get_users_hierarchy(User):
+		if (User == (UserProfile.get_UserProfile(User)).u_department.leader_of_department()):
+			return  (Department.from_user_get_depusers(User)).distinct('u_user')
+		if (User == (UserProfile.get_UserProfile(User)).u_management.leader_of_management()):
+			return User.objects.filter(username=((Management.from_user_get_manusers(User)).get_User).username)
+		else:
+			return User
 
 
 class SLA(models.Model):
@@ -128,11 +154,11 @@ class SLA(models.Model):
 		return str(self.s_number)+" "+self.s_measure
 
 	def ToDeltaTime(self):
-		if (self.s_measure=="dias"):
+		if (self.s_measure=="dias" or self.s_measure=="dia"):
 			return timedelta(days=self.s_number)
-		if (self.s_measure=="horas"):
+		if (self.s_measure=="horas" or self.s_measure=="hora"):
 			return timedelta(hours=self.s_number)
-		if (self.s_measure=="minutos"):
+		if (self.s_measure=="minutos" or self.s_measure=="minuto"):
 			return timedelta(minutes=self.s_number)
 		else:
 			return timedelta(seconds=self.s_number)

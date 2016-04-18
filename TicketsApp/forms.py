@@ -29,7 +29,6 @@ class AddArchiveForm(forms.ModelForm):
             'a_route': ('Ruta del documento'),
             'a_description': ('Descripción del documento a adjuntar'),
         }   
-  
         widgets = {
             'a_name': forms.TextInput(attrs={'class':'form-control'}),
             'a_description': forms.Textarea(attrs={'class':'form-control'}),
@@ -92,3 +91,10 @@ class CreateTicketForm(forms.ModelForm):
             't_sla': forms.Select(attrs={'class':'form-control'}),
             't_department': forms.Select(attrs={'class':'form-control'}),
         }
+
+class AsignateSolverTicketForm(forms.ModelForm):
+    class Meta:
+        model = Ticket
+        fields =('t_usersolver',)
+        label = {'t_usersolver':('Usuario Solucionador')}
+        widgets = {'t_usersolver':forms.Select(attrs={'class':'form-control'})}

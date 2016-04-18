@@ -60,7 +60,7 @@
                     {% for psolicitud in psolicitudes %}
                       <tr class="even pointer">
                         
-                        <td class=" "><a href="{% url 'TicketsApp.views.tickets' pk=psolicitud.pk %}">{{psolicitud.t_id}}</a></td>
+                        <td class=" "><a href="{% url 'TicketsApp.views.ticket' pk=psolicitud.pk %}">{{psolicitud.t_id}}</a></td>
                         <td class=" ">{{psolicitud.t_reportmadeon}}</td>
                         <td class=" ">{{psolicitud.t_category}}</td>
                         <td class=" ">{{psolicitud.t_priority}}</td>

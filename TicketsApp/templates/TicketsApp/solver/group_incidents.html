@@ -60,7 +60,7 @@
                     {% for gincident in gincidents %}
                       <tr class="even pointer">
                        
-                        <td class=" "><a href="{% url 'TicketsApp.views.tickets' pk=gincident.pk %}">{{gincident.t_id}}</a></td>
+                        <td class=" "><a href="{% url 'TicketsApp.views.ticket' pk=gincident.pk %}">{{gincident.t_id}}</a></td>
                         <td class=" ">{{gincident.t_reportmadeon}}</td>
                         <td class=" ">{{gincident.t_category}}</td>
                         <td class=" ">{{gincident.t_priority}}</td>
