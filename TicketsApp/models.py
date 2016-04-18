@@ -107,7 +107,7 @@ class Service(models.Model):
 
 
 class UserProfile(models.Model):
-	u_user = models.OneToOneField('auth.User', on_delete=models.CASCADE, primary_key=True,default=0)
+	u_user = models.OneToOneField('auth.User', on_delete=models.CASCADE, primary_key=True,default=0,related_name="profile")
 	u_secondname = models.CharField(max_length=30)
 	u_secondlastname = models.CharField(max_length=30)
 	u_phone = models.ForeignKey('Phone')
@@ -137,11 +137,13 @@ class UserProfile(models.Model):
 	def get_department(User):
 		return (UserProfile.objects.get(u_user=User)).u_department
 
-	def get_users_hierarchy(User):
-		if (User == (UserProfile.get_UserProfile(User)).u_department.leader_of_department()):
-			return  (Department.from_user_get_depusers(User)).distinct('u_user')
-		if (User == (UserProfile.get_UserProfile(User)).u_management.leader_of_management()):
-			return User.objects.filter(username=((Management.from_user_get_manusers(User)).get_User).username)
+	def get_users_hierarchy(self):
+		did = self.u_department
+		man = self.u_management
+		if (self == did.leader_of_department().profile):
+			return  User.objects.filter(profile__u_department=did)
+		if (self == man.leader_of_management().profile):
+			return User.objects.filter(profile__u_management=man)
 		else:
 			return User
 
