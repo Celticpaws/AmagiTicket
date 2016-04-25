@@ -34,7 +34,6 @@
   <link href="css/select/select2.min.css" rel="stylesheet">
   <!-- switchery -->
   <link rel="stylesheet" href="css/switchery/switchery.min.css" />
-
   <script src="{%static "js/jquery.min.js"%}"></script>
  <!-- <script>
      var time = new Date().getTime();
@@ -77,7 +76,7 @@
         <div class="left_col scroll-view">
 
           <div class="navbar nav_title" style="border: 0;">
-            <a href="{% url 'TicketsApp.views.index' %}" class="site_title"><span><img src="{%static "img/Logo.png"%}" width="70%"></span></a>
+            <a href="{% url 'index' %}" class="site_title"><span><img src="{%static "img/Logo.png"%}" width="70%"></span></a>
           </div>
           <div class="clearfix"></div>
 
@@ -105,34 +104,51 @@
               <ul class="nav side-menu">
                 <li><a><i class="fa fa-home"></i> Home <span class="fa fa-chevron-down"></span></a>
                   <ul class="nav child_menu" style="display: none">
-                    <li><a href="{% url 'TicketsApp.views.index' %}">Dashboard </a>
+                    <li><a href="{% url 'index' %}">Dashboard </a>
                     </li>
                   </ul>
                 </li>
                 <li><a><i class="fa fa-edit"></i> Solicitudes <span class="fa fa-chevron-down"></span></a>
                   <ul class="nav child_menu" style="display: none">
-                    <li><a href="{% url 'solicitudp' %}">Solicitudes Personales
+                    <li><a href="{% url 'TicketsApp.views.ticket_create' %}">Crear una Solicitud
+                    </a>
+                    </li>
+                    <li><a href="{% url 'TicketsApp.views.solicitudp' %}">Mis solicitudes reportadas
                       <span class="label label-primary pull-right">{{psolicitude}} </span>
                     </a>
                     </li>
-                    <li><a href="{% url 'solicitudg' %}">Solicitudes al Grupo
+                    <li><a href="{% url 'TicketsApp.views.solicitudg' %}">Solicitudes reportadas
                       <span class="label label-primary pull-right">{{gsolicitude}} </span>
-                    </a>
-                    </li>
-                  </ul>
-                </li>
-                <li><a><i class="fa fa-exclamation-triangle"></i> Incidentes <span class="fa fa-chevron-down"></span></a>
-                  <ul class="nav child_menu" style="display: none">
-                    <li><a href="{% url 'incidentp' %}">Incidentes Personales
-                      <span class="label label-danger pull-right">{{pincident}} </span>
-                    </a>
-                    </li>
-                    <li><a href="{% url 'incidentg' %}">Incidentes al Grupo
-                        <span class="label label-danger pull-right">{{gincident}} </span>
                     </a>
                     </li>                    
                   </ul>
                 </li>
+                <li><a><i class="fa fa-exclamation-triangle"></i> Incidentes <span class="fa fa-chevron-down"></span></a>
+                  <ul class="nav child_menu" style="display: none">
+                    <li><a href="#">Crear un Incidente
+                    </a>
+                    </li>
+                    <li><a href="{% url 'TicketsApp.views.incidentp' %}">Mis incidentes reportados
+                      <span class="label label-danger pull-right">{{pincident}} </span>
+                    </a>
+                    </li> 
+                    <li><a href="{% url 'TicketsApp.views.incidentg' %}">Incidentes reportados
+                      <span class="label label-danger pull-right">{{gincident}} </span>
+                    </a>
+                    </li>                 
+                  </ul>
+                </li>
+                <li><a><i class="fa fa-bar-chart-o"></i> Estadisticas <span class="fa fa-chevron-down"></span></a>
+                  <ul class="nav child_menu" style="display: none">
+                    <li><a href="{% url 'users' %}">Equipo</a>
+                    </li>
+                    <li><a href="tables_dynamic.html">Departamento</a>
+                    </li>
+                  </ul>
+                </li>
+                
+
+
                 <li><a><i class="fa fa-calendar"></i> Calendario <span class="fa fa-chevron-down"></span></a>
                   <ul class="nav child_menu" style="display: none">
                     <li><a href="tables.html">Calendario Personal</a>
@@ -141,7 +157,7 @@
                     </li>
                   </ul>
                 </li>
-                <li><a><i class="fa fa-bar-chart-o"></i> Estado del Sistema <span class="fa fa-chevron-down"></span></a>
+                <li><a><i class="fa fa-laptop"></i> Estado del Sistema <span class="fa fa-chevron-down"></span></a>
                   <ul class="nav child_menu" style="display: none">
                     <li><a href="chartjs.html">Servidores 
                     <span class="label label-warning pull-right"> {{servers}}</span>

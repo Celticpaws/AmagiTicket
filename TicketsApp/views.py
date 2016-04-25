@@ -12,6 +12,18 @@ from datetime import datetime
 #def auth(request):
 #	users = UserProfile.objects.filter(u_createddate__lte=timezone.now()).order_by('u_createddate')
 #	return render(request, 'TicketsApp/auth.html', {'users': users})
+def handler404(request):
+    response = render_to_response('TicketsApp/page_404.html', {},
+                                  context_instance=RequestContext(request))
+    response.status_code = 404
+    return response
+
+def handler500(request):
+    response = render_to_response('TicketsApp/page_500.html', {},
+                                  context_instance=RequestContext(request))
+    response.status_code = 500
+    return response
+
 
 
 @login_required(login_url ='')
@@ -23,33 +35,130 @@ def index(request):
     pincident = Ticket.personal_incident_count(request.user)
     gincident = Ticket.group_incident_count(request.user)
     types = Ticket.count_types(request.user)
+    svalues = (UserProfile.get_UserProfile(request.user)).solicitude_group_values()
+    ivalues = (UserProfile.get_UserProfile(request.user)).incident_group_values()
     servers = Server.server_count()
     services = Service.service_count()
-    if UserProfile.get_UserProfile(request.user).u_cancreatetickets :
-        return render(request, 'TicketsApp/creator/index.html', 
+    taskcount = Ticket.task_count(request.user)
+    if (userdepartment.leader_of_department() == request.user):
+        return render(request, 'TicketsApp/leader/index.html', 
             {'userjob':userjob,
              'psolicitude':psolicitude,
              'pincident':pincident,
              'gsolicitude':gsolicitude,
              'gincident':gincident,
-             'svalues': [[request.user, psolicitude], [userdepartment, gsolicitude-psolicitude]],
-             'ivalues': [[request.user, pincident], [userdepartment, gincident-pincident]],
+             'svalues': svalues,
+             'ivalues': ivalues,
              'bvalues': types,
              'servers': servers,
-             'services' : services
+             'services' : services,
+             'taskcount' : taskcount,
              })
     else:
-        return render(request, 'TicketsApp/solver/index.html', 
+        if UserProfile.get_UserProfile(request.user).u_cancreatetickets :
+            return render(request, 'TicketsApp/creator/index.html', 
+                {'userjob':userjob,
+                 'psolicitude':psolicitude,
+                 'pincident':pincident,
+                 'gsolicitude':gsolicitude,
+                 'gincident':gincident,
+                 'svalues': [[request.user, psolicitude], [userdepartment, gsolicitude-psolicitude]],
+                 'ivalues': [[request.user, pincident], [userdepartment, gincident-pincident]],
+                 'bvalues': types,
+                 'servers': servers,
+                 'services' : services,
+                 'taskcount' : taskcount,
+                 })
+        else:
+            return render(request, 'TicketsApp/solver/index.html', 
+                {'userjob':userjob,
+                 'psolicitude':psolicitude,
+                 'pincident':pincident,
+                 'gsolicitude':gsolicitude,
+                 'gincident':gincident,
+                 'svalues': [[request.user, psolicitude], [userdepartment, gsolicitude-psolicitude]],
+                 'ivalues': [[request.user, pincident], [userdepartment, gincident-pincident]],
+                 'bvalues': types,
+                 'servers': servers,
+                 'services' : services,
+                 'taskcount' : taskcount,
+                 })
+
+@login_required(login_url ='')
+def users(request):
+    userjob = UserProfile.get_jobtitle(request.user)
+    userdepartment = UserProfile.get_department(request.user)
+    psolicitude = Ticket.personal_solicitude_count(request.user)
+    gsolicitude = Ticket.group_solicitude_count(request.user)
+    pincident = Ticket.personal_incident_count(request.user)
+    gincident = Ticket.group_incident_count(request.user)
+    servers = Server.server_count()
+    services = Service.service_count()
+    usershierarchy = request.user.profile.get_users_hierarchy()
+    if (userdepartment.leader_of_department() == request.user):
+        return render(request, 'TicketsApp/leader/users_list.html', 
             {'userjob':userjob,
              'psolicitude':psolicitude,
              'pincident':pincident,
              'gsolicitude':gsolicitude,
              'gincident':gincident,
-             'svalues': [[request.user, psolicitude], [userdepartment, gsolicitude-psolicitude]],
-             'ivalues': [[request.user, pincident], [userdepartment, gincident-pincident]],
-             'bvalues': types,
              'servers': servers,
-             'services' : services
+             'services' : services,
+             'usershierarchy':usershierarchy,
+             })
+    else:
+        if UserProfile.get_UserProfile(request.user).u_cancreatetickets :
+            return render(request, 'TicketsApp/creator/users_list.html', 
+                {'userjob':userjob,
+                 'psolicitude':psolicitude,
+                 'pincident':pincident,
+                 'gsolicitude':gsolicitude,
+                 'gincident':gincident,
+                 'servers': servers,
+                 'services' : services,
+                 'usershierarchy':usershierarchy,
+                 })
+        else:
+            return render(request, 'TicketsApp/solver/users_list.html', 
+                {'userjob':userjob,
+                 'psolicitude':psolicitude,
+                 'pincident':pincident,
+                 'gsolicitude':gsolicitude,
+                 'gincident':gincident,
+                 'servers': servers,
+                 'services' : services,
+                 'usershierarchy':usershierarchy,
+                 })
+
+def users_id(request,pk):
+    userp= User.objects.get(pk=pk)
+    userjob = UserProfile.get_jobtitle(request.user)
+    userdepartment = UserProfile.get_department(request.user)
+    psolicitude = Ticket.personal_solicitude_count(request.user)
+    gsolicitude = Ticket.group_solicitude_count(request.user)
+    psolicitudea = Ticket.personal_solicitude_count_active(userp)
+    pincidenta = Ticket.personal_incident_count_active(userp)
+    pincident = Ticket.personal_incident_count(request.user)
+    gincident = Ticket.group_incident_count(request.user)
+    servers = Server.server_count()
+    services = Service.service_count()
+    usershierarchy = request.user.profile.get_users_hierarchy()
+    lastten = Activity.last_ten_of_user(userp)
+    usertickets = Ticket.objects.filter(t_usersolver=userp)
+    return render(request, 'TicketsApp/leader/users_id.html', 
+            {'userjob':userjob,
+             'psolicitude':psolicitude,
+             'pincident':pincident,
+             'psolicitudea':psolicitudea,
+             'pincidenta':pincidenta,
+             'gsolicitude':gsolicitude,
+             'gincident':gincident,
+             'servers': servers,
+             'services' : services,
+             'usershierarchy':usershierarchy,
+             'userp':userp,
+             'lastten':lastten,
+             'usertickets':usertickets,
              })
 
 
@@ -169,6 +278,29 @@ def incidentg(request):
          'services':services,
          })
 
+def ptasks(request):
+    userjob = UserProfile.get_jobtitle(request.user)
+    psolicitude = Ticket.personal_solicitude_count(request.user)
+    gsolicitude = Ticket.group_solicitude_count(request.user)
+    pincident = Ticket.personal_incident_count(request.user)
+    gincident = Ticket.group_incident_count(request.user)
+    ptasks = Ticket.tasks(request.user)
+    servers = Server.server_count()
+    services = Service.service_count()
+    if UserProfile.get_UserProfile(request.user).u_cancreatetickets :
+        return render(request, 'TicketsApp/creator/tasks.html', {'userjob':userjob,
+         'psolicitude':psolicitude,         'pincident':pincident,         'gsolicitude':gsolicitude,
+         'gincident':gincident,         'ptasks':ptasks,         'servers':servers,
+         'services':services,
+         })
+    else:
+        return render(request, 'TicketsApp/solver/tasks.html', {'userjob':userjob,
+         'psolicitude':psolicitude,         'pincident':pincident,         'gsolicitude':gsolicitude,
+         'gincident':gincident,         'ptasks':ptasks,         'servers':servers,
+         'services':services,
+         })
+
+
 def ticket(request,pk):
     userjob = UserProfile.get_jobtitle(request.user)
     userdepartment = UserProfile.get_department(request.user)
@@ -178,37 +310,42 @@ def ticket(request,pk):
     gincident = Ticket.group_incident_count(request.user)
     servers = Server.server_count()
     services = Service.service_count()
-    ticketpk = Ticket.objects.get(pk=pk)
-    useraffected = UserProfile.get_UserProfile(ticketpk.t_useraffected)
-    usersolver = UserProfile.get_UserProfile(ticketpk.t_usersolver)
-    sla = (ticketpk.t_reportmadeon-timezone.now())+ticketpk.t_sla.ToDeltaTime()
-    slahour = sla.seconds//3600
-    slaminute = (sla.seconds //60)%60
-    attacheds = Archive.archives_of_a_ticket(ticketpk)
-    sons = Ticket.get_sons(ticketpk)
-    activities = Activity.activities_of_a_ticket(ticketpk)
-    lastactivity = Activity.last_modified(ticketpk)
-    dateopen = ticketpk.t_reportmadeon
-    datesolved = Activity.date_of_event(ticketpk,'Resuelto')
-    dateclosed = Activity.date_of_event(ticketpk,'Cerrado')
-    if UserProfile.get_UserProfile(request.user).u_cancreatetickets :
-        return render(request,'TicketsApp/creator/ticketid.html',{
-         'userjob':userjob,         'psolicitude':psolicitude,         'pincident':pincident,
-         'gsolicitude':gsolicitude,         'gincident':gincident,        'ticketpk':ticketpk,
-        'useraffected':useraffected,        'usersolver':usersolver,        'sla':sla,
-        'slahour':slahour,        'slaminute':slaminute,        'attacheds':attacheds,
-        'sons':sons,        'activities':activities,        'lastactivity':lastactivity,
-        'datesolved':datesolved,        'dateclosed':dateclosed,        'servers':servers,
-        'services':services,    'dateopen':dateopen})
-    else:
-        return render(request,'TicketsApp/solver/ticketid.html',{
-         'userjob':userjob,         'psolicitude':psolicitude,         'pincident':pincident,
-         'gsolicitude':gsolicitude,         'gincident':gincident,        'ticketpk':ticketpk,
-        'useraffected':useraffected,        'usersolver':usersolver,        'sla':sla,
-        'slahour':slahour,        'slaminute':slaminute,        'attacheds':attacheds,
-        'sons':sons,        'activities':activities,        'lastactivity':lastactivity,
-        'datesolved':datesolved,        'dateclosed':dateclosed,        'servers':servers,
-        'services':services,    'dateopen':dateopen})
+    try:
+        ticketpk = Ticket.objects.get(pk=pk)
+    except:
+        ticketpk = None
+    if ticketpk :
+        useraffected = UserProfile.get_UserProfile(ticketpk.t_useraffected)
+        usersolver = UserProfile.get_UserProfile(ticketpk.t_usersolver)
+        sla = (ticketpk.t_reportmadeon-timezone.now())+ticketpk.t_sla.ToDeltaTime()
+        slahour = sla.seconds//3600
+        slaminute = (sla.seconds //60)%60
+        attacheds = Archive.archives_of_a_ticket(ticketpk)
+        sons = Ticket.get_sons(ticketpk)
+        activities = Activity.activities_of_a_ticket(ticketpk)
+        lastactivity = Activity.last_modified(ticketpk)
+        dateopen = ticketpk.t_reportmadeon
+        datesolved = Activity.date_of_event(ticketpk,'Resuelto')
+        dateclosed = Activity.date_of_event(ticketpk,'Cerrado')
+        if UserProfile.get_UserProfile(request.user).u_cancreatetickets :
+            return render(request,'TicketsApp/creator/ticketid.html',{
+             'userjob':userjob,         'psolicitude':psolicitude,         'pincident':pincident,
+             'gsolicitude':gsolicitude,         'gincident':gincident,        'ticketpk':ticketpk,
+            'useraffected':useraffected,        'usersolver':usersolver,        'sla':sla,
+            'slahour':slahour,        'slaminute':slaminute,        'attacheds':attacheds,
+            'sons':sons,        'activities':activities,        'lastactivity':lastactivity,
+            'datesolved':datesolved,        'dateclosed':dateclosed,        'servers':servers,
+            'services':services,    'dateopen':dateopen})
+        else:
+            return render(request,'TicketsApp/solver/ticketid.html',{
+             'userjob':userjob,         'psolicitude':psolicitude,         'pincident':pincident,
+             'gsolicitude':gsolicitude,         'gincident':gincident,        'ticketpk':ticketpk,
+            'useraffected':useraffected,        'usersolver':usersolver,        'sla':sla,
+            'slahour':slahour,        'slaminute':slaminute,        'attacheds':attacheds,
+            'sons':sons,        'activities':activities,        'lastactivity':lastactivity,
+            'datesolved':datesolved,        'dateclosed':dateclosed,        'servers':servers,
+            'services':services,    'dateopen':dateopen})
+    else: return render(request,'TicketsApp/page_404.html')
 
 def ticket_create(request):
     userjob = UserProfile.get_jobtitle(request.user)
@@ -604,13 +741,19 @@ def ticket_assign(request,pk):
     useraffected = UserProfile.get_UserProfile(ticketpk.t_useraffected)
     if request.method =="POST":
         formActivity = AsignateSolverTicketForm(request.POST, instance = ticketpk)
-        formActivity.fields['t_usersolver'].queryset = UserProfile.get_users_hierarchy(request.user)
-        newactivity = Activity.insert(ticketpk,
-            "Asignado",
-            request.user,datetime.now(),
-            "El ticket ha sido asignado de "+ticketpk.t_usersolver.get_full_name()+" a "+str(request.POST.get('t_usersolver')) +" \n")
+        formActivity.fields['t_usersolver'].queryset = UserProfile.get_users_hierarchy(request.user.profile)
+        if ticketpk.t_usersolver == None :
+            newactivity = Activity.insert(ticketpk,
+                "Asignado",
+                request.user,datetime.now(),
+                "El ticket ha sido asignado de \' \' a "+str(User.objects.get(pk=request.POST.get('t_usersolver')).get_full_name()) +" \n")
+        else:
+            newactivity = Activity.insert(ticketpk,
+                "Asignado",
+                request.user,datetime.now(),
+                "El ticket ha sido asignado de "+ticketpk.t_usersolver.get_full_name()+" a "+str(User.objects.get(pk=request.POST.get('t_usersolver')).get_full_name()) +" \n")
         newactivity.save()
-        ticketpk.t_usersolver = request.POST.get('t_usersolver')
+        ticketpk.t_usersolver = User.objects.get(pk=request.POST.get('t_usersolver'))
         ticketpk.t_department = UserProfile.get_department(request.POST.get('t_usersolver'))
         ticketpk.t_state = "Asignado"
         ticketpk.save()
@@ -624,7 +767,7 @@ def ticket_assign(request,pk):
         'services':services,})
     else:
         formTicket = AsignateSolverTicketForm(instance=ticketpk)
-        formTicket.fields['t_usersolver'].queryset = UserProfile.get_users_hierarchy(request.user)
+        formTicket.fields['t_usersolver'].queryset = UserProfile.get_users_hierarchy(request.user.profile)
     return render(request,'TicketsApp/solver/ticketid_assign.html',{
         'userjob':userjob,         'psolicitude':psolicitude,         'pincident':pincident,
         'gsolicitude':gsolicitude,         'gincident':gincident,        'ticketpk':ticketpk,
@@ -633,3 +776,5 @@ def ticket_assign(request,pk):
         'sons':sons,        'activities':activities,        'lastactivity':lastactivity,
         'datesolved':datesolved,        'dateclosed':dateclosed,        'servers':servers, 
         'services':services,        'usersofdep':usersofdep,        'formTicket':formTicket,})
+
+

@@ -1,4 +1,4 @@
-{% extends 'TicketsApp/maincreator.html' %}
+{% extends 'TicketsApp/mainleader.html' %}
 
     {% block title %} 
     Solicitudes Personales
@@ -12,7 +12,7 @@
           <div class="page-title">
             <div class="title_left">
               <h3>
-                   <span class='label label-info'> Solicitudes Personales</span>
+                  <span class='label label-info'>  Solicitudes Personales </span>
                     
                 </h3>
             </div>
@@ -41,7 +41,7 @@
                   <div class="clearfix"></div>
                 </div>
                 <div class="x_content">
-                  <table id="example" class="table table-striped responsive-utilities jambo_table sortable">
+                  <table id="Tabla" class="table table-striped responsive-utilities jambo_table sortable">
                     <thead>
                       <tr class="headings">
                         
@@ -76,6 +76,33 @@
                     </tbody>
 
                   </table>
+                  <script type="text/javascript">// < ![CDATA[
+                    function Buscar() {
+                                var tabla = document.getElementById('Tabla');
+                                var busqueda = document.getElementById('Busqueda').value.toLowerCase();
+                                var cellsOfRow="";
+                                var found=false;
+                                var compareWith="";
+                                for (var i = 1; i < tabla.rows.length; i++) {
+                                    cellsOfRow = tabla.rows[i].getElementsByTagName('td');
+                                    found = false;
+                                    for (var j = 0; j < cellsOfRow.length &#038;& !found; j++)
+                                    {
+                                        compareWith = cellsOfRow[j].innerHTML.toLowerCase();
+                                        if (busqueda.length == 0 || (compareWith.indexOf(busqueda) > -1))
+                                        {
+                                            found = true;
+                                        }
+                                    }
+                                    if(found)
+                                    {
+                                        tabla.rows[i].style.display = '';
+                                    } else {
+                                        tabla.rows[i].style.display = 'none';
+                                    }
+                                }
+                            }
+                    // ]]></script>
                 </div>
               </div>
             </div>

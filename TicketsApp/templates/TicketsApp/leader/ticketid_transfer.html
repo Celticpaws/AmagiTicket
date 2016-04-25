@@ -1,4 +1,4 @@
-{% extends 'TicketsApp/main.html' %}
+{% extends 'TicketsApp/mainleader.html' %}
 
     {% block title %} 
     Ticket 
@@ -25,25 +25,61 @@
                   </script>                    
               </h1>
             </div>
-            <div class="title_right">
-              <div class="col-md-5 col-sm-5 col-xs-12 form-group pull-right top_search">
-                <div class="input-group">
-                  <input type="text" class="form-control" placeholder="Search for...">
-                  <span class="input-group-btn">
-                            <button class="btn btn-default" type="button">Go!</button>
-                        </span>
-                </div>
-              </div>
-            </div>
           </div>
           <div class="clearfix"></div>
           <div class="row">
             <div class="col-md-12 col-sm-12 col-xs-12">
           
+          <!-- Resumen -->
+              <div class="x_panel">
+                  <div class="x_title">
+                    <h2>Resumen</h2>
+                    <ul class="nav navbar-right panel_toolbox">
+                      <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                      </li>
+                    </ul>
+                    <div class="clearfix"></div>
+                  </div>
+                  <div class="x_content">
+                    <section class="content invoice">
+                      <!-- info row -->
+                      <div class="row invoice-info">
+                        <div class="col-sm-4 invoice-col">
+                          <strong>Titulo: </strong> {{ticketpk.t_title}}<br>
+                          <strong>Fecha de Resolución: </strong> {{datesolved}}<br>
+                        </div>
+                        <!-- /.col -->
+                        <div class="col-sm-4 invoice-col">
+                          <strong>Apertura: </strong> {{ticketpk.t_usersolver.get_full_name}}<br>
+                          <strong>Fecha de Cierre: </strong> {{dateclosed}}<br>
+                        </div>
+                        <!-- /.col -->
+                        <div class="col-sm-4 invoice-col">
+                          <strong>Ultima Modificación: </strong> {{lastactivity}}<br>
+                        </div>
+                        <!-- /.col -->
+                          </div>
+                      <!-- /.row -->
+                    </section>
+                    <br>
+                    <div class="col-xs-6">
+                        <b>Descripción:</b><br>
+                        <p>{{ticketpk.t_description}}</p>
+                    </div>
+
+
+                  </div>
+                </div>
+
+
+
+
+
+
 
               <div class="x_panel">
                 <div class="x_title">
-                  <h2>Adjuntar un archivo</h2>
+                  <h2>Transferir Ticket</h2>
                   <ul class="nav navbar-right panel_toolbox">
                     <li><a href="{% url 'TicketsApp.views.ticket' pk=ticketpk.pk %}" class="close-link"><i class="fa fa-close"></i></a>
                     </li>
@@ -52,11 +88,15 @@
                 </div>
                 <div class="x_content">
                   <br />
-                  <form method="post" class="post-form" enctype="multipart/form-data" data-parsley-validate class="form-horizontal form-label-left">
+                  <form method="post" class="post-form"  data-parsley-validate class="form-horizontal form-label-left">
                         {% csrf_token %}
                         <div class="fieldWrapper">
-                          {{formArchive.as_p}}
-       
+                          <div class="form-group">
+                          <label for="t_state" class="control-label col-md-3 col-sm-3 col-xs-12"> 
+                            <h2>Razon de la transferencia:</h2> 
+                          </label>
+                          {{formTicket.as_p}}
+                      </div>
                     </div>
                     <div class="col-md-6 col-sm-6 col-xs-12 col-md-offset-10">
                       <a href="{% url 'TicketsApp.views.ticket' pk=ticketpk.pk %}" class="btn btn-danger">Cancel</button>

@@ -1,7 +1,7 @@
 {% extends 'TicketsApp/maincreator.html' %}
 
     {% block title %} 
-    Solicitudes Personales
+    Tareas Pendientes
     {% endblock %}
  <script src="js/jquery.min.js"></script>
 
@@ -12,7 +12,7 @@
           <div class="page-title">
             <div class="title_left">
               <h3>
-                   <span class='label label-info'> Solicitudes Personales</span>
+                    Tareas Pendientes
                     
                 </h3>
             </div>
@@ -20,10 +20,9 @@
             <div class="title_right">
               <div class="col-md-5 col-sm-5 col-xs-12 form-group pull-right top_search">
                 <div class="input-group">
-                  <input type="text" id="search" class="form-control" placeholder="Busqueda por Ticket...">
+                  <input type="text" class="form-control" placeholder="Busqueda por estado...">
                   <span class="input-group-btn">
-                            <a href="" onclick="this.href='ticket/'+document.getElementById('search').value">
-                              <button class="btn btn-default" type="button">Ir</button></a>
+                            <button class="btn btn-default" type="button">Ir</button>
                         </span>
                 </div>
               </div>
@@ -36,7 +35,7 @@
             <div class="col-md-12 col-sm-12 col-xs-12">
               <div class="x_panel">
                 <div class="x_title">
-                  <h2>Lista de solicitudes</h2>
+                  <h2>Lista de tickets pendientes</h2>
                   
                   <div class="clearfix"></div>
                 </div>
@@ -49,26 +48,55 @@
                         <th>Fecha de la Solicitud </th>
                         <th>Categoria </th>
                         <th>Prioridad </th>
-                        <th>Resumen </th>
                         <th>Estado </th>
-                        <th>Departamento </th>
-                        <th class=" no-link last"><span class="nobr">Asignatario</span>
-                        </th>
+                        <th class=" no-link last sorttable_nosort"><span class="nobr"> SLA </span></th>
                       </tr>
                     </thead>
 
                     <tbody>
-                    {% for psolicitud in psolicitudes %}
+                    {% for psolicitud in ptasks %}
                       <tr class="even pointer">
                         
-                        <td class=" "><a href="{% url 'TicketsApp.views.ticket' pk=psolicitud.pk %}">{{psolicitud.t_id}}</a></td>
+                        <td class=" ">
+                          <a href="{% url 'TicketsApp.views.ticket' pk=psolicitud.pk %}">
+                          <span id="sol{{psolicitud.t_id}}"></span>
+                          <script>
+                              var b = "{{psolicitud.t_isincident}}" 
+                              var text;  
+                               if ( b=="True") {
+                                  text = "<span class='label label-danger'>{{psolicitud.t_id}}</span>"
+                               }else{
+                                  text = "<span class='label label-info'>{{psolicitud.t_id}}</span>"
+                               }
+                              document.getElementById("sol{{psolicitud.t_id}}").innerHTML = text;
+                        
+                          </script>
+                          </a>
+                        </td>
                         <td class=" ">{{psolicitud.t_reportmadeon}}</td>
                         <td class=" ">{{psolicitud.t_category}}</td>
                         <td class=" ">{{psolicitud.t_priority}}</td>
-                        <td class=" " style="width:10%"><div style="white-space: nowrap;text-overflow: ellipsis; width: 300px;display: block;overflow: hidden"> {{psolicitud.t_description}}</div></td>
                         <td class="a-right a-right ">{{psolicitud.t_state}}</td>
-                        <td class="a-right a-right ">{{psolicitud.t_department}}</td>
-                        <td class=" last">{{psolicitud.t_usersolver}}</td>
+                        <td style="width:40%"> 
+                          <div class="progress progress_sm" id ="pro{{psolicitud.t_id}}">
+                            <script>
+                              var p = {{psolicitud.delta_life}}
+                              var text;  
+                               if ( p<100 && p>=75) {
+                                  text = "<div class='progress-bar progress-bar-danger' data-transitiongoal='{{psolicitud.delta_life}}'  style='width: 100%;'></div>"
+                               }else if (p<75 && p>=50){
+                                  text = "<div class='progress-bar progress-bar-warning' data-transitiongoal='{{psolicitud.delta_life}}'  style='width: 100%;'></div>"
+                               }else if (p<50){
+                                  text = "<div class='progress-bar progress-bar-info' data-transitiongoal='{{psolicitud.delta_life}}'  style='width: 100%;'></div>"
+                               }else{
+                                  text = "<div class='progress-bar progress-bar-dark' data-transitiongoal='{{psolicitud.delta_life}}'  style='width: 100%;'></div>"
+                               }
+                              document.getElementById("pro{{psolicitud.t_id}}").innerHTML = text;
+                        
+                          </script>
+                          </div><small>{{psolicitud.life_spawn}}</small>
+                          
+                        </td>
                       </tr>
                     {% endfor %}
 

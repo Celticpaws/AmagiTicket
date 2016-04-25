@@ -1,7 +1,7 @@
-{% extends 'TicketsApp/maincreator.html' %}
+{% extends 'TicketsApp/mainleader.html' %}
 
     {% block title %} 
-    Solicitudes Personales
+    Incidentes Personales
     {% endblock %}
  <script src="js/jquery.min.js"></script>
 
@@ -12,7 +12,7 @@
           <div class="page-title">
             <div class="title_left">
               <h3>
-                   <span class='label label-info'> Solicitudes Personales</span>
+                   <span class='label label-danger'> Incidentes Personales </span>
                     
                 </h3>
             </div>
@@ -36,7 +36,7 @@
             <div class="col-md-12 col-sm-12 col-xs-12">
               <div class="x_panel">
                 <div class="x_title">
-                  <h2>Lista de solicitudes</h2>
+                  <h2>Lista de incidentes</h2>
                   
                   <div class="clearfix"></div>
                 </div>
@@ -46,7 +46,7 @@
                       <tr class="headings">
                         
                         <th>Nº </th>
-                        <th>Fecha de la Solicitud </th>
+                        <th>Fecha del Incidente </th>
                         <th>Categoria </th>
                         <th>Prioridad </th>
                         <th>Resumen </th>
@@ -58,17 +58,16 @@
                     </thead>
 
                     <tbody>
-                    {% for psolicitud in psolicitudes %}
+                    {% for pincident in pincidents %}
                       <tr class="even pointer">
-                        
-                        <td class=" "><a href="{% url 'TicketsApp.views.ticket' pk=psolicitud.pk %}">{{psolicitud.t_id}}</a></td>
-                        <td class=" ">{{psolicitud.t_reportmadeon}}</td>
-                        <td class=" ">{{psolicitud.t_category}}</td>
-                        <td class=" ">{{psolicitud.t_priority}}</td>
-                        <td class=" " style="width:10%"><div style="white-space: nowrap;text-overflow: ellipsis; width: 300px;display: block;overflow: hidden"> {{psolicitud.t_description}}</div></td>
-                        <td class="a-right a-right ">{{psolicitud.t_state}}</td>
-                        <td class="a-right a-right ">{{psolicitud.t_department}}</td>
-                        <td class=" last">{{psolicitud.t_usersolver}}</td>
+                        <td class=" "><a href="{% url 'TicketsApp.views.ticket' pk=pincident.pk %}">{{pincident.t_id}}</a></td>
+                        <td class=" ">{{pincident.t_reportmadeon}}</td>
+                        <td class=" ">{{pincident.t_category}}</td>
+                        <td class=" ">{{pincident.t_priority}}</td>
+                        <td class=" " style="width:10%"><div style="white-space: nowrap;text-overflow: ellipsis; width: 300px;display: block;overflow: hidden"> {{pincident.t_description}}</div></td>
+                        <td class="a-right a-right ">{{pincident.t_state}}</td>
+                        <td class="a-right a-right ">{{pincident.t_department}}</td>
+                        <td class=" last">{{pincident.t_usersolver}}</td>
                       </tr>
                     {% endfor %}
 

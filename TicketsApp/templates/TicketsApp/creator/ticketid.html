@@ -4,6 +4,8 @@
     Ticket 
     {% endblock %}
  <script src="js/jquery.min.js"></script>
+ <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+ <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
  
 {% block content %}
     <div class="right_col" role="main">
@@ -208,6 +210,7 @@
                            <table id="example" class="table table-striped responsive-utilities jambo_table">
                                     <thead>
                                       <tr class="headings">
+                                        <th> </th>
                                         <th>Tipo </th>
                                         <th>Creado por </th>
                                         <th>Fecha </th>
@@ -218,6 +221,29 @@
                                     <tbody>
                                     {% for activity in activities %}
                                       <tr class="even pointer">
+                                        <td>
+                                          <div class="container">
+                                            <button type="button" class="btn btn-xs" data-toggle="modal" data-target="#{{activity.at_id}}">+</button>
+                                            <div class="modal fade" id="{{activity.at_id}}" role="dialog">
+                                            <div class="modal-dialog modal-lg">
+                                              <div class="modal-content">
+                                                <div class="modal-header">
+                                                  <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span>
+                                                  </button>
+                                                  <h4 class="modal-title" id="myModalLabel">{{activity.at_tipe}} - {{activity.at_date}}</h4>
+                                                </div>
+                                                <div class="modal-body">
+                                                  <h3>{{activity.at_createdby.get_full_name}}:</h3>
+                                                  <p>{{activity.at_description}}</p>
+                                                </div>
+                                                <div class="modal-footer">
+                                                <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                                              </div>
+                                            </div>
+                                          </div>
+                                        </div>
+                                        </td>
+
                                         <td class=" ">{{activity.at_tipe}}</td>
                                         <td class=" ">{{activity.at_createdby}}</td>
                                         <td class=" ">{{activity.at_date}}</td>

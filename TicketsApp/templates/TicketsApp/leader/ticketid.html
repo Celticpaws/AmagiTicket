@@ -1,4 +1,4 @@
-{% extends 'TicketsApp/main.html' %}
+{% extends 'TicketsApp/mainleader.html' %}
 
     {% block title %} 
     Ticket 
@@ -286,7 +286,7 @@
                                     <tbody>
                                     {% for son in sons %}
                                       <tr class="even pointer">
-                                        <td class=" "><a href="{% url 'TicketsApp.views.ticket' pk=son.pk %}">{{son.t_id}}</a></td>
+                                        <td class=" "><a href="{% url 'TicketsApp.views.tickets' pk=son.pk %}">{{son.t_id}}</a></td>
                                         <td class=" ">{{son.t_reportmadeon}}</td>
                                         <td class=" ">{{son.t_category}}</td>
                                         <td class=" ">{{son.t_priority}}</td>

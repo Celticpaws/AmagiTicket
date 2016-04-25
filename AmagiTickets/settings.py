@@ -25,7 +25,7 @@ SECRET_KEY = 'br(+c4-6uq&@)@j&8+*_3srbz-t=35d@vn70%c@jhq_)+rr6)_'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
 
 # Application definition
@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'TicketsApp',
+    'django-auth-ldap-ad',
     'googlecharts',
     'qsstats'
 ]
@@ -140,3 +141,34 @@ EMAIL_USE_TLS = True
 
 LOGIN_REDIRECT_URL ='auth'
 LOGIN_URL ='auth'
+
+
+#AUTHENTICATION_BACKENDS = ('django.contrib.auth.backends.ModelBackend', 'django-auth-ldap-ad.backend.LDAPBackend')
+
+
+#AUTH_LDAP_SERVER_URI    = ["ldap://192.168.56.1:389","ldap://172.16.48.80:389"]
+#AUTH_LDAP_SEARCH_DN     = "DC=banplus,DC=dc"
+
+#AUTH_LDAP_USER_FLAGS_BY_GROUP = {
+    # Groups on left side are memberOf key values. If all the groups are found in single entry, then the flag is set to
+    # True. If no entry contains all required groups then the flag is set False.
+
+#    "is_superuser" : ["CN=WebAdmin,DC=mydomain"], 
+    # Above example will match on entry "CN=WebAdmin,DC=mydomain,OU=People,OU=Users" 
+    # Above will NOT match "CN=WebAdmin,OU=People,OU=Users" (missing DC=mydomain).
+
+#    "is_staff" : ["CN=Developer,DC=mydomain","CN=Tester,DC=mydomain"] 
+    # True if one of the conditions is true.
+#}
+
+ # All people that are to be staff are also to belong to this group  
+#AUTH_LDAP_USER_GROUPS_BY_GROUP = {
+#"AdminGroup" : AUTH_LDAP_USER_FLAGS_BY_GROUP["is_staff"],
+#}
+
+# Map django user preferences
+#AUTH_LDAP_USER_ATTR_MAP = {
+#"first_name": "givenName",
+#"last_name": "sn",
+#"email": "mail"
+#}
