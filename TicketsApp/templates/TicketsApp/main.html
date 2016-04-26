@@ -212,75 +212,60 @@
               <li role="presentation" class="dropdown">
                 <a href="javascript:;" class="dropdown-toggle info-number" data-toggle="dropdown" aria-expanded="false">
                   <i class="fa fa-bell-o"></i>
-                  <span class="badge bg-green">6</span>
+                  <span id="countnotifications" class="badge bg-green"></span>
                 </a>
                 <ul id="menu1" class="dropdown-menu list-unstyled msg_list animated fadeInDown" role="menu">
-                  <li>
-                    <a>
-                      <span class="image">
-                                        <img src="images/img.jpg" alt="Profile Image" />
-                                    </span>
-                      <span>
-                                        <span>John Smith</span>
-                      <span class="time">3 mins ago</span>
-                      </span>
-                      <span class="message">
-                                        Film festivals used to be do-or-die moments for movie makers. They were where...
-                                    </span>
-                    </a>
-                  </li>
-                  <li>
-                    <a>
-                      <span class="image">
-                                        <img src="images/img.jpg" alt="Profile Image" />
-                                    </span>
-                      <span>
-                                        <span>John Smith</span>
-                      <span class="time">3 mins ago</span>
-                      </span>
-                      <span class="message">
-                                        Film festivals used to be do-or-die moments for movie makers. They were where...
-                                    </span>
-                    </a>
-                  </li>
-                  <li>
-                    <a>
-                      <span class="image">
-                                        <img src="images/img.jpg" alt="Profile Image" />
-                                    </span>
-                      <span>
-                                        <span>John Smith</span>
-                      <span class="time">3 mins ago</span>
-                      </span>
-                      <span class="message">
-                                        Film festivals used to be do-or-die moments for movie makers. They were where...
-                                    </span>
-                    </a>
-                  </li>
-                  <li>
-                    <a>
-                      <span class="image">
-                                        <img src="images/img.jpg" alt="Profile Image" />
-                                    </span>
-                      <span>
-                                        <span>John Smith</span>
-                      <span class="time">3 mins ago</span>
-                      </span>
-                      <span class="message">
-                                        Film festivals used to be do-or-die moments for movie makers. They were where...
-                                    </span>
-                    </a>
-                  </li>
+                  <script> var i = 0 </script>
+                  {% for notification in notifications %}
+                    <li id="li{{notification.t_id}}">
+                      <a href="{% url 'TicketsApp.views.ticket' pk=notification.pk %}">
+                        <span class="image">
+                                          <i class="fa fa-info-circle"></i>
+                                      </span>
+                        <span>
+                                          <span id="sol{{notification.t_id}}"></span>
+                                          <script>
+                                              var b = "{{notification.t_isincident}}" 
+                                              var text;  
+                                               if ( b=="True") {
+                                                  text = "<span class='label label-danger'>Ticket {{notification}}</span>"
+                                               }else{
+                                                  text = "<span class='label label-info'>Ticket {{notification}}</span>"
+                                               }
+                                              document.getElementById("sol{{notification.t_id}}").innerHTML = text;
+                                        
+                                          </script>
+                        <span class="time"> {{notification.life_spawn}}</span>
+                        </span>
+                        <span class="message">
+                                          {{notification.t_title}}
+                                      </span>
+                      </a>
+                    </li>
+                    <script>
+                      var user = "{{user.username}}"+",";
+                      var viewers = "{{notification.t_viewers}}";
+                      var viewed = viewers.search(user);
+                      if (viewed == -1){
+                        document.getElementById("li{{notification.t_id}}").style.background="aliceblue";
+                        i +=1;
+                      }else{
+                        document.getElementById("li{{notification.t_id}}").style.fontStyle="italic";
+                        document.getElementById("li{{notification.t_id}}").style.opacity=0.3;
+                        
+                      }
+                    </script>
+
+                  {% endfor %}
+                  <script>  document.getElementById("countnotifications").innerHTML=i; </script>  
                   <li>
                     <div class="text-center">
-                      <a>
-                        <strong>See All Alerts</strong>
+                      <a href = "{% url 'ptasks' %}">
+                        <strong>Ver todas las alertas</strong>
                         <i class="fa fa-angle-right"></i>
                       </a>
                     </div>
                   </li>
-                </ul>
-              </li>
 
             </ul>
           </nav>
@@ -305,6 +290,62 @@
     <div class="clearfix"></div>
     <div id="notif-group" class="tabbed_notifications"></div>
   </div>
+
+<!-- Notificaciones flotantes -->
+  <script type="text/javascript" src="{%static "js/notify/pnotify.core.js"%}"></script>
+  <script type="text/javascript" src="{%static "js/notify/pnotify.buttons.js"%}"></script>
+  <script type="text/javascript" src="{%static "js/notify/pnotify.nonblock.js"%}"></script>
+
+{% for activity in activitiespop %}
+
+<script type="text/javascript">
+  var auser = "{{user.username}}"+",";
+  var aviewers = "{{activity.at_viewers}}";
+  var aviewed = aviewers.search(auser);
+  if ((aviewed == -1) && ("{{activity.at_createdby}}"!="{{request.user}}")){
+    new PNotify({
+      title:"Ticket {{activity.at_ticket}}",
+      text:"{{activity.at_tipe}} - {{activity.at_createdby.get_full_name}}<br><small>{{activity.at_description}}</small>",
+      type:"info",
+      hide:true})
+  }
+</script>
+
+{% endfor %}
+
+{% for slapop in slaspop %}
+
+<script type="text/javascript">
+  if (parseInt("{{slapop.delta_life}}")>=100){
+    new PNotify({
+      title:"<a style='color:white;' href='{% url 'TicketsApp.views.ticket' pk=slapop.pk %}'>Ticket {{slapop}}</a>",
+      text:"El ticket ha caducado y no ha sido resuelto <br><small>{{slapop.life_spawn}}</small>",
+      type:'dark',
+      hide:false});
+  }   
+</script>
+
+<script type="text/javascript">
+  if ((parseInt("{{slapop.delta_life}}")>=75) && (parseInt("{{slapop.delta_life}}")<100)){
+    new PNotify({
+      title:"<a style='color:white;' href='{% url 'TicketsApp.views.ticket' pk=slapop.pk %}'>Ticket {{slapop}}</a>",
+      text:"Alerta ticket próximo a caducar<br><small>{{slapop.life_spawn}}</small>",
+      type:'error',
+      hide:false});
+  }   
+</script>
+
+<script type="text/javascript">
+  if ((parseInt("{{slapop.delta_life}}")>=50) && (parseInt("{{slapop.delta_life}}")<75)){
+    new PNotify({
+      title:"<a style='color:white;' href='{% url 'TicketsApp.views.ticket' pk=slapop.pk %}'>Ticket {{slapop}}</a>",
+      text:"Advertencia ticket próximo a caducar <br><small>{{slapop.life_spawn}}</small>",
+      hide:false});
+  }   
+</script>
+
+{% endfor %}
+<!-- /Notificaciones flotantes -->
 
   <script src="{%static "js/bootstrap.min.js"%}"></script>
   <script src="{%static "js/nicescroll/jquery.nicescroll.min.js"%}"></script>

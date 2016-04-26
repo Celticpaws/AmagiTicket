@@ -3,7 +3,7 @@ from django.conf import settings
 from django.db.models import Count
 from django.utils import timezone
 from django.contrib.auth.models import User
-from django.db.models.signals import post_save
+from django.db.models import signals
 from django.core.validators import RegexValidator
 from datetime import datetime, timedelta
 import os
@@ -159,14 +159,14 @@ class UserProfile(models.Model):
 
 	def solicitude_group_values(self):
 		users=self.get_users_hierarchy()
-		res=[]
+		res=[["No asignados",Ticket.personal_solicitude_count(None)]]
 		for user in users:
 			res += [[user.get_full_name,Ticket.personal_solicitude_count(user)]]
 		return res
 
 	def incident_group_values(self):
 		users=self.get_users_hierarchy()
-		res=[]
+		res=[["No asignados",Ticket.personal_incident_count(None)]]
 		for user in users:
 			res += [[user.get_full_name,Ticket.personal_incident_count(user)]]
 		return res
@@ -210,6 +210,7 @@ class Ticket(models.Model):
 	t_usersolver = models.ForeignKey('auth.User',related_name='t_usersolver',default=0,null=True)
 	t_state = models.CharField(max_length=10)
 	t_issolved = models.BooleanField(default=False)
+	t_viewers = models.CharField(max_length=1000,default="")
 
 	def __str__(self):
 		return '# '+str(self.t_id)
@@ -323,8 +324,14 @@ class Ticket(models.Model):
 			return strsladays+str(slahour)+" horas "+str(slaminute)+" minutos"
 		else:
 			return "Ticket vencido"
-		
 
+	def pop(User):
+		tickets = Ticket.objects.filter(t_usersolver=User)
+		ticketsfiltered =[]
+		for ticket in tickets.all():
+			if (ticket.delta_life() > 50):
+				ticketsfiltered += Ticket.objects.filter(t_id=ticket.t_id)
+		return ticketsfiltered	
 
 class Archive(models.Model):
 	a_id = models.IntegerField(primary_key=True)
@@ -361,6 +368,7 @@ class Activity(models.Model):
 	at_date = models.DateTimeField()
 	at_timeinverted = models.DateTimeField(default=datetime.now())
 	at_description = models.CharField(max_length=500)
+	at_viewers = models.CharField(max_length=1000,default="")
 
 
 	def activities_of_a_ticket(Ticket):
@@ -388,6 +396,13 @@ class Activity(models.Model):
 
 	def last_ten_of_user(User):
 		activities = Activity.objects.filter(at_createdby=User).order_by('-at_date')[:5]
+		return activities
+
+	def pop(User):
+		tickets = Ticket.objects.filter(t_usersolver=User)
+		activities =[]
+		for ticket in tickets:
+			activities += Activity.activities_of_a_ticket(ticket)
 		return activities
 
 	@classmethod
