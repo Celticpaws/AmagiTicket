@@ -257,7 +257,12 @@
                     </script>
 
                   {% endfor %}
-                  <script>  document.getElementById("countnotifications").innerHTML=i; </script>  
+                  <script>  
+                  if (i>0){
+                    document.getElementById("countnotifications").innerHTML=i; 
+                  }else{
+                    document.getElementById("countnotifications").style.display=none;
+                  } </script>    
                   <li>
                     <div class="text-center">
                       <a href = "{% url 'ptasks' %}">

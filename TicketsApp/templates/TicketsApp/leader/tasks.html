@@ -49,6 +49,7 @@
                         <th>Categoria </th>
                         <th>Prioridad </th>
                         <th>Estado </th>
+                        <th>Asignatario </th>
                         <th class=" no-link last sorttable_nosort"><span class="nobr"> SLA </span></th>
                       </tr>
                     </thead>
@@ -76,7 +77,8 @@
                         <td class=" ">{{psolicitud.t_reportmadeon}}</td>
                         <td class=" ">{{psolicitud.t_category}}</td>
                         <td class=" ">{{psolicitud.t_priority}}</td>
-                        <td class="a-right a-right ">{{psolicitud.t_state}}</td>
+                        <td class=" ">{{psolicitud.t_state}}</td>                        
+                        <td class="a-right a-right ">{{psolicitud.t_usersolver}}</td>
                         <td style="width:40%"> 
                           <div class="progress progress_sm" id ="pro{{psolicitud.t_id}}">
                             <script>
