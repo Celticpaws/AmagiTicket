@@ -158,17 +158,33 @@ class UserProfile(models.Model):
 			return User.objects.filter(profile=self)
 
 	def solicitude_group_values(self):
-		users=self.get_users_hierarchy()
-		res=[["No asignados",Ticket.personal_solicitude_count(None)]]
-		for user in users:
-			res += [[user.get_full_name,Ticket.personal_solicitude_count(user)]]
+		users = self.get_users_hierarchy()
+		none = Ticket.none_count(self,False)
+		personal = Ticket.ticket_count(self.u_user,True,False)
+		group = Ticket.ticket_count(self.u_user,False,False)
+		res=[["No asignados",none]]
+		userdep = self.u_department
+		if (userdep.leader_of_department() == self.u_user):
+			for user in users:
+				res += [[user.get_full_name,Ticket.ticket_count(user,True,False)]]
+		else: 
+			res += [[self.u_user.get_full_name,personal]]
+			res += [[userdep,group-none-personal]]
 		return res
 
 	def incident_group_values(self):
-		users=self.get_users_hierarchy()
-		res=[["No asignados",Ticket.personal_incident_count(None)]]
-		for user in users:
-			res += [[user.get_full_name,Ticket.personal_incident_count(user)]]
+		users = self.get_users_hierarchy()
+		none = Ticket.none_count(self,True)
+		personal = Ticket.ticket_count(self.u_user,True,True)
+		group = Ticket.ticket_count(self.u_user,False,True)
+		res=[["No asignados",none]]
+		userdep = self.u_department
+		if (userdep.leader_of_department() == self.u_user):
+			for user in users:
+				res += [[user.get_full_name,Ticket.ticket_count(user,True,True)]]
+		else: 
+			res += [[self.u_user.get_full_name,personal]]
+			res += [[userdep,group-none-personal]]
 		return res
 
 
@@ -215,61 +231,35 @@ class Ticket(models.Model):
 	def __str__(self):
 		return '# '+str(self.t_id)
 
-	def personal_solicitude_count(User):
-		psolicitude = Ticket.objects.filter(t_isincident=False,t_usersolver=User)
-		return psolicitude.count()
+	def none_count(User,isincident):
+		nonesolicitude = Ticket.objects.filter(t_isincident=isincident,t_usersolver=None,t_department=User.u_department)
+		return nonesolicitude.count()
 
-	def personal_solicitude_count_active(User):
-		psolicitude = Ticket.objects.filter(t_isincident=False,t_state="Resuelto",t_usersolver=User)| Ticket.objects.filter(t_isincident=False,t_state="Cerrado",t_usersolver=User)
-		psol = Ticket.personal_solicitude_count(User)
-		if psol == 0:
+	def ticket_count(User,ispersonal,isincident):
+		if ispersonal:
+			ticket = Ticket.objects.filter(t_isincident=isincident,t_usersolver=User)
+		else:
+			depuser = UserProfile.get_department(User)
+			did = Department.get_did(depuser)
+			ticket = Ticket.objects.filter(t_isincident=isincident,t_department=did)
+		return ticket.count()
+
+	def ticket_count_active(User,isincident):
+		p = Ticket.objects.filter(t_isincident=isincident,t_state="Resuelto",t_usersolver=User)| Ticket.objects.filter(t_isincident=isincident,t_state="Cerrado",t_usersolver=User)
+		count = Ticket.ticket_count(User,True,isincident)
+		if count == 0:
 			return 0
 		else:
-			return (psolicitude.count()/psol*100)
+			return (p.count()/count*100)
 
-	def personal_incident_count(User):
-		pincidents = Ticket.objects.filter(t_isincident=True,t_usersolver=User)
-		return pincidents.count()
-
-	def personal_incident_count_active(User):
-		pincident = Ticket.objects.filter(t_isincident=True,t_state="Resuelto",t_usersolver=User)| Ticket.objects.filter(t_isincident=True,t_state="Cerrado",t_usersolver=User)
-		psol = Ticket.personal_incident_count(User)
-		if psol == 0:
-			return 0
+	def tickets(User,ispersonal,isincident):
+		if ispersonal:
+			t = Ticket.objects.filter(t_isincident=isincident,t_usersolver=User)
 		else:
-			return (pincident.count()/psol*100)
-
-	def group_solicitude_count(User):
-		depuser = UserProfile.get_department(User)
-		did = Department.get_did(depuser)
-		gsolicitude = Ticket.objects.filter(t_isincident=False,t_department=did)
-		return gsolicitude.count()
-
-	def group_incident_count(User):
-		depuser = UserProfile.get_department(User)
-		did = Department.get_did(depuser)
-		gincidents = Ticket.objects.filter(t_isincident=True,t_department=did)
-		return gincidents.count()
-
-	def personal_solicitudes(User):
-		psolicitudes = Ticket.objects.filter(t_isincident=False,t_usersolver=User)
-		return psolicitudes
-
-	def group_solicitudes(User):
-		depuser = UserProfile.get_department(User)
-		did = Department.get_did(depuser)
-		gsolicitudes = Ticket.objects.filter(t_isincident=False,t_department=did)
-		return gsolicitudes
-
-	def personal_incidents(User):
-		psolicitudes = Ticket.objects.filter(t_isincident=True,t_usersolver=User)
-		return psolicitudes
-
-	def group_incidents(User):
-		depuser = UserProfile.get_department(User)
-		did = Department.get_did(depuser)
-		gsolicitudes = Ticket.objects.filter(t_isincident=True,t_department=did)
-		return gsolicitudes
+			depuser = UserProfile.get_department(User)
+			did = Department.get_did(depuser)
+			t = Ticket.objects.filter(t_isincident=isincident,t_department=did)
+		return t
 
 	def get_sons(Ticke):
 		sons = Ticket.objects.filter(t_mother=Ticke)
@@ -287,13 +277,6 @@ class Ticket(models.Model):
 			arrayoftypes+=[[t['t_state'],t['dcount']]]
 		return arrayoftypes
 
-	def task_count(User):
-		if User.profile.u_department.leader_of_department()==User:
-			tasks = Ticket.objects.filter(t_state="Asignado",t_department=User.profile.u_department)| Ticket.objects.filter(t_state="En Proceso",t_department=User.profile.u_department)| Ticket.objects.filter(t_state="En Espera",t_department=User.profile.u_department)| Ticket.objects.filter(t_state="Reabierto",t_department=User.profile.u_department)
-		else:
-			tasks = Ticket.objects.filter(t_state="Asignado",t_usersolver=User)| Ticket.objects.filter(t_state="En Proceso",t_usersolver=User)| Ticket.objects.filter(t_state="En Espera",t_usersolver=User)| Ticket.objects.filter(t_state="Re-abierto",t_usersolver=User)
-		return tasks.count()
-
 	def tasks(User):
 		if User.profile.u_department.leader_of_department()==User:
 			tasks = Ticket.objects.filter(t_state="Asignado",t_department=User.profile.u_department)| Ticket.objects.filter(t_state="En Proceso",t_department=User.profile.u_department)| Ticket.objects.filter(t_state="En Espera",t_department=User.profile.u_department)| Ticket.objects.filter(t_state="Reabierto",t_department=User.profile.u_department)
@@ -302,6 +285,11 @@ class Ticket(models.Model):
 		
 		orderedtasks = tasks.order_by('-t_isincident','t_priority','-t_sla')
 		return orderedtasks
+
+	def task_count(User):
+		t = tasks(User)
+		return t.count()
+
 
 	def delta_life(self):
 		lifetime = self.t_sla.ToDeltaTime()
