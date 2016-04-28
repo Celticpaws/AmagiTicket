@@ -46,7 +46,7 @@
                                         <i class="fa fa-mail-reply"></i> Transferir Ticket
                    </a> 
                   
-                   <a class="btn btn-default btn-dark">
+                   <a href="{% url 'TicketsApp.views.ticket_print' pk=ticketpk.pk %}" target="_blank" class="btn btn-default btn-dark">
                                         <i class="fa fa-print"></i> Imprimir Informe
                    </a> 
               </div>
@@ -86,7 +86,7 @@
           <br>
           <div class="col-xs-6">
               <b>Descripción:</b><br>
-              <p>{{ticketpk.t_description}}</p>
+              <p>{{ticketpk.t_description|linebreaks}}</p>
           </div>
 
 
@@ -286,7 +286,7 @@
                                     <tbody>
                                     {% for son in sons %}
                                       <tr class="even pointer">
-                                        <td class=" "><a href="{% url 'TicketsApp.views.tickets' pk=son.pk %}">{{son.t_id}}</a></td>
+                                        <td class=" "><a href="{% url 'TicketsApp.views.ticket' pk=son.pk %}">{{son.t_id}}</a></td>
                                         <td class=" ">{{son.t_reportmadeon}}</td>
                                         <td class=" ">{{son.t_category}}</td>
                                         <td class=" ">{{son.t_priority}}</td>

@@ -65,9 +65,9 @@
                               var b = "{{psolicitud.t_isincident}}" 
                               var text;  
                                if ( b=="True") {
-                                  text = "<span class='label label-danger'>{{psolicitud.t_id}}</span>"
+                                  text = "<span class='label label-danger' style='font-size:15px'>{{psolicitud.t_id}}</span>"
                                }else{
-                                  text = "<span class='label label-info'>{{psolicitud.t_id}}</span>"
+                                  text = "<span class='label label-info' style='font-size:15px'>{{psolicitud.t_id}}</span>"
                                }
                               document.getElementById("sol{{psolicitud.t_id}}").innerHTML = text;
                         

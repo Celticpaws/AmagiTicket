@@ -109,7 +109,7 @@
                 </li>
                 <li><a><i class="fa fa-edit"></i> Solicitudes <span class="fa fa-chevron-down"></span></a>
                   <ul class="nav child_menu" style="display: none">
-                    <li><a href="{% url 'TicketsApp.views.ticket_create' %}">Crear una Solicitud
+                    <li><a href="{% url 'TicketsApp.views.ticket_create' pk='solicitud' %}">Crear una Solicitud
                     </a>
                     </li>
                     <li><a href="{% url 'TicketsApp.views.solicitudp' %}">Mis solicitudes reportadas
@@ -124,7 +124,7 @@
                 </li>
                 <li><a><i class="fa fa-exclamation-triangle"></i> Incidentes <span class="fa fa-chevron-down"></span></a>
                   <ul class="nav child_menu" style="display: none">
-                    <li><a href="#">Crear un Incidente
+                    <li><a href="{% url 'TicketsApp.views.ticket_create' pk='incidente' %}">Crear un Incidente
                     </a>
                     </li>
                     <li><a href="{% url 'TicketsApp.views.incidentp' %}">Mis incidentes reportados

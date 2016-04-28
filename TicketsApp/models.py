@@ -7,6 +7,7 @@ from django.db.models import signals
 from django.core.validators import RegexValidator
 from datetime import datetime, timedelta
 import os
+import time
 
 # Create your models here.
 
@@ -287,7 +288,7 @@ class Ticket(models.Model):
 		return orderedtasks
 
 	def task_count(User):
-		t = tasks(User)
+		t = Ticket.tasks(User)
 		return t.count()
 
 
@@ -368,18 +369,23 @@ class Activity(models.Model):
 		if (activities.count() == 0):
 			activitylast='No hay una ultima modificación'
 		else:
-		    activitylast = activities[0].at_date
+		    activitylast = activities[0].at_date.strftime("%d de %b del %Y a las %I:%M:%S %p")
 		return activitylast
 
 	def date_of_event(Ticket,String):
-		activity = Activity.objects.filter(at_ticket=Ticket,at_tipe=String)
-		if (activity.count() == 0):
-			if (String == 'Resuelto'):
-				solved='No ha sido resuelto'
-			if (String == 'Cerrado'):
-				solved = 'No ha sido cerrado'
+		if String == "":
+			date=Ticket.t_reportmadeon
+			solved=date.strftime("%d de %b del %Y a las %I:%M:%S %p")
 		else:
-		    solved=activity[0].at_date
+			activity = Activity.objects.filter(at_ticket=Ticket,at_tipe=String)
+			if (activity.count() == 0):
+				if (String == 'Resuelto'):
+					solved='No ha sido resuelto'
+				if (String == 'Cerrado'):
+					solved = 'No ha sido cerrado'
+			else:
+				date=activity[0].at_date
+				solved=date.strftime("%d de %b del %Y a las %I:%M:%S %p")
 		return solved
 
 	def last_ten_of_user(User):
