@@ -188,6 +188,29 @@ class UserProfile(models.Model):
 			res += [[userdep,group-none-personal]]
 		return res
 
+	def resume_in_time(User,datestart,datefinish):
+		tickets = Ticket.objects.filter(t_usersolver=User,t_reportmadeon__gte=datestart,t_reportmadeon__lte=datefinish)
+		values = []
+		asienp = 0
+		enpres = 0
+		rescer = 0
+		reares = 0
+		for ticket in tickets:
+			asienp += Activity.time_between_activities(ticket,"Asignado","En Proceso")
+			enpres += Activity.time_between_activities(ticket,"En Proceso","Resuelto")
+			rescer += Activity.time_between_activities(ticket,"Resuelto","Cerrado")
+			reares += Activity.time_between_activities(ticket,"Re-abierto","Resuelto")
+		asienp = asienp /len(tickets)
+		enpres = enpres /len(tickets)
+		rescer = rescer /len(tickets)
+		reares = reares /len(tickets)
+		return [[['Tiempo de procesamiento'],[asienp]],
+				  [['Tiempo de resolución'],[enpres]],
+				  [['Tiempo de cierre'],[rescer]],
+				  [['Tiempo de resolución de reaperturas'],[reares]]]
+
+
+
 
 class SLA(models.Model):
 	s_number = models.IntegerField()
@@ -315,7 +338,7 @@ class Ticket(models.Model):
 			return "Ticket vencido"
 
 	def pop(User):
-		tickets = Ticket.objects.filter(t_usersolver=User)
+		tickets = Ticket.objects.filter(t_usersolver=User,t_state='Iniciado')| Ticket.objects.filter(t_usersolver=User,t_state='Asignado')| Ticket.objects.filter(t_usersolver=User,t_state='En Proceso')| Ticket.objects.filter(t_usersolver=User,t_state='Re-abierto')
 		ticketsfiltered =[]
 		for ticket in tickets.all():
 			if (ticket.delta_life() > 50):
@@ -379,9 +402,9 @@ class Activity(models.Model):
 		else:
 			activity = Activity.objects.filter(at_ticket=Ticket,at_tipe=String)
 			if (activity.count() == 0):
-				if (String == 'Resuelto'):
+				if (String == "Resuelto"):
 					solved='No ha sido resuelto'
-				if (String == 'Cerrado'):
+				if (String == "Cerrado"):
 					solved = 'No ha sido cerrado'
 			else:
 				date=activity[0].at_date
@@ -398,6 +421,17 @@ class Activity(models.Model):
 		for ticket in tickets:
 			activities += Activity.activities_of_a_ticket(ticket)
 		return activities
+
+	def time_between_activities(ticket,istate,fstate):
+		idate = Activity.objects.filter(at_ticket=ticket,at_tipe=istate)
+		fdate = Activity.objects.filter(at_ticket=ticket,at_tipe=fstate)
+		if len(idate) == 0:
+			return -1
+		if len(fdate) == 0:
+			return -2
+		idate=idate[0]
+		fdate=fdate[0]
+		return (fdate.at_date-idate.at_date).total_seconds()
 
 	@classmethod
 	def insert(cls,ticket,tipe,createdby,date,description):

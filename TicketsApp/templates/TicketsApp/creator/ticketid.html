@@ -48,9 +48,31 @@
                                         <i class="fa fa-mail-reply"></i> Transferir Ticket
                    </a> 
                   
-                   <a class="btn btn-default btn-dark">
+                   <a href="{% url 'TicketsApp.views.ticket_print' pk=ticketpk.pk %}" class="btn btn-default btn-dark">
                                         <i class="fa fa-print"></i> Imprimir Informe
                    </a> 
+
+                   <button data-toggle="modal" data-target="#solved" class="btn btn-default btn-success">
+                                        <i class="fa fa-check-square-o"></i> Validar solución
+                   </button> 
+                   <div class="modal fade" id="solved" role="dialog">
+                                            <div class="modal-dialog modal-sm">
+                                              <div class="modal-content">
+                                                <div class="modal-header">
+                                                  <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span>
+                                                  </button>
+                                                  <h4 class="modal-title" id="myModalLabel"> Validar Solucion </h4>
+                                                </div>
+                                                <div class="modal-body">
+                                                  <p>¿Esta seguro que el Ticket # {{ticketpk.t_id}} ha sido solucionado?</p>
+                                                </div>
+                                                <div class="modal-footer">
+                                                <button type="button" class="btn btn-danger" data-dismiss="modal">No</button>
+                                                <a href="{% url 'TicketsApp.views.ticket_close' pk=ticketpk.pk %}" class="btn btn-default btn-success">Si</a>
+                                              </div>
+                                            </div>
+                                          </div>
+                                        </div>
               </div>
         </div>
 
