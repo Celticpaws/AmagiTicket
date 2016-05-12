@@ -39,8 +39,9 @@ def index(request):
     prequisite = Ticket.ticket_count(request.user,True,None)
     grequisite = Ticket.ticket_count(request.user,False,None)
     types = Ticket.count_types(request.user)
-    svalues = (UserProfile.get_UserProfile(request.user)).solicitude_group_values()
-    ivalues = (UserProfile.get_UserProfile(request.user)).incident_group_values()
+    svalues = (UserProfile.get_UserProfile(request.user)).group_values(False)
+    ivalues = (UserProfile.get_UserProfile(request.user)).group_values(True)
+    rvalues = (UserProfile.get_UserProfile(request.user)).group_values(None)
     servers = Server.server_count()
     services = Service.service_count()
     taskcount = Ticket.task_count(request.user)
@@ -58,7 +59,7 @@ def index(request):
     return render(request, link, 
             {'userjob':userjob,'userdepartment':userdepartment,'psolicitude':psolicitude,'prequisite':prequisite,'grequisite':grequisite,
              'pincident':pincident,'gsolicitude':gsolicitude,'gincident':gincident,
-             'svalues': svalues,'ivalues': ivalues,'bvalues': types,    
+             'svalues': svalues,'ivalues': ivalues,'rvalues': rvalues,'bvalues': types,    
              'servers': servers,'services' : services,'taskcount' : taskcount,
              'notifications':notifications,'activitiespop':activitiespop,'slaspop':slaspop,
              })

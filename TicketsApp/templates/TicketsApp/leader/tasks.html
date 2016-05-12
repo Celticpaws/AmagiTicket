@@ -61,11 +61,13 @@
                         <td class=" ">
                           <a href="{% url 'TicketsApp.views.ticket' pk=psolicitud.pk %}">
                           <span id="sol{{psolicitud.t_id}}"></span>
-                          <script>
+                         <script>
                               var b = "{{psolicitud.t_isincident}}" 
                               var text;  
                                if ( b=="True") {
                                   text = "<span class='label label-danger' style='font-size:15px'>{{psolicitud.t_id}}</span>"
+                               }else if ( b=="None") {
+                                  text = "<span class='label label-success' style='font-size:15px'>{{psolicitud.t_id}}</span>"
                                }else{
                                   text = "<span class='label label-info' style='font-size:15px'>{{psolicitud.t_id}}</span>"
                                }

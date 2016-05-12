@@ -162,31 +162,16 @@ class UserProfile(models.Model):
 		else:
 			return User.objects.filter(profile=self)
 
-	def solicitude_group_values(self):
+	def group_values(self,isincident):
 		users = self.get_users_hierarchy()
-		none = Ticket.none_count(self,False)
-		personal = Ticket.ticket_count(self.u_user,True,False)
-		group = Ticket.ticket_count(self.u_user,False,False)
+		none = Ticket.none_count(self,isincident)
+		personal = Ticket.ticket_count(self.u_user,True,isincident)
+		group = Ticket.ticket_count(self.u_user,False,isincident)
 		res=[["No asignados",none]]
 		userdep = self.u_department
 		if (userdep.leader_of_department() == self.u_user):
 			for user in users:
-				res += [[user.get_full_name,Ticket.ticket_count(user,True,False)]]
-		else: 
-			res += [[self.u_user.get_full_name,personal]]
-			res += [[userdep,group-none-personal]]
-		return res
-
-	def incident_group_values(self):
-		users = self.get_users_hierarchy()
-		none = Ticket.none_count(self,True)
-		personal = Ticket.ticket_count(self.u_user,True,True)
-		group = Ticket.ticket_count(self.u_user,False,True)
-		res=[["No asignados",none]]
-		userdep = self.u_department
-		if (userdep.leader_of_department() == self.u_user):
-			for user in users:
-				res += [[user.get_full_name,Ticket.ticket_count(user,True,True)]]
+				res += [[user.get_full_name,Ticket.ticket_count(user,True,isincident)]]
 		else: 
 			res += [[self.u_user.get_full_name,personal]]
 			res += [[userdep,group-none-personal]]

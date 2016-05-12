@@ -66,6 +66,8 @@
                               var text;  
                                if ( b=="True") {
                                   text = "<span class='label label-danger' style='font-size:15px'>{{psolicitud.t_id}}</span>"
+                               }else if ( b=="None") {
+                                  text = "<span class='label label-success' style='font-size:15px'>{{psolicitud.t_id}}</span>"
                                }else{
                                   text = "<span class='label label-info' style='font-size:15px'>{{psolicitud.t_id}}</span>"
                                }
