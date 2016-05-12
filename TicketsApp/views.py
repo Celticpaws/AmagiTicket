@@ -36,6 +36,8 @@ def index(request):
     gsolicitude = Ticket.ticket_count(request.user,False,False)
     pincident = Ticket.ticket_count(request.user,True,True)
     gincident = Ticket.ticket_count(request.user,False,True)
+    prequisite = Ticket.ticket_count(request.user,True,None)
+    grequisite = Ticket.ticket_count(request.user,False,None)
     types = Ticket.count_types(request.user)
     svalues = (UserProfile.get_UserProfile(request.user)).solicitude_group_values()
     ivalues = (UserProfile.get_UserProfile(request.user)).incident_group_values()
@@ -54,7 +56,7 @@ def index(request):
         else:
             link ='TicketsApp/solver/index.html'
     return render(request, link, 
-            {'userjob':userjob,'userdepartment':userdepartment,'psolicitude':psolicitude,
+            {'userjob':userjob,'userdepartment':userdepartment,'psolicitude':psolicitude,'prequisite':prequisite,'grequisite':grequisite,
              'pincident':pincident,'gsolicitude':gsolicitude,'gincident':gincident,
              'svalues': svalues,'ivalues': ivalues,'bvalues': types,    
              'servers': servers,'services' : services,'taskcount' : taskcount,
@@ -69,6 +71,8 @@ def users(request):
     gsolicitude = Ticket.ticket_count(request.user,False,False)
     pincident = Ticket.ticket_count(request.user,True,True)
     gincident = Ticket.ticket_count(request.user,False,True)
+    prequisite = Ticket.ticket_count(request.user,True,None)
+    grequisite = Ticket.ticket_count(request.user,False,None)
     servers = Server.server_count()
     services = Service.service_count()
     usershierarchy = request.user.profile.get_users_hierarchy()
@@ -83,7 +87,7 @@ def users(request):
             link ='TicketsApp/solver/users_list.html'
     return render(request, link, 
             {'userjob':userjob,'psolicitude':psolicitude,'pincident':pincident,
-             'gsolicitude':gsolicitude,'gincident':gincident,'servers': servers,
+             'gsolicitude':gsolicitude,'gincident':gincident,'prequisite':prequisite,'grequisite':grequisite,'servers': servers,
              'services' : services,'usershierarchy':usershierarchy,'notifications':notifications,
              })
 
@@ -97,6 +101,8 @@ def users_id(request,pk):
     pincidenta = Ticket.ticket_count_active(userp,True)
     pincident = Ticket.ticket_count(request.user,True,True)
     gincident = Ticket.ticket_count(request.user,False,True)
+    prequisite = Ticket.ticket_count(request.user,True,None)
+    grequisite = Ticket.ticket_count(request.user,False,None)
     servers = Server.server_count()
     services = Service.service_count()
     ivalues = (UserProfile.get_UserProfile(request.user)).incident_group_values()
@@ -115,7 +121,7 @@ def users_id(request,pk):
             link ='TicketsApp/solver/users_id.html'
     return render(request, link, 
             {'userjob':userjob,'psolicitude':psolicitude,'pincident':pincident,
-             'psolicitudea':psolicitudea,'pincidenta':pincidenta,'gsolicitude':gsolicitude,
+             'psolicitudea':psolicitudea,'pincidenta':pincidenta,'gsolicitude':gsolicitude,'prequisite':prequisite,'grequisite':grequisite,
              'gincident':gincident,'servers': servers,'services' : services,'usershierarchy':usershierarchy,'userp':userp,
              'lastten':lastten,'usertickets':usertickets,'notifications':notifications,'bars':bars,'ivalues':ivalues,
              })
@@ -154,6 +160,8 @@ def solicitudp(request):
     gsolicitude = Ticket.ticket_count(request.user,False,False)
     pincident = Ticket.ticket_count(request.user,True,True)
     gincident = Ticket.ticket_count(request.user,False,True)
+    prequisite = Ticket.ticket_count(request.user,True,None)
+    grequisite = Ticket.ticket_count(request.user,False,None)
     psolicitudes = Ticket.tickets(request.user,True,False)
     servers = Server.server_count()
     services = Service.service_count()
@@ -167,7 +175,7 @@ def solicitudp(request):
         else:
             link ='TicketsApp/solver/personal_solicitude.html'
     return render(request, link, {'userjob':userjob,
-             'psolicitude':psolicitude,'pincident':pincident,'gsolicitude':gsolicitude,
+             'psolicitude':psolicitude,'pincident':pincident,'gsolicitude':gsolicitude,'prequisite':prequisite,'grequisite':grequisite,
              'gincident':gincident,'psolicitudes':psolicitudes,'servers':servers,
              'services':services,'notifications':notifications,
                  })
@@ -179,6 +187,8 @@ def solicitudg(request):
     gsolicitude = Ticket.ticket_count(request.user,False,False)
     pincident = Ticket.ticket_count(request.user,True,True)
     gincident = Ticket.ticket_count(request.user,False,True)
+    prequisite = Ticket.ticket_count(request.user,True,None)
+    grequisite = Ticket.ticket_count(request.user,False,None)
     gsolicitudes = Ticket.tickets(request.user,False,False)
     servers = Server.server_count()
     services = Service.service_count()
@@ -192,7 +202,7 @@ def solicitudg(request):
         else:
             link ='TicketsApp/solver/group_solicitude.html'
     return render(request, link,{'userjob':userjob,
-             'psolicitude':psolicitude,'pincident':pincident,'gsolicitude':gsolicitude,
+             'psolicitude':psolicitude,'pincident':pincident,'gsolicitude':gsolicitude,'prequisite':prequisite,'grequisite':grequisite,
              'gincident':gincident,'gsolicitudes':gsolicitudes,'servers':servers,
              'services':services,'notifications':notifications,
                  })
@@ -204,6 +214,8 @@ def incidentp(request):
     gsolicitude = Ticket.ticket_count(request.user,False,False)
     pincident = Ticket.ticket_count(request.user,True,True)
     gincident = Ticket.ticket_count(request.user,False,True)
+    prequisite = Ticket.ticket_count(request.user,True,None)
+    grequisite = Ticket.ticket_count(request.user,False,None)
     pincidents = Ticket.tickets(request.user,True,True)
     servers = Server.server_count()
     services = Service.service_count()
@@ -217,7 +229,7 @@ def incidentp(request):
         else:
             link ='TicketsApp/solver/personal_incidents.html'
     return render(request, link, {'userjob':userjob,
-         'psolicitude':psolicitude,'pincident':pincident,'gsolicitude':gsolicitude,
+         'psolicitude':psolicitude,'pincident':pincident,'gsolicitude':gsolicitude,'prequisite':prequisite,'grequisite':grequisite,
          'gincident':gincident,'pincidents':pincidents,'servers':servers,
          'services':services,'notifications':notifications,
              })
@@ -229,6 +241,8 @@ def incidentg(request):
     gsolicitude = Ticket.ticket_count(request.user,False,False)
     pincident = Ticket.ticket_count(request.user,True,True)
     gincident = Ticket.ticket_count(request.user,False,True)
+    prequisite = Ticket.ticket_count(request.user,True,None)
+    grequisite = Ticket.ticket_count(request.user,False,None)
     gincidents = Ticket.tickets(request.user,False,True)
     servers = Server.server_count()
     services = Service.service_count()
@@ -242,8 +256,62 @@ def incidentg(request):
         else:
             link ='TicketsApp/solver/group_incidents.html'
     return render(request, link, {'userjob':userjob,
-         'psolicitude':psolicitude,'pincident':pincident,'gsolicitude':gsolicitude,
+         'psolicitude':psolicitude,'pincident':pincident,'gsolicitude':gsolicitude,'prequisite':prequisite,'grequisite':grequisite,
          'gincident':gincident,'gincidents':gincidents,'servers':servers,
+         'services':services,'notifications':notifications,
+             })
+
+def requisitep(request):
+    userjob = UserProfile.get_jobtitle(request.user)
+    userdepartment = UserProfile.get_department(request.user)
+    psolicitude = Ticket.ticket_count(request.user,True,False)
+    gsolicitude = Ticket.ticket_count(request.user,False,False)
+    pincident = Ticket.ticket_count(request.user,True,True)
+    gincident = Ticket.ticket_count(request.user,False,True)
+    prequisite = Ticket.ticket_count(request.user,True,None)
+    grequisite = Ticket.ticket_count(request.user,False,None)
+    prequisites = Ticket.tickets(request.user,True,None)
+    servers = Server.server_count()
+    services = Service.service_count()
+    notifications = Ticket.objects.filter(t_department=request.user.profile.u_department,t_state="Iniciado").order_by('-t_reportmadeon')[:8]
+    link = ''
+    if (userdepartment.leader_of_department() == request.user):
+        link = 'TicketsApp/leader/personal_requisites.html'
+    else:
+        if (UserProfile.get_UserProfile(request.user).u_cancreatetickets) :
+            link ='TicketsApp/creator/personal_requisites.html'
+        else:
+            link ='TicketsApp/solver/personal_requisites.html'
+    return render(request, link, {'userjob':userjob,
+         'psolicitude':psolicitude,'pincident':pincident,'gsolicitude':gsolicitude,'prequisite':prequisite,'grequisite':grequisite,
+         'gincident':gincident,'prequisites':prequisites,'servers':servers,
+         'services':services,'notifications':notifications,
+             })
+
+def requisiteg(request):
+    userjob = UserProfile.get_jobtitle(request.user)
+    userdepartment = UserProfile.get_department(request.user)
+    psolicitude = Ticket.ticket_count(request.user,True,False)
+    gsolicitude = Ticket.ticket_count(request.user,False,False)
+    pincident = Ticket.ticket_count(request.user,True,True)
+    gincident = Ticket.ticket_count(request.user,False,True)
+    prequisite = Ticket.ticket_count(request.user,True,None)
+    grequisite = Ticket.ticket_count(request.user,False,None)
+    grequisites = Ticket.tickets(request.user,False,None)
+    servers = Server.server_count()
+    services = Service.service_count()
+    notifications = Ticket.objects.filter(t_department=request.user.profile.u_department,t_state="Iniciado").order_by('-t_reportmadeon')[:8]
+    link = ''
+    if (userdepartment.leader_of_department() == request.user):
+        link = 'TicketsApp/leader/group_requisites.html'
+    else:
+        if (UserProfile.get_UserProfile(request.user).u_cancreatetickets) :
+            link ='TicketsApp/creator/group_requisites.html'
+        else:
+            link ='TicketsApp/solver/group_requisites.html'
+    return render(request, link, {'userjob':userjob,
+         'psolicitude':psolicitude,'pincident':pincident,'gsolicitude':gsolicitude,'prequisite':prequisite,'grequisite':grequisite,
+         'gincident':gincident,'grequisites':grequisites,'servers':servers,
          'services':services,'notifications':notifications,
              })
 
@@ -254,6 +322,8 @@ def ptasks(request):
     gsolicitude = Ticket.ticket_count(request.user,False,False)
     pincident = Ticket.ticket_count(request.user,True,True)
     gincident = Ticket.ticket_count(request.user,False,True)
+    prequisite = Ticket.ticket_count(request.user,True,None)
+    grequisite = Ticket.ticket_count(request.user,False,None)
     ptasks = Ticket.tasks(request.user)
     servers = Server.server_count()
     services = Service.service_count()
@@ -267,7 +337,7 @@ def ptasks(request):
         else:
             link ='TicketsApp/solver/tasks.html'
     return render(request, link, {'userjob':userjob,
-         'psolicitude':psolicitude,'pincident':pincident,'gsolicitude':gsolicitude,
+         'psolicitude':psolicitude,'pincident':pincident,'gsolicitude':gsolicitude,'prequisite':prequisite,'grequisite':grequisite,
          'gincident':gincident,'ptasks':ptasks,'servers':servers,
          'services':services,
          'notifications':notifications,
@@ -280,6 +350,8 @@ def ticket(request,pk):
     gsolicitude = Ticket.ticket_count(request.user,False,False)
     pincident = Ticket.ticket_count(request.user,True,True)
     gincident = Ticket.ticket_count(request.user,False,True)
+    prequisite = Ticket.ticket_count(request.user,True,None)
+    grequisite = Ticket.ticket_count(request.user,False,None)
     servers = Server.server_count()
     services = Service.service_count()
     notifications = Ticket.objects.filter(t_department=request.user.profile.u_department,t_state="Iniciado").order_by('-t_reportmadeon')[:8]
@@ -316,7 +388,7 @@ def ticket(request,pk):
             else:
                 link ='TicketsApp/solver/ticketid.html'
         return render(request,link,{
-             'userjob':userjob,'psolicitude':psolicitude,'pincident':pincident,
+             'userjob':userjob,'psolicitude':psolicitude,'pincident':pincident,'prequisite':prequisite,'grequisite':grequisite,
              'gsolicitude':gsolicitude,'gincident':gincident,'ticketpk':ticketpk,
             'useraffected':useraffected,'usersolver':usersolver,'sla':sla,
             'slahour':slahour,'slaminute':slaminute,'attacheds':attacheds,
@@ -330,13 +402,18 @@ def ticket_create(request,pk):
     if (pk == 'solicitud'):
         isincident = False
     else:
-        isincident = True
+        if (pk == 'requisito'):
+            isincident = None
+        else:
+            isincident = True
     userjob = UserProfile.get_jobtitle(request.user)
     userdepartment = UserProfile.get_department(request.user)
     psolicitude = Ticket.ticket_count(request.user,True,False)
     gsolicitude = Ticket.ticket_count(request.user,False,False)
     pincident = Ticket.ticket_count(request.user,True,True)
     gincident = Ticket.ticket_count(request.user,False,True)
+    prequisite = Ticket.ticket_count(request.user,True,None)
+    grequisite = Ticket.ticket_count(request.user,False,None)
     servers = Server.server_count()
     services = Service.service_count()
     usersofdep = Department.from_user_get_depusers(request.user)
@@ -364,7 +441,7 @@ def ticket_create(request,pk):
     else:
         formTicket = CreateTicketForm()
         return render(request,'TicketsApp/creator/ticketid_create.html',{
-        'userjob':userjob,'psolicitude':psolicitude,'pincident':pincident,
+        'userjob':userjob,'psolicitude':psolicitude,'pincident':pincident,'prequisite':prequisite,'grequisite':grequisite,
         'gsolicitude':gsolicitude,'gincident':gincident,'servers':servers, 
         'services':services,'usersofdep':usersofdep,'formTicket':formTicket,'notifications':notifications,
         'isincident':isincident,
@@ -377,6 +454,8 @@ def ticket_edit(request,pk):
     gsolicitude = Ticket.ticket_count(request.user,False,False)
     pincident = Ticket.ticket_count(request.user,True,True)
     gincident = Ticket.ticket_count(request.user,False,True)
+    prequisite = Ticket.ticket_count(request.user,True,None)
+    grequisite = Ticket.ticket_count(request.user,False,None)
     servers = Server.server_count()
     services = Service.service_count()
     ticketpk = Ticket.objects.get(pk=pk)
@@ -411,7 +490,7 @@ def ticket_edit(request,pk):
         ticketpk.usersolver=request.user
         ticketpk.save()
         return render(request, link+'ticketid.html',{
-        'userjob':userjob,'psolicitude':psolicitude,'pincident':pincident,
+        'userjob':userjob,'psolicitude':psolicitude,'pincident':pincident,'prequisite':prequisite,'grequisite':grequisite,
         'gsolicitude':gsolicitude,'gincident':gincident,'ticketpk':ticketpk,
         'useraffected':useraffected,'usersolver':usersolver,'sla':sla,
         'slahour':slahour,'slaminute':slaminute,'attacheds':attacheds,
@@ -422,7 +501,7 @@ def ticket_edit(request,pk):
     else:
         formTicket = EditTicketStateForm(instance=ticketpk)
         return render(request,link+'ticketid_edit.html',{
-        'userjob':userjob,'psolicitude':psolicitude,'pincident':pincident,
+        'userjob':userjob,'psolicitude':psolicitude,'pincident':pincident,'prequisite':prequisite,'grequisite':grequisite,
         'gsolicitude':gsolicitude,'gincident':gincident,'ticketpk':ticketpk,
         'useraffected':useraffected,'usersolver':usersolver,'sla':sla,
         'slahour':slahour,'slaminute':slaminute,'attacheds':attacheds,    
@@ -438,6 +517,8 @@ def ticket_attach(request,pk):
     gsolicitude = Ticket.ticket_count(request.user,False,False)
     pincident = Ticket.ticket_count(request.user,True,True)
     gincident = Ticket.ticket_count(request.user,False,True)
+    prequisite = Ticket.ticket_count(request.user,True,None)
+    grequisite = Ticket.ticket_count(request.user,False,None)
     servers = Server.server_count()
     services = Service.service_count()
     ticketpk = Ticket.objects.get(pk=pk)
@@ -476,7 +557,7 @@ def ticket_attach(request,pk):
         archiveattached.save()
         newactivity.save()
         return render(request,link+'ticketid.html',{
-         'userjob':userjob,'psolicitude':psolicitude,'pincident':pincident,
+         'userjob':userjob,'psolicitude':psolicitude,'pincident':pincident,'prequisite':prequisite,'grequisite':grequisite,
          'gsolicitude':gsolicitude,'gincident':gincident,'ticketpk':ticketpk,
         'useraffected':useraffected,'usersolver':usersolver,'sla':sla,
         'slahour':slahour,'slaminute':slaminute,'attacheds':attacheds,
@@ -487,7 +568,7 @@ def ticket_attach(request,pk):
     else:
         formArchive = AddArchiveForm(instance=ticketpk)
         return render(request,link+'ticketid_attach.html',{
-         'userjob':userjob,'psolicitude':psolicitude,'pincident':pincident,
+         'userjob':userjob,'psolicitude':psolicitude,'pincident':pincident,'prequisite':prequisite,'grequisite':grequisite,
          'gsolicitude':gsolicitude,'gincident':gincident,'ticketpk':ticketpk,
         'useraffected':useraffected,'usersolver':usersolver,'sla':sla,
         'slahour':slahour,'slaminute':slaminute,'attacheds':attacheds,
@@ -503,6 +584,8 @@ def ticket_scale(request,pk):
     gsolicitude = Ticket.ticket_count(request.user,False,False)
     pincident = Ticket.ticket_count(request.user,True,True)
     gincident = Ticket.ticket_count(request.user,False,True)
+    prequisite = Ticket.ticket_count(request.user,True,None)
+    grequisite = Ticket.ticket_count(request.user,False,None)
     servers = Server.server_count()
     services = Service.service_count()
     ticketpk = Ticket.objects.get(pk=pk)
@@ -563,6 +646,8 @@ def ticket_transfer(request,pk):
     gsolicitude = Ticket.ticket_count(request.user,False,False)
     pincident = Ticket.ticket_count(request.user,True,True)
     gincident = Ticket.ticket_count(request.user,False,True)
+    prequisite = Ticket.ticket_count(request.user,True,None)
+    grequisite = Ticket.ticket_count(request.user,False,None)
     servers = Server.server_count()
     services = Service.service_count()
     ticketpk = Ticket.objects.get(pk=pk)
@@ -597,7 +682,7 @@ def ticket_transfer(request,pk):
         ticketpk.t_department = UserProfile.get_department(ticketpk.t_userreporter)
         ticketpk.save()
         return render(request,'TicketsApp/creator/ticketid.html',{
-            'userjob':userjob,'psolicitude':psolicitude,'pincident':pincident,
+            'userjob':userjob,'psolicitude':psolicitude,'pincident':pincident,'prequisite':prequisite,'grequisite':grequisite,
             'gsolicitude':gsolicitude,'gincident':gincident,'ticketpk':ticketpk,
             'useraffected':useraffected,'usersolver':usersolver,'sla':sla,
             'slahour':slahour,'slaminute':slaminute,'attacheds':attacheds,
@@ -608,7 +693,7 @@ def ticket_transfer(request,pk):
     else:
         formTicket = TransferForm(instance=ticketpk)
         return render(request,'TicketsApp/creator/ticketid_transfer.html',{
-            'userjob':userjob,'psolicitude':psolicitude,'pincident':pincident,
+            'userjob':userjob,'psolicitude':psolicitude,'pincident':pincident,'prequisite':prequisite,'grequisite':grequisite,
             'gsolicitude':gsolicitude,'gincident':gincident,'ticketpk':ticketpk,
             'useraffected':useraffected,'usersolver':usersolver,'sla':sla,
             'slahour':slahour,'slaminute':slaminute,'attacheds':attacheds,    
@@ -624,6 +709,8 @@ def ticket_assign(request,pk):
     gsolicitude = Ticket.ticket_count(request.user,False,False)
     pincident = Ticket.ticket_count(request.user,True,True)
     gincident = Ticket.ticket_count(request.user,False,True)
+    prequisite = Ticket.ticket_count(request.user,True,None)
+    grequisite = Ticket.ticket_count(request.user,False,None)
     servers = Server.server_count()
     services = Service.service_count()
     ticketpk = Ticket.objects.get(pk=pk)
@@ -666,7 +753,7 @@ def ticket_assign(request,pk):
         ticketpk.t_state = "Asignado"
         ticketpk.save()
         return render(request,link+'ticketid.html',{
-            'userjob':userjob,'psolicitude':psolicitude,'pincident':pincident,
+            'userjob':userjob,'psolicitude':psolicitude,'pincident':pincident,'prequisite':prequisite,'grequisite':grequisite,
             'gsolicitude':gsolicitude,'gincident':gincident,'ticketpk':ticketpk,
             'useraffected':useraffected,'usersolver':usersolver,'sla':sla,
             'slahour':slahour,'slaminute':slaminute,'attacheds':attacheds,
@@ -678,7 +765,7 @@ def ticket_assign(request,pk):
         formTicket = AsignateSolverTicketForm(instance=ticketpk)
         formTicket.fields['t_usersolver'].queryset = UserProfile.get_users_hierarchy(request.user.profile)
         return render(request,link+'ticketid_assign.html',{
-            'userjob':userjob,'psolicitude':psolicitude,'pincident':pincident,
+            'userjob':userjob,'psolicitude':psolicitude,'pincident':pincident,'prequisite':prequisite,'grequisite':grequisite,
             'gsolicitude':gsolicitude,'gincident':gincident,'ticketpk':ticketpk,
             'useraffected':useraffected,'usersolver':usersolver,'sla':sla,
             'slahour':slahour,'slaminute':slaminute,'attacheds':attacheds,    

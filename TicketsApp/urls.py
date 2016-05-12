@@ -12,6 +12,8 @@ urlpatterns = [
         url(r'^solicitudg$', views.solicitudg, name='solicitudg'),
         url(r'^incidentp$', views.incidentp, name='incidentp'),
         url(r'^incidentg$', views.incidentg, name='incidentg'),
+        url(r'^requisitep$', views.requisitep, name='requisitep'),
+        url(r'^requisiteg$', views.requisiteg, name='requisiteg'),
         url(r'^ptasks$', views.ptasks, name='ptasks'),
         url(r'^users$',views.users, name='users'),
         url(r'^user/(?P<pk>[0-9]+)$',views.users_id),

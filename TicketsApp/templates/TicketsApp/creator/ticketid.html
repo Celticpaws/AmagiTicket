@@ -19,12 +19,14 @@
                       var text;  
                        if ( b=="True") {
                           text = "<span class='label label-danger'>Ticket # {{ticketpk.t_id}}</span>"
+                       }else if (b=="None"){
+                          text = "<span class='label label-success'>Ticket # {{ticketpk.t_id}}</span>"
                        }else{
                           text = "<span class='label label-info'>Ticket # {{ticketpk.t_id}}</span>"
                        }
                       document.getElementById("sol").innerHTML = text;
                 
-                  </script>                    
+                  </script>              
               </h1>
             </div>
           </div>
@@ -52,9 +54,9 @@
                                         <i class="fa fa-print"></i> Imprimir Informe
                    </a> 
 
-                   <button data-toggle="modal" data-target="#solved" class="btn btn-default btn-success">
+                   <a><button data-toggle="modal" data-target="#solved" class="btn btn-default btn-success">
                                         <i class="fa fa-check-square-o"></i> Validar solución
-                   </button> 
+                   </button> </a>
                    <div class="modal fade" id="solved" role="dialog">
                                             <div class="modal-dialog modal-sm">
                                               <div class="modal-content">
@@ -176,6 +178,8 @@
                       var text;  
                        if ( b=="True") {
                           text = "<span class='label label-danger'>Incidente</span>"
+                       }else if (b=="None"){
+                          text = "<span class='label label-success'>Requisito</span>"
                        }else{
                           text = "<span class='label label-info'>Solicitud"
                        }

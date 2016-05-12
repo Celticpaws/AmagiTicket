@@ -17,6 +17,8 @@
                       var text;  
                        if ( b=="True") {
                           text = "<span class='label label-danger'>Ticket # {{ticketpk.t_id}}</span>"
+                       }else if (b=="None"){
+                          text = "<span class='label label-success'>Ticket # {{ticketpk.t_id}}</span>"
                        }else{
                           text = "<span class='label label-info'>Ticket # {{ticketpk.t_id}}</span>"
                        }

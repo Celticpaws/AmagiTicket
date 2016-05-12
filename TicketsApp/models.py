@@ -30,9 +30,13 @@ class Company(models.Model):
 	c_id = models.IntegerField(unique=True,primary_key=True)
 	c_name = models.CharField(max_length=100)
 	c_owner = models.ForeignKey('auth.User',default=0)
+	c_solicitude = models.BooleanField(default=False)
+	c_requisite = models.BooleanField(default=False)
+	c_incident = models.BooleanField(default=False)
 
 	def __str__(self):
 		return self.c_name
+
 
 
 class Management(models.Model):
@@ -234,13 +238,13 @@ class SLA(models.Model):
 class Ticket(models.Model):
 	t_id = models.IntegerField(primary_key=True)
 	t_mother = models.ForeignKey('Ticket',related_name='t_mother_of',default=0,null=True,blank=True)
-	t_isincident = models.BooleanField(default=False)
+	t_isincident = models.NullBooleanField(default=False)
 	t_useraffected = models.ForeignKey('auth.User',related_name='t_useraffected',default=0)
-	t_category = models.CharField(max_length=20)
-	t_title = models.CharField(max_length = 100)
+	t_category = models.CharField(max_length=20,null=True)
+	t_title = models.CharField(max_length = 100,null=True)
 	t_description = models.CharField(max_length=1000)
-	t_server =models.ForeignKey('Server')
-	t_service = models.ForeignKey('Service')
+	t_server =models.ForeignKey('Server',null=True)
+	t_service = models.ForeignKey('Service',null=True)
 	t_impact = models.IntegerField()
 	t_priority = models.IntegerField()
 	t_sla = models.ForeignKey('SLA',related_name='sla')

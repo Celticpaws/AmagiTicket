@@ -1,7 +1,7 @@
 {% extends 'TicketsApp/maincreator.html' %}
 
     {% block title %} 
-    Incidentes Personales
+    Incidentes Grupales
     {% endblock %}
  <script src="js/jquery.min.js"></script>
 
@@ -12,12 +12,13 @@
           <div class="page-title">
             <div class="title_left">
               <h3>
-                  <span class='label label-danger'>  Incidentes Personales </span>
+                  <span class='label label-success'>  Requisitos Grupales </span>
                     
                 </h3>
             </div>
 
             
+            </div>
           </div>
           <div class="clearfix"></div>
 
@@ -26,7 +27,7 @@
             <div class="col-md-12 col-sm-12 col-xs-12">
               <div class="x_panel">
                 <div class="x_title">
-                  <h2>Lista de incidentes</h2>
+                  <h2>Lista de requisitos</h2>
                   
                   <div class="clearfix"></div>
                 </div>
@@ -48,18 +49,17 @@
                     </thead>
 
                     <tbody>
-                    {% for pincident in pincidents %}
+                    {% for grequisite in grequisites %}
                       <tr class="even pointer">
-                        
-                        <td class=" "><a href="{% url 'TicketsApp.views.ticket' pk=pincident.pk %}">{{pincident.t_id}}</a>
-                        </td>
-                        <td class=" ">{{pincident.t_reportmadeon}}</td>
-                        <td class=" ">{{pincident.t_category}}</td>
-                        <td class=" ">{{pincident.t_priority}}</td>
-                        <td class=" " style="width:10%"><div style="white-space: nowrap;text-overflow: ellipsis; width: 300px;display: block;overflow: hidden"> {{pincident.t_description}}</div></td>
-                        <td class="a-right a-right ">{{pincident.t_state}}</td>
-                        <td class="a-right a-right ">{{pincident.t_department}}</td>
-                        <td class=" last">{{pincident.t_usersolver}}</td>
+                       
+                        <td class=" "><a href="{% url 'TicketsApp.views.ticket' pk=grequisite.pk %}">{{grequisite.t_id}}</a></td>
+                        <td class=" ">{{grequisite.t_reportmadeon}}</td>
+                        <td class=" ">{{grequisite.t_category}}</td>
+                        <td class=" ">{{grequisite.t_priority}}</td>
+                        <td class=" " style="width:10%"><div style="white-space: nowrap;text-overflow: ellipsis; width: 300px;display: block;overflow: hidden"> {{grequisite.t_description}}</div></td>
+                        <td class="a-right a-right ">{{grequisite.t_state}}</td>
+                        <td class="a-right a-right ">{{grequisite.t_department}}</td>
+                        <td class=" last">{{grequisite.t_usersolver}}</td>
                       </tr>
                     {% endfor %}
 

@@ -16,9 +16,11 @@
                       var b = "{{ticketpk.t_isincident}}" 
                       var text;  
                        if ( b=="True") {
-                          text = "<span class='label label-danger'>Ticket # {{ticketpk.t_id}}</span>"
+                          text = "<span class='label label-danger'>Incidente</span>"
+                       }else if (b=="None"){
+                          text = "<span class='label label-success'>Requisito</span>"
                        }else{
-                          text = "<span class='label label-info'>Ticket # {{ticketpk.t_id}}</span>"
+                          text = "<span class='label label-info'>Solicitud"
                        }
                       document.getElementById("sol").innerHTML = text;
                 

@@ -109,30 +109,72 @@
                     </li>
                   </ul>
                 </li>
-                <li><a><i class="fa fa-edit"></i> Solicitudes <span class="fa fa-chevron-down"></span></a>
+                <li id="solicitudes"><a><i class="fa fa-edit"></i> Solicitudes <span class="fa fa-chevron-down"></span></a>
                   <ul class="nav child_menu" style="display: none">
-                    <li><a href="{% url 'solicitudp' %}">Solicitudes Personales
+                    <li><a href="{% url 'TicketsApp.views.ticket_create' pk='solicitud' %}">Crear una Solicitud
+                    </a>
+                    </li>
+                    <li><a href="{% url 'TicketsApp.views.solicitudp' %}">Mis solicitudes reportadas
                       <span class="label label-primary pull-right">{{psolicitude}} </span>
                     </a>
                     </li>
-                    <li><a href="{% url 'solicitudg' %}">Solicitudes al Grupo
+                    <li><a href="{% url 'TicketsApp.views.solicitudg' %}">Solicitudes reportadas
                       <span class="label label-primary pull-right">{{gsolicitude}} </span>
-                    </a>
-                    </li>
-                  </ul>
-                </li>
-                <li><a><i class="fa fa-exclamation-triangle"></i> Incidentes <span class="fa fa-chevron-down"></span></a>
-                  <ul class="nav child_menu" style="display: none">
-                    <li><a href="{% url 'incidentp' %}">Incidentes Personales
-                      <span class="label label-danger pull-right">{{pincident}} </span>
-                    </a>
-                    </li>
-                    <li><a href="{% url 'incidentg' %}">Incidentes al Grupo
-                        <span class="label label-danger pull-right">{{gincident}} </span>
                     </a>
                     </li>                    
                   </ul>
                 </li>
+                <script>
+                      var solicitude = "{{userdepartment.d_management.m_company.c_solicitude}}";
+                      if (solicitude == "False"){
+                        document.getElementById("solicitudes").style.display="None";
+                        i +=1;
+                      }
+                </script>
+                <li id="incidentes"><a><i class="fa fa-exclamation-triangle"></i> Incidentes <span class="fa fa-chevron-down"></span></a>
+                  <ul class="nav child_menu" style="display: none">
+                    <li><a href="{% url 'TicketsApp.views.ticket_create' pk='incidente' %}">Crear un Incidente
+                    </a>
+                    </li>
+                    <li><a href="{% url 'TicketsApp.views.incidentp' %}">Mis incidentes reportados
+                      <span class="label label-danger pull-right">{{pincident}} </span>
+                    </a>
+                    </li> 
+                    <li><a href="{% url 'TicketsApp.views.incidentg' %}">Incidentes reportados
+                      <span class="label label-danger pull-right">{{gincident}} </span>
+                    </a>
+                    </li>                 
+                  </ul>
+                </li>
+                <script>
+                      var incidentes = "{{userdepartment.d_management.m_company.c_incident}}";
+                      if (incidentes == "False"){
+                        document.getElementById("incidentes").style.display="None";
+                        i +=1;
+                      }
+                </script>
+                <li id="requisitos"><a><i class="fa fa-list-alt"></i> Requisitos <span class="fa fa-chevron-down"></span></a>
+                  <ul class="nav child_menu" style="display: none">
+                    <li><a href="{% url 'TicketsApp.views.ticket_create' pk='requisito' %}">Crear un Requisito
+                    </a>
+                    </li>
+                    <li><a href="{% url 'TicketsApp.views.requisitep' %}">Mis requisitos reportados
+                      <span class="label label-success pull-right">{{prequisite}} </span>
+                    </a>
+                    </li> 
+                    <li><a href="{% url 'TicketsApp.views.requisiteg' %}">Requisitos reportados
+                      <span class="label label-success pull-right">{{grequisite}} </span>
+                    </a>
+                    </li>                 
+                  </ul>
+                </li>
+                <script>
+                      var requisitos = "{{userdepartment.d_management.m_company.c_requisite}}";
+                      if (requisitos == "False"){
+                        document.getElementById("requisitos").style.display="None";
+                        i +=1;
+                      }
+                </script>
                 <li><a><i class="fa fa-calendar"></i> Calendario <span class="fa fa-chevron-down"></span></a>
                   <ul class="nav child_menu" style="display: none">
                     <li><a href="tables.html">Calendario Personal</a>
