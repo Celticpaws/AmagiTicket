@@ -1,0 +1,290 @@
+{% extends 'TicketsApp/main.html' %}
+{% load staticfiles%}
+    {% block title %} 
+    Resumen de Usuario
+    {% endblock %}
+
+ <script src="js/jquery.min.js"></script>
+{% block content %}
+
+  {% load googlecharts %}
+    {% googlecharts %}
+      {% data bvalues "out_data" %}
+        {% col "string" "Name" %}"{{ val }}"{% endcol %}
+        {% col "number" "Value" %}{{ val }}{% endcol %}
+      {% enddata %}
+      {% options "out_options" %}
+        kind: "ColumnChart",
+        options: {chartArea:{left:5,top:5,width:'100%',height:'75%'},
+                  colors: [['#73879C'],['#FFFF00'],['#00FF00']],
+                  fontSize:12,
+                }
+      {% endoptions %}
+
+      {% graph "out" "out_data" "out_options" %}
+    {% endgooglecharts %}
+
+      <div class="right_col" role="main">
+
+        <div class="">
+          <div class="page-title">
+            <div class="title_left">
+              <h3>Perfil del Usuario</h3>
+            </div>
+          </div>
+          <div class="clearfix"></div>
+
+          <div class="row">
+            <div class="col-md-12 col-sm-12 col-xs-12">
+              <div class="x_panel">
+                <div class="x_title">
+                  <h2>Reporte del usuario {{userp}} <small>Reporte de actividad</small></h2>
+                  <ul class="nav navbar-right panel_toolbox">
+                    <li><a href="#"><i class="fa fa-chevron-up"></i></a>
+                    </li>
+                  </ul>
+                  <div class="clearfix"></div>
+                </div>
+                <div class="x_content">
+
+                  <div class="col-md-3 col-sm-3 col-xs-12 profile_left">
+
+                    <div class="profile_img">
+
+                      <!-- end of image cropping -->
+                      <div id="crop-avatar">
+                        <!-- Current avatar -->
+                        <div class="avatar-view" title="Change the avatar">
+                          <img src="{%static "" %}img/userphoto/{{userp.username}}.jpg" onError ="this.src='{%static "" %}img/userphoto/noprofile.jpg'" alt="Avatar">
+                        </div>
+                        
+                      </div>
+                      <!-- end of image cropping -->
+
+                    </div>
+                    <h3>{{userp.get_full_name}}</h3>
+
+                    <ul class="list-unstyled user_data">
+                      <li><i class="fa fa-suitcase user-profile-icon"></i> {{userp.profile.u_jobtitle}}
+                      </li>
+
+                      <li>
+                        <i class="fa fa-briefcase user-profile-envelope"></i> {{userp.email}}
+                      </li>
+
+                      <li class="m-top-xs">
+                        <i class="fa fa-phone user-profile-icon"></i> {{userp.profile.u_phone}}
+                      </li>
+                    </ul>
+
+                   <!-- start skills -->
+                    <h4>Tickets activos</h4>
+                    <ul class="list-unstyled user_data">
+                      <li>
+                        <p>Solicitudes completadas</p>
+                          <div class="progress progress_sm" id ="percentsol">
+                            <script>
+                              var p = {{psolicitudea}}
+                              var text;  
+                               if ( p<100 && p>=60) {
+                                  text = "<div class='progress-bar progress-bar-sucess' data-transitiongoal='{{psolicitudea}}'  style='width: 100%;'></div>"
+                               }else if (p<60 && p>=40){
+                                  text = "<div class='progress-bar progress-bar-warning' data-transitiongoal='{{psolicitudea}}'  style='width: 100%;'></div>"
+                               }else if (p<40){
+                                  text = "<div class='progress-bar progress-bar-danger' data-transitiongoal='{{psolicitudea}}'  style='width: 100%;'></div>"
+                               }else{
+                                  text = "<div class='progress-bar progress-bar-dark' data-transitiongoal='{{psolicitudea}}'  style='width: 100%;'></div>"
+                               }
+                              document.getElementById("percentsol").innerHTML = text;
+                        
+                          </script>
+                        </div>
+                      </li>
+                      <li>
+                        <p>Incidentes completados</p>
+                        <div class="progress progress_sm" id ="percentinc">
+                            <script>
+                              var p = {{pincidenta}}
+                              var text;  
+                               if ( p<100 && p>=60) {
+                                  text = "<div class='progress-bar progress-bar-sucess' data-transitiongoal='{{pincidenta}}'  style='width: 100%;'></div>"
+                               }else if (p<60 && p>=40){
+                                  text = "<div class='progress-bar progress-bar-warning' data-transitiongoal='{{pincidenta}}'  style='width: 100%;'></div>"
+                               }else if (p<40){
+                                  text = "<div class='progress-bar progress-bar-danger' data-transitiongoal='{{pincidenta}}'  style='width: 100%;'></div>"
+                               }else{
+                                  text = "<div class='progress-bar progress-bar-dark' data-transitiongoal='{{pincidenta}}'  style='width: 100%;'></div>"
+                               }
+                              document.getElementById("percentinc").innerHTML = text;
+                        
+                          </script>
+                        </div>
+                      </li>
+                      <li>
+                        <p>Requisitos completados</p>
+                          <div class="progress progress_sm" id ="percentsol">
+                            <script>
+                              var p = {{prequisitea}}
+                              var text;  
+                               if ( p<100 && p>=60) {
+                                  text = "<div class='progress-bar progress-bar-sucess' data-transitiongoal='{{prequisitea}}'  style='width: 100%;'></div>"
+                               }else if (p<60 && p>=40){
+                                  text = "<div class='progress-bar progress-bar-warning' data-transitiongoal='{{prequisitea}}'  style='width: 100%;'></div>"
+                               }else if (p<40){
+                                  text = "<div class='progress-bar progress-bar-danger' data-transitiongoal='{{prequisitea}}'  style='width: 100%;'></div>"
+                               }else{
+                                  text = "<div class='progress-bar progress-bar-dark' data-transitiongoal='{{prequisitea}}'  style='width: 100%;'></div>"
+                               }
+                              document.getElementById("percentsol").innerHTML = text;
+                        
+                          </script>
+                        </div>
+                      </li>
+                      
+                    </ul>
+                    <!-- end of skills -->
+
+                  </div>
+                  <div class="col-md-9 col-sm-9 col-xs-12">
+
+                    <div class="profile_title">
+                      <div class="col-md-6">
+                        <h2>Reporte de actividad - Ultima semana</h2>
+                      </div>
+                    </div>
+                    <!-- start of user-activity-graph -->
+
+            <div id="out"></div>
+            <div class="clearfix"></div>
+   
+                    <!-- end of user-activity-graph -->
+
+                    <div class="" role="tabpanel" data-example-id="togglable-tabs">
+                      <ul id="myTab" class="nav nav-tabs bar_tabs" role="tablist">
+                        <li role="presentation" class="active"><a href="#tab_content1" id="home-tab" role="tab" data-toggle="tab" aria-expanded="true">Ultimas actividades</a>
+                        </li>
+                        <li role="presentation" class=""><a href="#tab_content2" role="tab" id="profile-tab" data-toggle="tab" aria-expanded="false">Tickets del usuario</a>
+                        </li>
+                      </ul>
+                      <div id="myTabContent" class="tab-content">
+                        <div role="tabpanel" class="tab-pane fade active in" id="tab_content1" aria-labelledby="home-tab">
+
+                          <!-- start recent activity -->
+                          <ul class="messages" style="list-style-type: none;">
+                            {% for act in lastten %}
+                            <li>
+                              
+                              <div class="message_date">
+                                <p class="month">{{act.at_date}}</p>
+                              </div>
+                              <div class="message_wrapper">
+                                <h4 class="heading">Ticket {{act.at_ticket}}</h4>
+                                <blockquote class="message">{{act.at_description}}</blockquote>
+                                <br />
+                                <p class="url">
+                                  <span class="fs1 text-info" aria-hidden="true" data-icon=""></span>
+                                  <a href="#"><i class="fa fa-paperclip"></i> User Acceptance Test.doc </a>
+                                </p>
+                              </div>
+                            </li>
+                            {% endfor %}
+
+                          </ul>
+                          <!-- end recent activity -->
+
+                        </div>
+                        <div role="tabpanel" class="tab-pane fade" id="tab_content2" aria-labelledby="profile-tab">
+
+                          <!-- start user projects -->
+                          <table class="data table table-striped no-margin">
+                            <thead>
+                              <tr>
+                                <th>#</th>
+                                <th>Fecha de creación</th>
+                                <th>Estado</th>
+                                <th class="hidden-phone">Prioridad</th>
+                                <th>SLA</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                    {% for ticket in usertickets %}
+                      <tr class="even pointer">
+                        
+                        <td class=" ">
+                          <a href="{% url 'TicketsApp.views.ticket' pk=ticket.pk %}">
+                          <span id="sol{{ticket.t_id}}"></span>
+                          <script>
+                              var b = "{{ticket.t_isincident}}" 
+                              var text;  
+                               if ( b=="True") {
+                                  text = "<span class='label label-danger'>{{ticket.t_id}}</span>"
+                               }else{
+                                  text = "<span class='label label-info'>{{ticket.t_id}}</span>"
+                               }
+                              document.getElementById("sol{{ticket.t_id}}").innerHTML = text;
+                        
+                          </script>
+                          </a>
+                        </td>
+                        <td class=" ">{{ticket.t_reportmadeon}}</td>
+                        <td class="a-right a-right ">{{ticket.t_state}}</td>                        
+                        <td class=" ">{{ticket.t_priority}}</td>
+                        <td style="width:20%"> 
+                          <div class="progress progress_sm" id ="pro{{ticket.t_id}}">
+                            <script>
+                              var p = {{ticket.delta_life}}
+                              var text;  
+                               if ( p<100 && p>=75) {
+                                  text = "<div class='progress-bar progress-bar-danger' data-transitiongoal='{{ticket.delta_life}}'  style='width: 100%;'></div>"
+                               }else if (p<75 && p>=50){
+                                  text = "<div class='progress-bar progress-bar-warning' data-transitiongoal='{{ticket.delta_life}}'  style='width: 100%;'></div>"
+                               }else if (p<50){
+                                  text = "<div class='progress-bar progress-bar-info' data-transitiongoal='{{ticket.delta_life}}'  style='width: 100%;'></div>"
+                               }else{
+                                  text = "<div class='progress-bar progress-bar-dark' data-transitiongoal='{{ticket.delta_life}}'  style='width: 100%;'></div>"
+                               }
+                              document.getElementById("pro{{ticket.t_id}}").innerHTML = text;
+                        
+                          </script>
+                          </div>
+                          <small>{{ticket.life_spawn}}</small>
+                        </td>
+                      </tr>
+                    {% endfor %}
+                            </tbody>
+                          </table>
+                          <!-- end user projects -->
+
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- footer content -->
+        <footer>
+          <div class="copyright-info">
+            <p class="pull-right">Carlos Farinha - Amagi</p>
+          </div>
+          <div class="clearfix"></div>
+        </footer>
+        <!-- /footer content -->
+
+      </div>
+      <!-- /page content -->
+
+  <!-- Datatables -->
+  <script src="js/datatables/js/jquery.dataTables.js"></script>
+  <script src="js/datatables/tools/js/dataTables.tableTools.js"></script>
+
+  <!-- pace -->
+  <script src="js/pace/pace.min.js"></script>
+
+
+
+
+{% endblock %}

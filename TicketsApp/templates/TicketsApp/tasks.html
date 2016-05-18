@@ -1,0 +1,144 @@
+{% extends 'TicketsApp/main.html' %}
+
+    {% block title %} 
+    Solicitudes Personales
+    {% endblock %}
+ <script src="js/jquery.min.js"></script>
+
+{% block content %}
+      <!-- page content -->
+      <div class="right_col" role="main">
+        <div class="">
+          <div class="page-title">
+            <div class="title_left">
+              <h3>
+                    Solicitudes personales
+                    
+                </h3>
+            </div>
+
+            <div class="title_right">
+              <div class="col-md-5 col-sm-5 col-xs-12 form-group pull-right top_search">
+                <div class="input-group">
+                  <input type="text" class="form-control" placeholder="Busqueda por estado...">
+                  <span class="input-group-btn">
+                            <button class="btn btn-default" type="button">Ir</button>
+                        </span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="clearfix"></div>
+
+          <div class="row">
+
+            <div class="col-md-12 col-sm-12 col-xs-12">
+              <div class="x_panel">
+                <div class="x_title">
+                  <h2>Lista de solicitudes</h2>
+                  
+                  <div class="clearfix"></div>
+                </div>
+                <div class="x_content">
+                  <table id="example" class="table table-striped responsive-utilities jambo_table sortable">
+                    <thead>
+                      <tr class="headings">
+                        
+                        <th>Nº </th>
+                        <th>Fecha de la Solicitud </th>
+                        <th>Categoria </th>
+                        <th>Prioridad </th>
+                        <th>Estado </th>
+                        <th>Asignatario </th>
+                        <th class=" no-link last sorttable_nosort"><span class="nobr"> SLA </span></th>
+                      </tr>
+                    </thead>
+
+                    <tbody>
+                    {% for psolicitud in ptasks %}
+                      <tr class="even pointer">
+                        
+                        <td class=" ">
+                          <a href="{% url 'TicketsApp.views.ticket' pk=psolicitud.pk %}">
+                          <span id="sol{{psolicitud.t_id}}"></span>
+                         <script>
+                              var b = "{{psolicitud.t_isincident}}" 
+                              var text;  
+                               if ( b=="True") {
+                                  text = "<span class='label label-danger' style='font-size:15px'>{{psolicitud.t_id}}</span>"
+                               }else if ( b=="None") {
+                                  text = "<span class='label label-success' style='font-size:15px'>{{psolicitud.t_id}}</span>"
+                               }else{
+                                  text = "<span class='label label-info' style='font-size:15px'>{{psolicitud.t_id}}</span>"
+                               }
+                              document.getElementById("sol{{psolicitud.t_id}}").innerHTML = text;
+                        
+                          </script>
+                          </a>
+                        </td>
+                        <td class=" ">{{psolicitud.t_reportmadeon}}</td>
+                        <td class=" ">{{psolicitud.t_category}}</td>
+                        <td class=" ">{{psolicitud.t_priority}}</td>
+                        <td class=" ">{{psolicitud.t_state}}</td>                        
+                        <td class="a-right a-right ">{{psolicitud.t_usersolver}}</td>
+                        <td style="width:40%"> 
+                          <div class="progress progress_sm" id ="pro{{psolicitud.t_id}}">
+                            <script>
+                              var p = {{psolicitud.delta_life}}
+                              var text;  
+                               if ( p<100 && p>=75) {
+                                  text = "<div class='progress-bar progress-bar-danger' data-transitiongoal='{{psolicitud.delta_life}}'  style='width: 100%;'></div>"
+                               }else if (p<75 && p>=50){
+                                  text = "<div class='progress-bar progress-bar-warning' data-transitiongoal='{{psolicitud.delta_life}}'  style='width: 100%;'></div>"
+                               }else if (p<50){
+                                  text = "<div class='progress-bar progress-bar-info' data-transitiongoal='{{psolicitud.delta_life}}'  style='width: 100%;'></div>"
+                               }else{
+                                  text = "<div class='progress-bar progress-bar-dark' data-transitiongoal='{{psolicitud.delta_life}}'  style='width: 100%;'></div>"
+                               }
+                              document.getElementById("pro{{psolicitud.t_id}}").innerHTML = text;
+                        
+                          </script>
+                          </div>
+                          <small>{{psolicitud.life_spawn}}</small>
+                        </td>
+                      </tr>
+                    {% endfor %}
+
+                    <script> $( "td:odd" ).css( "class", "odd pointer" );</script>                      
+                    </tbody>
+
+                  </table>
+                </div>
+              </div>
+            </div>
+
+            <br />
+            <br />
+            <br />
+
+          </div>
+        </div>
+
+        <!-- footer content -->
+        <footer>
+          <div class="copyright-info">
+            <p class="pull-right">Carlos Farinha - Amagi</p>
+          </div>
+          <div class="clearfix"></div>
+        </footer>
+        <!-- /footer content -->
+
+      </div>
+      <!-- /page content -->
+
+  <!-- Datatables -->
+  <script src="js/datatables/js/jquery.dataTables.js"></script>
+  <script src="js/datatables/tools/js/dataTables.tableTools.js"></script>
+
+  <!-- pace -->
+  <script src="js/pace/pace.min.js"></script>
+
+
+
+
+{% endblock %}

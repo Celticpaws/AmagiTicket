@@ -1,0 +1,82 @@
+{% extends 'TicketsApp/main.html' %}
+
+    {% block title %} 
+    Ticket 
+    {% endblock %}
+ <script src="js/jquery.min.js"></script>
+ 
+{% block content %}
+       <div class="right_col" role="main">
+        <div class="">
+
+          <div class="page-title">
+            <div class="title_left">
+                  <h1><span id="sol"></span>
+                  <script>
+                      var b = "{{isincident}}" 
+                      var text;  
+                       if ( b=="True") {
+                          text = "<span class='label label-danger'>Crear un incidente</span>"
+                       }else if (b=="None"){
+                          text = "<span class='label label-success'>Crear un requisito</span>"
+                       }else{
+                          text = "<span class='label label-info'>Crear una solicitud</span>"
+                       }
+                      document.getElementById("sol").innerHTML = text;
+                
+                  </script>                      
+              </h1>
+            </div>
+          </div>
+
+          <div class="clearfix"></div>
+          <div class="row">
+            <div class="col-md-12 col-sm-12 col-xs-12">
+          
+              <div class="x_panel">
+                <div class="x_title">
+                  <h2>Detalle de la solicitud</h2>
+                  <ul class="nav navbar-right panel_toolbox">
+                    <li><a href="{% url 'TicketsApp.views.index' %}" class="close-link"><i class="fa fa-close"></i></a>
+                    </li>
+                  </ul>
+                  <div class="clearfix"></div>
+                </div>
+                <div class="x_content">
+                  <br />
+                  <form method="post" class="post-form"  data-parsley-validate class="form-horizontal form-label-left">
+                        {% csrf_token %}
+                        <div class="fieldWrapper">
+                          <div class="form-group">
+                          {{formTicket.as_p}}
+                      </div>
+                    </div>
+                    <div class="col-md-6 col-sm-6 col-xs-12 col-md-offset-10">
+                      <a href="{% url 'TicketsApp.views.index' %}" class="btn btn-danger">Cancel</button>
+                      </a>
+                        <button type="submit" class="btn btn-success">Aceptar</button>
+                      </form>
+                      </div>
+                    </div>
+
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <script type="text/javascript">
+            $(document).ready(function() {
+              $('#birthday').daterangepicker({
+                singleDatePicker: true,
+                calender_style: "picker_4"
+              }, function(start, end, label) {
+                console.log(start.toISOString(), end.toISOString(), label);
+              });
+            });
+          </script>
+
+
+ 
+
+{% endblock %}

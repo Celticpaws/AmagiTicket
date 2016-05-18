@@ -19,7 +19,6 @@
   <script src="{%static "js/sorttable.js"%}"></script>
   <link href="{%static "fonts/css/font-awesome.min.css"%}" rel="stylesheet">
   <link href="{%static "css/animate.min.css"%}" rel="stylesheet">
-
   <!-- Custom styling plus plugins -->
   <link href="{%static "css/custom.css"%}" rel="stylesheet">
   <link rel="stylesheet" type="text/css" href="{%static "css/maps/jquery-jvectormap-2.0.3.css"%}" />
@@ -34,7 +33,6 @@
   <link href="css/select/select2.min.css" rel="stylesheet">
   <!-- switchery -->
   <link rel="stylesheet" href="css/switchery/switchery.min.css" />
-
   <script src="{%static "js/jquery.min.js"%}"></script>
  <!-- <script>
      var time = new Date().getTime();
@@ -77,7 +75,7 @@
         <div class="left_col scroll-view">
 
           <div class="navbar nav_title" style="border: 0;">
-            <a href="{% url 'TicketsApp.views.index' %}" class="site_title"><span><img src="{%static "img/Logo.png"%}" width="70%"></span></a>
+            <a href="{% url 'index' %}" class="site_title"><span><img src="{%static "img/Logo.png"%}" width="70%"></span></a>
           </div>
           <div class="clearfix"></div>
 
@@ -105,15 +103,22 @@
               <ul class="nav side-menu">
                 <li><a><i class="fa fa-home"></i> Home <span class="fa fa-chevron-down"></span></a>
                   <ul class="nav child_menu" style="display: none">
-                    <li><a href="{% url 'TicketsApp.views.index' %}">Dashboard </a>
+                    <li><a href="{% url 'index' %}">Dashboard </a>
                     </li>
                   </ul>
                 </li>
                 <li id="solicitudes"><a><i class="fa fa-edit"></i> Solicitudes <span class="fa fa-chevron-down"></span></a>
                   <ul class="nav child_menu" style="display: none">
-                    <li><a href="{% url 'TicketsApp.views.ticket_create' pk='solicitud' %}">Crear una Solicitud
+                    <li id="createsolicitude"><a href="{% url 'TicketsApp.views.ticket_create' pk='solicitud' %}">Crear una Solicitud
                     </a>
                     </li>
+                    <script>
+                      var requisitos = "{{user.profile.u_cancreatetickets}}";
+                      if (requisitos == "False"){
+                        document.getElementById("createsolicitude").style.display="None";
+                        i +=1;
+                      }
+                    </script>  
                     <li><a href="{% url 'TicketsApp.views.solicitudp' %}">Mis solicitudes reportadas
                       <span class="label label-primary pull-right">{{psolicitude}} </span>
                     </a>
@@ -133,9 +138,16 @@
                 </script>
                 <li id="incidentes"><a><i class="fa fa-exclamation-triangle"></i> Incidentes <span class="fa fa-chevron-down"></span></a>
                   <ul class="nav child_menu" style="display: none">
-                    <li><a href="{% url 'TicketsApp.views.ticket_create' pk='incidente' %}">Crear un Incidente
+                    <li id="createincident"><a href="{% url 'TicketsApp.views.ticket_create' pk='incidente' %}">Crear un Incidente
                     </a>
                     </li>
+                    <script>
+                      var requisitos = "{{user.profile.u_cancreatetickets}}";
+                      if (requisitos == "False"){
+                        document.getElementById("createincident").style.display="None";
+                        i +=1;
+                      }
+                    </script> 
                     <li><a href="{% url 'TicketsApp.views.incidentp' %}">Mis incidentes reportados
                       <span class="label label-danger pull-right">{{pincident}} </span>
                     </a>
@@ -155,9 +167,16 @@
                 </script>
                 <li id="requisitos"><a><i class="fa fa-list-alt"></i> Requisitos <span class="fa fa-chevron-down"></span></a>
                   <ul class="nav child_menu" style="display: none">
-                    <li><a href="{% url 'TicketsApp.views.ticket_create' pk='requisito' %}">Crear un Requisito
+                    <li id="createrequisite"><a href="{% url 'TicketsApp.views.ticket_create' pk='requisito' %}">Crear un Requisito
                     </a>
                     </li>
+                    <script>
+                      var requisitos = "{{user.profile.u_cancreatetickets}}";
+                      if (requisitos == "False"){
+                        document.getElementById("createrequisite").style.display="None";
+                        i +=1;
+                      }
+                    </script> 
                     <li><a href="{% url 'TicketsApp.views.requisitep' %}">Mis requisitos reportados
                       <span class="label label-success pull-right">{{prequisite}} </span>
                     </a>
@@ -175,6 +194,17 @@
                         i +=1;
                       }
                 </script>
+                <li><a><i class="fa fa-bar-chart-o"></i> Estadisticas <span class="fa fa-chevron-down"></span></a>
+                  <ul class="nav child_menu" style="display: none">
+                    <li><a href="{% url 'users' %}">Equipo</a>
+                    </li>
+                    <li><a href="tables_dynamic.html">Departamento</a>
+                    </li>
+                  </ul>
+                </li>
+                
+
+
                 <li><a><i class="fa fa-calendar"></i> Calendario <span class="fa fa-chevron-down"></span></a>
                   <ul class="nav child_menu" style="display: none">
                     <li><a href="tables.html">Calendario Personal</a>
@@ -183,7 +213,7 @@
                     </li>
                   </ul>
                 </li>
-                <li><a><i class="fa fa-bar-chart-o"></i> Estado del Sistema <span class="fa fa-chevron-down"></span></a>
+                <li><a><i class="fa fa-laptop"></i> Estado del Sistema <span class="fa fa-chevron-down"></span></a>
                   <ul class="nav child_menu" style="display: none">
                     <li><a href="chartjs.html">Servidores 
                     <span class="label label-warning pull-right"> {{servers}}</span>
@@ -306,7 +336,7 @@
                     document.getElementById("countnotifications").innerHTML=i; 
                   }else{
                     document.getElementById("countnotifications").style.display=none;
-                  } </script>    
+                  } </script>              
                   <li>
                     <div class="text-center">
                       <a href = "{% url 'ptasks' %}">
@@ -315,6 +345,8 @@
                       </a>
                     </div>
                   </li>
+                </ul>
+              </li>
 
             </ul>
           </nav>
@@ -339,6 +371,7 @@
     <div class="clearfix"></div>
     <div id="notif-group" class="tabbed_notifications"></div>
   </div>
+
 
 <!-- Notificaciones flotantes -->
   <script type="text/javascript" src="{%static "js/notify/pnotify.core.js"%}"></script>
@@ -395,6 +428,7 @@
 
 {% endfor %}
 <!-- /Notificaciones flotantes -->
+
 
   <script src="{%static "js/bootstrap.min.js"%}"></script>
   <script src="{%static "js/nicescroll/jquery.nicescroll.min.js"%}"></script>

@@ -38,34 +38,11 @@ class Company(models.Model):
 		return self.c_name
 
 
-
-class Management(models.Model):
-	m_id = models.IntegerField(unique=True,primary_key=True)
-	m_name = models.CharField(max_length=100)
-	m_manager = models.ForeignKey('auth.User',default=0)
-	m_company = models.ForeignKey('Company',default=0)
-
-	def __str__(self):
-		return self.m_name
-
-	def get_man(str):
-		return Management.objects.get(m_name=str)
-
-	def from_user_get_manusers(User):
-		manuser = UserProfile.get_management(User)
-		man = Management.get_man(manuser)
-		users = UserProfile.objects.filter(u_management=man)
-		return users
-
-	def leader_of_management(self):
-		return self.m_manager
-
-
 class Department(models.Model):
 	d_id = models.IntegerField(unique=True)
 	d_name = models.CharField(max_length=100,primary_key=True)
 	d_manager = models.ForeignKey('auth.User',default=0)
-	d_management = models.ForeignKey('Management',default=0)
+	d_management = models.ForeignKey('Department',related_name='d_superior',default=0,null=True,blank=True)
 
 	def __str__(self):
 		return self.d_name
@@ -73,11 +50,17 @@ class Department(models.Model):
 	def get_did(str):
 		return Department.objects.get(d_name=str)
 
-	def from_user_get_depusers(User):
-		depuser = UserProfile.get_department(User)
-		did = Department.get_did(depuser)
-		users = UserProfile.objects.filter(u_department=did)
+	def from_did_get_depusers(self):
+		sons = self.from_did_get_sondids()
+		users = UserProfile.objects.filter(u_department=self)
+		if sons:
+			for son in sons:
+				users = users | son.from_did_get_depusers()
 		return users
+
+	def from_did_get_sondids(self):
+		sons = Department.objects.filter(d_management=self)
+		return sons
 
 	def leader_of_department(self):
 		return self.d_manager
@@ -128,7 +111,6 @@ class UserProfile(models.Model):
 	u_phone = models.ForeignKey('Phone')
 	u_jobtitle = models.CharField(max_length=100)
 	u_department = models.ForeignKey('Department',default=0)
-	u_management = models.ForeignKey('Management',default=0)
 	u_company = models.ForeignKey('Company',default=0)
 	u_cancreatetickets = models.BooleanField(default=False)
 
@@ -154,25 +136,32 @@ class UserProfile(models.Model):
 
 	def get_users_hierarchy(self):
 		did = self.u_department
-		man = self.u_management
 		if (self == did.leader_of_department().profile):
-			return  User.objects.filter(profile__u_department=did)
-		if (self == man.leader_of_management().profile):
-			return User.objects.filter(profile__u_management=man)
+			sons = did.from_did_get_depusers()
+			return  sons
 		else:
 			return User.objects.filter(profile=self)
 
 	def group_values(self,isincident):
-		users = self.get_users_hierarchy()
-		none = Ticket.none_count(self,isincident)
-		personal = Ticket.ticket_count(self.u_user,True,isincident)
-		group = Ticket.ticket_count(self.u_user,False,isincident)
-		res=[["No asignados",none]]
+		personal = Ticket.ticket_count(self.u_user,self.u_department,True,isincident)
+		res = []
 		userdep = self.u_department
 		if (userdep.leader_of_department() == self.u_user):
-			for user in users:
-				res += [[user.get_full_name,Ticket.ticket_count(user,True,isincident)]]
+			sons = userdep.from_did_get_sondids()
+			if sons :
+				res=[["No asignados",0]]
+				for son in sons:
+					res += [[son.d_name,Ticket.ticket_count(None,son,False,isincident)]]
+			else:
+				none = Ticket.none_count(self,self.u_department,isincident)
+				res=[["No asignados",none]]
+				users = self.get_users_hierarchy()
+				for user in users:
+					res += [[user.u_user.get_full_name(),Ticket.ticket_count(user.u_user,user.u_department,True,isincident)]]
 		else: 
+			none = Ticket.none_count(self,self.u_department,isincident)
+			res=[["No asignados",none]]
+			group = Ticket.ticket_count(self.u_user,self.u_department,False,isincident)
 			res += [[self.u_user.get_full_name,personal]]
 			res += [[userdep,group-none-personal]]
 		return res
@@ -244,50 +233,100 @@ class Ticket(models.Model):
 	def __str__(self):
 		return '# '+str(self.t_id)
 
-	def none_count(User,isincident):
-		nonesolicitude = Ticket.objects.filter(t_isincident=isincident,t_usersolver=None,t_department=User.u_department)
-		return nonesolicitude.count()
-
-	def ticket_count(User,ispersonal,isincident):
-		if ispersonal:
-			ticket = Ticket.objects.filter(t_isincident=isincident,t_usersolver=User)
+	def none_count(User,dep,isincident):
+		ticket = []
+		sons = dep.from_did_get_sondids()
+		if sons :
+			for son in sons:
+				ticket += Ticket.objects.filter(t_isincident=isincident,t_usersolver=None,t_department=son)
 		else:
-			depuser = UserProfile.get_department(User)
-			did = Department.get_did(depuser)
-			ticket = Ticket.objects.filter(t_isincident=isincident,t_department=did)
-		return ticket.count()
+			ticket += Ticket.objects.filter(t_isincident=isincident,t_usersolver=None,t_department=dep)
+		return len(ticket)
+
+	def ticket_count(User,dep,ispersonal,isincident):
+		t = Ticket.tickets(User,dep,ispersonal,isincident)
+		count = len(t)
+		return count
 
 	def ticket_count_active(User,isincident):
 		p = Ticket.objects.filter(t_isincident=isincident,t_state="Resuelto",t_usersolver=User)| Ticket.objects.filter(t_isincident=isincident,t_state="Cerrado",t_usersolver=User)
-		count = Ticket.ticket_count(User,True,isincident)
+		count = Ticket.ticket_count(User,User.profile.u_department,True,isincident)
 		if count == 0:
 			return 0
 		else:
 			return (p.count()/count*100)
 
-	def tickets(User,ispersonal,isincident):
-		if ispersonal:
-			t = Ticket.objects.filter(t_isincident=isincident,t_usersolver=User)
+	def tickets(User,dep,ispersonal,isincident):
+		if (User == None):
+			if ispersonal:
+				ticket = Ticket.objects.filter(t_isincident=isincident,t_department=dep)
+			else:
+				ticket = []
+				sons = dep.from_did_get_sondids()
+				if sons :
+					for son in sons:
+						ticket += Ticket.tickets(User,son,ispersonal,isincident)
+				else:
+					ticket += Ticket.objects.filter(t_isincident=isincident,t_department=dep)
 		else:
-			depuser = UserProfile.get_department(User)
-			did = Department.get_did(depuser)
-			t = Ticket.objects.filter(t_isincident=isincident,t_department=did)
-		return t
+			if ispersonal:
+				ticket = Ticket.objects.filter(t_isincident=isincident,t_usersolver=User)
+			else:
+				ticket = []
+				sons = dep.from_did_get_sondids()
+				if sons :
+					for son in sons:
+						ticket += Ticket.tickets(User,son,ispersonal,isincident)
+				else:
+					ticket += Ticket.objects.filter(t_isincident=isincident,t_department=dep)
+		return ticket
 
 	def get_sons(Ticke):
 		sons = Ticket.objects.filter(t_mother=Ticke)
 		return sons
 
-	def count_types(User):
-		if User.profile.u_department.leader_of_department()==User:
-			types = Ticket.objects.filter(t_department=User.profile.u_department).values('t_state').annotate(dcount=Count('t_state'))
-		else:
-			types = Ticket.objects.filter(t_usersolver=User).values('t_state').annotate(dcount=Count('t_state'))
-		order = ['Iniciado','Asignado','En Proceso','En Espera','Re-abierto','Resuelto','Cerrado']
-		typesordered = sorted(types, key = lambda p: order.index(p['t_state']))
+	def count_types(User,dep,ispersonal):
+		solicitudes = Ticket.tickets(User,dep,ispersonal,False)
+		incidents = Ticket.tickets(User,dep,ispersonal,True)
+		requisites = Ticket.tickets(User,dep,ispersonal,None)
+		tickets = solicitudes + incidents + requisites
+		ini = 0
+		asi=0
+		enp=0
+		ene=0
+		rea=0
+		res=0
+		cer = 0
+		for t in tickets:
+			if t.t_state == 'Iniciado':
+				ini+=1
+			if t.t_state == 'Asignado':
+				asi+=1
+			if t.t_state == 'En Proceso':
+				enp+=1
+			if t.t_state == 'En Espera':
+				ene+=1
+			if t.t_state == 'Re-abierto':
+				rea+=1
+			if t.t_state == 'Resuelto':
+				res+=1
+			if t.t_state == 'Cerrado':
+				cer+=1
 		arrayoftypes=[]
-		for t in typesordered:
-			arrayoftypes+=[[t['t_state'],t['dcount']]]
+		if ini >0:
+			arrayoftypes+=[['Iniciado',ini]]
+		if asi >0:
+			arrayoftypes+=[['Asignado',asi]]
+		if enp >0:
+			arrayoftypes+=[['En Proceso',enp]]
+		if ene >0:
+			arrayoftypes+=[['En Espera',ene]]
+		if rea >0:
+			arrayoftypes+=[['Re-abierto',rea]]
+		if res >0:
+			arrayoftypes+=[['Resuelto',res]]
+		if cer >0:
+			arrayoftypes+=[['Cerrado',cer]]
 		return arrayoftypes
 
 	def tasks(User):
