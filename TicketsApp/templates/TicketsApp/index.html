@@ -4,27 +4,14 @@
     Dashboard
     {% endblock %}
 
-{% block content %}
-
   {% load googlecharts %}
     {% googlecharts %}
-      {% data ivalues "out_data" %}
-        {% col "string" "Name" %}"{{ val }}"{% endcol %}
-        {% col "number" "Value" %}{{ val }}{% endcol %}
-      {% enddata %}
-      {% data svalues "out_data2" %}
-        {% col "string" "Name" %}"{{ val }}"{% endcol %}
-        {% col "number" "Value" %}{{ val }}{% endcol %}
-      {% enddata %}
-      {% data bvalues "out_data3" %}
+  {% for tc in cakes %}
+      {% data tc "d{{forloop.counter}}" %}
         {% col "string" "Name" %}"{{ val }}"{% endcol %}
         {% col "number" "Cantidad" %}{{ val }}{% endcol %}
       {% enddata %}
-      {% data rvalues "out_data4" %}
-        {% col "string" "Name" %}"{{ val }}"{% endcol %}
-        {% col "number" "Cantidad" %}{{ val }}{% endcol %}
-      {% enddata %}
-      {% options "out_options" %}
+      {% options "o{{forloop.counter}}" %}
         kind: "PieChart",
         options: {chartArea:{left:5,top:5,width:'100%',height:'100%'},
                   colors: ['#262b33','#22527B','#3B87C8','#2D6DA3','#337AB7','#4F93CE','#285F8F','#63A0D4'],
@@ -34,191 +21,108 @@
                   pieSliceTextStyle:{fontSize: 14},
                 }
       {% endoptions %}
-      {% options "out_options1" %}
-        kind: "PieChart",
-        options: {chartArea:{left:5,top:5,width:'100%',height:'100%'},
-                  colors: ['#262b33','#E74C3C','#A94442','#883836','#c67270','#A94442','#883836','#c67270'],
-                  fontSize:15,
-                  legend:{position:'none'},
-                  pieHole:0.4,
-                  pieSliceTextStyle:{fontSize: 14},
-                }
-      {% endoptions %}                
-      {% options "out_options3" %}
-        kind: "PieChart",
-        options: {chartArea:{left:5,top:5,width:'100%',height:'100%'},
-                  colors: ['#262b33','#3D8B3D','#91CF91','#449D44','#80C780','#4CAE4C','#6EC06E','#5CB85C'],
-                  fontSize:15,
-                  legend:{position:'none'},
-                  pieHole:0.4,
-                  pieSliceTextStyle:{fontSize: 14},
-          }
-      {% endoptions %}
-      {% options "out_options2" %}
-        kind: "ColumnChart",
-        options: {chartArea:{left:5,top:5,width:'100%',height:'75%'},
-                  colors: [['#73879C'],['#FFFF00'],['#00FF00']],
-                  fontSize:12,
-                }
-      {% endoptions %}
+      {% graph "out{{forloop.counter}}" "d{{forloop.counter}}" "o{{forloop.counter}}" %}
+  {% endfor %}
+ {% endgooglecharts %}
 
-      {% graph "out" "out_data2" "out_options" %}
-      {% graph "out2" "out_data" "out_options1" %}
-      {% graph "out3" "out_data3" "out_options2" %}
-      {% graph "out4" "out_data4" "out_options3" %}
-    {% endgooglecharts %}
-
-
+{% block content %}
       <!-- page content -->
       <div class="right_col" role="main">
 
         <br />
         <div class="">
-
+        {% for t,p,g in tctype %}
           <div class="row top_tiles">
 
             <div id="csolicitude" class="animated flipInY col-lg-3 col-md-3 col-sm-6 col-xs-12">
-              <a href= "{% url 'solicitudg' %}" style="text-decoration:none">
+              <a href= "{% url 'solicitudg' pk=userdepartment.d_id %}" style="text-decoration:none">
                 <div class="tile-stats">
-                  <div class="icon"><i class="fa fa-edit"></i>
+                  <div class="icon"><i class="fa {{t.ty_icon}}"></i>
                   </div>
-                  <div class="count">{{gsolicitude}}</div>
+                  <div class="count">{{p}}</div>
 
-                  <h3>Solicitudes </h3>
-                  <p>para {{userdepartment}}</p>
+                  <h3>{{t.ty_name}} </h3>
+                  <p>
+                  {% for e,d in g %} 
+                    {{e}} - {{d}}<br>
+                  {% endfor %}
                 </div>
               </a>
             </div>
-            <script>
-                  var requisitos = "{{userdepartment.d_management.m_company.c_solicitude}}";
-                  if (requisitos == "False"){
-                    document.getElementById("csolicitude").style.display="None";
-                    i +=1;
-                  }
-            </script>  
-            <div id = "cincident" class="animated flipInY col-lg-3 col-md-3 col-sm-6 col-xs-12">
-              <a href= "{% url 'incidentg' %}" style="text-decoration:none">
-                <div class="tile-stats">
-                  <div class="icon"><i class="fa fa-exclamation-triangle"></i>
-                  </div>
-                  <div class="count">{{gincident}}</div>
-
-                  <h3>Incidentes</h3>
-                  <p>para {{userdepartment}}</p>
+            <div id="esolicitude" class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+                <div class ="tile-stats">
+                  <p>Distribución de {{t.ty_name}}</p>
+                        <div id="cake{{forloop.counter0|safe}}"></div>
+                        <div class="clearfix"></div>
                 </div>
-              </a>
             </div>
-            <script>
-                  var requisitos = "{{userdepartment.d_management.m_company.c_incident}}";
-                  if (requisitos == "False"){
-                    document.getElementById("cincident").style.display="None";
-                    i +=1;
-                  }
-            </script>  
-            <div id="crequisite" class="animated flipInY col-lg-3 col-md-3 col-sm-6 col-xs-12">
-              <a href= "{% url 'requisiteg' %}" style="text-decoration:none">
-              <div class="tile-stats">
-                <div class="icon"><i class="fa fa-envelope-o"></i>
+              
+            <div class="col-lg-6 col-md-3 col-sm-3 col-xs-12">
+                <div class ="tile-stats">
+                  <p>Estado de {{t.ty_name}}</p>
+                        <div id="bars{{forloop.counter0|safe}}"></div>
+                        <div class="clearfix"></div>
                 </div>
-                <div class="count">{{grequisite}}</div>
-
-                <h3>Requisitos</h3>
-                <p>para {{userdepartment}}</p>
               </div>
-            </a>
             </div>
-            <script>
-                  var requisitos = "{{userdepartment.d_management.m_company.c_requisite}}";
-                  if (requisitos == "False"){
-                    document.getElementById("crequisite").style.display="None";
-                    i +=1;
+            {% endfor %}
+              <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+                <script type="text/javascript">
+                  google.charts.load('current', {'packages':['corechart']});
+                  google.charts.setOnLoadCallback(drawChart);
+                  google.charts.setOnLoadCallback(drawBarChart);
+                  function drawChart() {
+                    var d = eval({{cakes|safe}});
+                    var s = d.length;
+                    var data = new Array(s);
+                    var chart = new Array(s);
+                    var i = 0;
+                    var options = {'chartArea':{left:10,top:10,width:'90%',height:'90%'},
+                                'colors': ['#262b33','#22527B','#3B87C8','#2D6DA3','#337AB7','#4F93CE','#285F8F','#63A0D4'],
+                                'fontSize':15,
+                                'legend':{position:'none'},
+                                'pieHole':0.4,
+                                'pieSliceTextStyle':{fontSize: 14},};
+                    while (i <= s+1){
+                      data[i] = new google.visualization.DataTable();
+                      data[i].addColumn('string', 'Usuario');
+                      data[i].addColumn('number', 'Cantidad');
+                      data[i].addRows(d[i]);
+                      // Set chart options
+                      // Instantiate and draw our chart, passing in some options.
+                      chart[i] = new google.visualization.PieChart(document.getElementById('cake'+i));
+                      chart[i].draw(data[i], options);
+                      i++;
+                    }
                   }
-            </script>  
-            <div class="animated flipInY col-lg-3 col-md-3 col-sm-6 col-xs-12">
-              <a href= "{% url 'ptasks' %}" style="text-decoration:none">
-                <div class="tile-stats">
-                  <div class="icon"><i class="fa fa-check-square-o"></i>
-                  </div>
-                  <div class="count">{{taskcount}}</div>
-
-                  <h3>Tareas</h3>
-                  <p>Pendientes</p>
-                </div>
-              </a>
-            </div>
-          </div>
-
-<div class="row top_tiles">
-  <div id="esolicitude" class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
-    <div class ="tile-stats">
-      <p>Solicitudes - Estadistica</p>
-            <div id="out"></div>
-            <div class="clearfix"></div>
-    </div>
-  </div>
-<script>
-      var requisitos = "{{userdepartment.d_management.m_company.c_solicitude}}";
-      if (requisitos == "False"){
-        document.getElementById("esolicitude").style.display="None";
-        i +=1;
-      }
-</script>  
-<div id="eincident" class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
-    <div class ="tile-stats">
-      <p>Incidentes - Estadistica</p>
-            <div id="out2"></div>
-            <div class="clearfix"></div>
-    </div>
-  </div>
-<script>
-      var requisitos = "{{userdepartment.d_management.m_company.c_incident}}";
-      if (requisitos == "False"){
-        document.getElementById("eincident").style.display="None";
-        i +=1;
-      }
-</script>  
-<div id ="erequisite" class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
-    <div class ="tile-stats">
-      <p>Requisitos - Estadistica</p>
-            <div id="out4"></div>
-            <div class="clearfix"></div>
-    </div>
-  </div>
-<script>
-      var requisitos = "{{userdepartment.d_management.m_company.c_requisite}}";
-      if (requisitos == "False"){
-        document.getElementById("erequisite").style.display="None";
-        i +=1;
-      }
-</script>
-<div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
-    <div class ="tile-stats">
-      <p>Tickets de {{userdepartment}} - Estado de los tickets</p>
-            <div id="out3"></div>
-            <div class="clearfix"></div>
-    </div>
-  </div>
-</div>
-
+                  function drawBarChart() {
+                    var db = eval({{cakes|safe}});
+                    var sb = db.length;
+                    var datab = new Array(sb);
+                    var chartb = new Array(sb);
+                    var ib = 0;
+                    var optionsb = {'chartArea':{left:10,top:10,width:'90%',height:'90%'},
+                                'fontSize':15,
+                                'legend':{position:'none'},};
+                    while (ib <= sb+1){
+                      datab[ib] = new google.visualization.DataTable();
+                      datab[ib].addColumn('string', 'Usuario');
+                      datab[ib].addColumn('number', 'Cantidad');
+                      datab[ib].addRows(db[ib]);
+                      // Set chart options
+                      // Instantiate and draw our chart, passing in some options.
+                      chartb[ib] = new google.visualization.BarChart(document.getElementById('bars'+ib));
+                      chartb[ib].draw(datab[i], optionsb);
+                      ib++;
+                    }
+                  }
+                </script>
 
 <div class="row top_tiles">
   <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
     
   </div>
 </div>
-
-
-
-
-
-        <!-- footer content -->
-        <footer>
-          <div class="copyright-info">
-            <p class="pull-right">Carlos Farinha - Amagi</p>
-          </div>
-          <div class="clearfix"></div>
-        </footer>
-        <!-- /footer content -->
 
       </div>
       <!-- /page content -->

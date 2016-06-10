@@ -1,7 +1,7 @@
 {% extends 'TicketsApp/main.html' %}
 {% load staticfiles%}
     {% block title %} 
-    Usuarios del equipo
+    Áreas de trabajo
     {% endblock %}
  <script src="js/jquery.min.js"></script>
 
@@ -11,20 +11,11 @@
         <div class="">
           <div class="page-title">
             <div class="title_left">
-              <h3>
-                    {{department}}
-                    
-                </h3>
-            </div>
+             </div>
 
             <div class="title_right">
               <div class="col-md-5 col-sm-5 col-xs-12 form-group pull-right top_search">
-                <div class="input-group">
-                  <input type="text" class="form-control" placeholder="Busqueda por estado...">
-                  <span class="input-group-btn">
-                            <button class="btn btn-default" type="button">Ir</button>
-                        </span>
-                </div>
+                
               </div>
             </div>
           </div>
@@ -35,7 +26,7 @@
             <div class="col-md-12 col-sm-12 col-xs-12">
               <div class="x_panel">
                 <div class="x_title">
-                  <h2>Lista de usuarios de {{department}}</h2>
+                  <h2>Lista de Áreas</h2>
                   
                   <div class="clearfix"></div>
                 </div>
@@ -46,24 +37,26 @@
                      <div class="col-md-4 col-sm-4 col-xs-12 animated fadeInDown">
                       <div class="well profile_view">
                         <div class="col-sm-12">
-                          <h4 class="brief"><i>{{son.u_jobtitle}}</i></h4>
+                          <h4 class="brief"><i>Nivel: {{son.d_level}} - {{son.d_name}}</i></h4>
                           <div class="left col-xs-7">
-                            <h2>{{son.u_user.get_full_name}}</h2>
                             <small><ul class="list-unstyled">
-                              <li><i class="fa fa-phone"></i>  {{son.u_phone}} </li>
-                              <li> {{son.u_user.email}} </li>
+                              <li><i class="fa fa-user"></i> Supervisor: {{son.d_manager}} </li>
+                              <li> {{son.d_management}} </li>
 
                             </ul></small>
                           </div>
                           <div class="right col-xs-5 text-center">
-                            <img src="{%static "" %}img/userphoto/{{son.u_user.username}}.jpg" onError ="this.src='{%static "" %}img/userphoto/noprofile.jpg'" alt="..." class="img-circle profile_img">
+                            <img src="{%static "" %}img/userphoto/{{son.d_manager.username}}.jpg" onError ="this.src='{%static "" %}img/userphoto/noprofile.jpg'" alt="..." class="img-circle profile_img">
                           </div>
                         </div>
                         <div class="col-xs-12 bottom text-center">
                           <div class="col-xs-12 col-sm-12 emphasis">
-                            <a href="{% url 'TicketsApp.views.users_id' pk=son.pk %}">
+                           <a href="#">
                            <button type="button" class="btn btn-primary btn-xs"> <i class="fa fa-bar-chart">
                                                             </i> Estadísticas </button></a>
+                           <a href="{% url 'TicketsApp.views.users' pk=son.d_id %}">
+                           <button type="button" class="btn btn-primary btn-xs"> <i class="fa fa-users">
+                                </i> Equipo </button></a>
                           </div>
                         </div>
                       </div>
@@ -83,8 +76,7 @@
 
           </div>
         </div>
-
-     </div>
+      </div>
       <!-- /page content -->
 
   <!-- Datatables -->

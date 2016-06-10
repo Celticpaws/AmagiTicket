@@ -30,18 +30,43 @@ class Company(models.Model):
 	c_id = models.IntegerField(unique=True,primary_key=True)
 	c_name = models.CharField(max_length=100)
 	c_owner = models.ForeignKey('auth.User',default=0)
-	c_solicitude = models.BooleanField(default=False)
-	c_requisite = models.BooleanField(default=False)
-	c_incident = models.BooleanField(default=False)
 
 	def __str__(self):
 		return self.c_name
 
+	def start_of_workflows_of(self):
+		ct= Ctype.objects.filter(ct_company=self)
+		s=[]
+		for c in ct:
+			s += [c.ct_type.ty_workflow.w_start]
+		return s
+
+class Ctype(models.Model):
+	ct_company = models.ForeignKey('Company')
+	ct_type = models.ForeignKey('Ttype')
+
+	def __str__(self):
+		return self.ct_company.c_name+" - "+self.ct_type.ty_name
+
+class Member(models.Model):
+	m_user = models.ForeignKey('auth.User')
+	m_department = models.ForeignKey('Department')
+
+	def __str__(self):
+			return self.m_user.get_full_name()+" - "+self.m_department.d_name
+
+	def by_user(user):
+		return Member.objects.get(m_user=user)
+
+	def by_department(department):
+		return Member.objects.get(m_department=department)
 
 class Department(models.Model):
 	d_id = models.IntegerField(unique=True)
 	d_name = models.CharField(max_length=100,primary_key=True)
+	d_level = models.IntegerField(default=0)
 	d_manager = models.ForeignKey('auth.User',default=0)
+	d_haveview = models.ManyToManyField('auth.User', through ='Member',related_name='viewers')
 	d_management = models.ForeignKey('Department',related_name='d_superior',default=0,null=True,blank=True)
 
 	def __str__(self):
@@ -107,6 +132,7 @@ class Service(models.Model):
 class UserProfile(models.Model):
 	u_user = models.OneToOneField('auth.User', on_delete=models.CASCADE, primary_key=True,default=0,related_name="profile")
 	u_secondname = models.CharField(max_length=30)
+	u_accesslevel = models.IntegerField(default=0)
 	u_secondlastname = models.CharField(max_length=30)
 	u_phone = models.ForeignKey('Phone')
 	u_jobtitle = models.CharField(max_length=100)
@@ -142,8 +168,8 @@ class UserProfile(models.Model):
 		else:
 			return User.objects.filter(profile=self)
 
-	def group_values(self,isincident):
-		personal = Ticket.ticket_count(self.u_user,self.u_department,True,isincident)
+	def group_values(self,ttype):
+		personal = Ticket.ticket_count(self.u_user,self.u_department,True,ttype)
 		res = []
 		userdep = self.u_department
 		if (userdep.leader_of_department() == self.u_user):
@@ -151,17 +177,17 @@ class UserProfile(models.Model):
 			if sons :
 				res=[["No asignados",0]]
 				for son in sons:
-					res += [[son.d_name,Ticket.ticket_count(None,son,False,isincident)]]
+					res += [[son.d_name,Ticket.ticket_count(None,son,False,ttype)]]
 			else:
-				none = Ticket.none_count(self,self.u_department,isincident)
+				none = Ticket.none_count(self,self.u_department,ttype)
 				res=[["No asignados",none]]
 				users = self.get_users_hierarchy()
 				for user in users:
-					res += [[user.u_user.get_full_name(),Ticket.ticket_count(user.u_user,user.u_department,True,isincident)]]
+					res += [[user.u_user.get_full_name(),Ticket.ticket_count(user.u_user,user.u_department,True,ttype)]]
 		else: 
-			none = Ticket.none_count(self,self.u_department,isincident)
+			none = Ticket.none_count(self,self.u_department,ttype)
 			res=[["No asignados",none]]
-			group = Ticket.ticket_count(self.u_user,self.u_department,False,isincident)
+			group = Ticket.ticket_count(self.u_user,self.u_department,False,ttype)
 			res += [[self.u_user.get_full_name,personal]]
 			res += [[userdep,group-none-personal]]
 		return res
@@ -187,6 +213,17 @@ class UserProfile(models.Model):
 				  [['Tiempo de cierre'],[rescer]],
 				  [['Tiempo de resolución de reaperturas'],[reares]]]
 
+	def from_level_get_dep(self):
+		level = self.u_accesslevel
+		final = []
+		while level > 0:
+			dids = Department.objects.filter(d_level=level)
+			for did in dids:
+				if Member.objects.filter(m_department=did,m_user=self.u_user):
+					final += [did]
+			level -=1
+		return final
+
 
 
 
@@ -207,14 +244,54 @@ class SLA(models.Model):
 		else:
 			return timedelta(seconds=self.s_number)
 		
+class Workflow(models.Model):
+	w_name = models.CharField(max_length=100)
+	w_start = models.ForeignKey('State',null=True,blank=True)
 
+	def __str__(self):
+		return self.w_name
+
+	def states_of (self):
+		return State.objects.filter(s_workflow=self)
+
+
+
+class State(models.Model):
+	s_name = models.CharField(max_length=100)
+	s_workflow = models.ForeignKey('Workflow', null=True,blank=True)
+
+	def __str__(self):
+		return self.s_workflow.w_name+" - "+self.s_name
+
+class Action(models.Model):
+	ac_name = models.CharField (max_length=50)
+	ac_state_apply = models.ForeignKey('State',related_name='ac_s_actual')
+	ac_next_state = models.ForeignKey('State',related_name='ac_s_next')
+
+	def __str__(self):
+		return self.ac_name
+
+class Ttype(models.Model):
+	ty_name = models.CharField(max_length=100)
+	ty_workflow = models.ForeignKey('Workflow')
+	ty_color = models.CharField(max_length=20)
+	ty_icon = models.CharField(max_length=40,null=True,blank=True)
+
+	def __str__(self):
+		return self.ty_name
+
+class Category(models.Model):
+	ca_name = models.CharField(max_length=100)
+
+	def __str__(self):
+		return self.ca_name
 
 class Ticket(models.Model):
 	t_id = models.IntegerField(primary_key=True)
 	t_mother = models.ForeignKey('Ticket',related_name='t_mother_of',default=0,null=True,blank=True)
-	t_isincident = models.NullBooleanField(default=False)
+	t_ttype = models.ForeignKey('Ttype',default=None,null=True,blank=True)
 	t_useraffected = models.ForeignKey('auth.User',related_name='t_useraffected',default=0)
-	t_category = models.CharField(max_length=20,null=True)
+	t_category = models.ForeignKey('Category',null=True,blank=True)
 	t_title = models.CharField(max_length = 100,null=True)
 	t_description = models.CharField(max_length=1000)
 	t_server =models.ForeignKey('Server',null=True)
@@ -226,116 +303,122 @@ class Ticket(models.Model):
 	t_reportmadeon = models.DateTimeField(default=datetime.now())
 	t_department = models.ForeignKey('Department')
 	t_usersolver = models.ForeignKey('auth.User',related_name='t_usersolver',default=0,null=True)
-	t_state = models.CharField(max_length=10)
+	t_state = models.ForeignKey('State',null=True)
 	t_issolved = models.BooleanField(default=False)
 	t_viewers = models.CharField(max_length=1000,default="")
 
 	def __str__(self):
 		return '# '+str(self.t_id)
 
-	def none_count(User,dep,isincident):
+	def none_count(User,dep,ttype):
 		ticket = []
 		sons = dep.from_did_get_sondids()
 		if sons :
 			for son in sons:
-				ticket += Ticket.objects.filter(t_isincident=isincident,t_usersolver=None,t_department=son)
+				ticket += Ticket.objects.filter(t_ttype=ttype.ct_type,t_usersolver=None,t_department=son)
 		else:
-			ticket += Ticket.objects.filter(t_isincident=isincident,t_usersolver=None,t_department=dep)
+			ticket += Ticket.objects.filter(t_ttype=ttype.ct_type,t_usersolver=None,t_department=dep)
 		return len(ticket)
 
-	def ticket_count(User,dep,ispersonal,isincident):
-		t = Ticket.tickets(User,dep,ispersonal,isincident)
+	def ticket_count_deps(User,deps,ispersonal,ttype):
+		final =[]
+		for ty in ttype:
+			final += [[ty.ct_type.ty_name,Ticket.ticket_count_deps(User,deps,ispersonal,ty)]]
+		return final
+
+	def ticket_count_dep(User,deps,ispersonal,ttype):
+		final =[]
+		for dep in deps:
+			final += [[dep,Ticket.ticket_count(User,dep,ispersonal,ttype)]]
+		return final
+
+	def ticket_counts(User,dep,ttypes):
+		final = []
+		for ty in ttypes:
+			n = ty.ct_type
+			p = Ticket.ticket_count(User,User.profile.u_department,True,ty)
+			g = Ticket.ticket_count_dep(User,dep,False,ty)
+			final += [[n,p,g]]
+		return final
+
+	def ticket_count(User,dep,ispersonal,ttype):
+		ty = Ttype.objects.get(ty_name=ttype.ct_type)
+		t = Ticket.tickets(User,dep,ispersonal,ty)
 		count = len(t)
 		return count
 
-	def ticket_count_active(User,isincident):
-		p = Ticket.objects.filter(t_isincident=isincident,t_state="Resuelto",t_usersolver=User)| Ticket.objects.filter(t_isincident=isincident,t_state="Cerrado",t_usersolver=User)
-		count = Ticket.ticket_count(User,User.profile.u_department,True,isincident)
+	def ticket_count_active(User,ttype):
+		p = Ticket.objects.filter(t_ttype=ttype,t_state="Resuelto",t_usersolver=User)| Ticket.objects.filter(t_ttype=ttype,t_state="Cerrado",t_usersolver=User)
+		count = Ticket.ticket_count(User,User.profile.u_department,True,ttype)
 		if count == 0:
 			return 0
 		else:
 			return (p.count()/count*100)
 
-	def tickets(User,dep,ispersonal,isincident):
+	def tickets_dep(User,deps,ispersonal,ttype):
+		final =[]
+		if len(deps)>0:
+			for dep in deps:
+				final += [Ticket.tickets(User,dep,ispersonal,ttype)]
+		else: 
+			final += [Ticket.tickets(User,deps,ispersonal,ttype)]
+		return final
+
+	def tickets(User,dep,ispersonal,ttype):
 		if (User == None):
 			if ispersonal:
-				ticket = Ticket.objects.filter(t_isincident=isincident,t_department=dep)
+				ticket = Ticket.objects.filter(t_ttype=ttype,t_usersolver=User,t_issolved=False)
 			else:
-				ticket = []
+				ticket = Ticket.objects.filter(t_ttype=ttype,t_department=dep,t_issolved=False)
 				sons = dep.from_did_get_sondids()
 				if sons :
 					for son in sons:
-						ticket += Ticket.tickets(User,son,ispersonal,isincident)
+						ticket = ticket | Ticket.tickets(User,son,ispersonal,ttype)
 				else:
-					ticket += Ticket.objects.filter(t_isincident=isincident,t_department=dep)
+					ticket = ticket | Ticket.objects.filter(t_ttype=ttype,t_department=dep,t_issolved=False)
 		else:
 			if ispersonal:
-				ticket = Ticket.objects.filter(t_isincident=isincident,t_usersolver=User)
+				ticket = Ticket.objects.filter(t_ttype=ttype,t_usersolver=User,t_issolved=False)
 			else:
-				ticket = []
+				ticket = Ticket.objects.filter(t_ttype=ttype,t_department=dep,t_issolved=False)
 				sons = dep.from_did_get_sondids()
 				if sons :
 					for son in sons:
-						ticket += Ticket.tickets(User,son,ispersonal,isincident)
+						ticket = ticket | Ticket.tickets(User,son,ispersonal,ttype)
 				else:
-					ticket += Ticket.objects.filter(t_isincident=isincident,t_department=dep)
+					ticket = ticket | Ticket.objects.filter(t_ttype=ttype,t_department=dep,t_issolved=False)
 		return ticket
 
 	def get_sons(Ticke):
 		sons = Ticket.objects.filter(t_mother=Ticke)
 		return sons
 
-	def count_types(User,dep,ispersonal):
-		solicitudes = Ticket.tickets(User,dep,ispersonal,False)
-		incidents = Ticket.tickets(User,dep,ispersonal,True)
-		requisites = Ticket.tickets(User,dep,ispersonal,None)
-		tickets = solicitudes + incidents + requisites
-		ini = 0
-		asi=0
-		enp=0
-		ene=0
-		rea=0
-		res=0
-		cer = 0
-		for t in tickets:
-			if t.t_state == 'Iniciado':
-				ini+=1
-			if t.t_state == 'Asignado':
-				asi+=1
-			if t.t_state == 'En Proceso':
-				enp+=1
-			if t.t_state == 'En Espera':
-				ene+=1
-			if t.t_state == 'Re-abierto':
-				rea+=1
-			if t.t_state == 'Resuelto':
-				res+=1
-			if t.t_state == 'Cerrado':
-				cer+=1
-		arrayoftypes=[]
-		if ini >0:
-			arrayoftypes+=[['Iniciado',ini]]
-		if asi >0:
-			arrayoftypes+=[['Asignado',asi]]
-		if enp >0:
-			arrayoftypes+=[['En Proceso',enp]]
-		if ene >0:
-			arrayoftypes+=[['En Espera',ene]]
-		if rea >0:
-			arrayoftypes+=[['Re-abierto',rea]]
-		if res >0:
-			arrayoftypes+=[['Resuelto',res]]
-		if cer >0:
-			arrayoftypes+=[['Cerrado',cer]]
+	def count_types(User,dep,ispersonal,ttype):
+		if ispersonal:
+			tickets = Ticket.objects.filter(t_usersolver=User)
+		else:
+			tickets = Ticket.objects.filter(t_department=dep)
+		for ty in ttype:
+			states = ty.ct_type.ty_workflow.states_of()
+			count=[0]*len(states)
+			for t in tickets:
+				position = [i for i,x in enumerate(states) if x==t.t_state][0]
+				count[position]+=1
+
+			arrayoftypes=[]
+			for i in range(len(count)):
+				if count[i]>0:
+					arrayoftypes+=[[states[0].s_name,count[i]]]
 		return arrayoftypes
 
 	def tasks(User):
+		state = State.objects.filter(s_name="Cerrado")
 		if User.profile.u_department.leader_of_department()==User:
-			tasks = Ticket.objects.filter(t_state="Asignado",t_department=User.profile.u_department)| Ticket.objects.filter(t_state="En Proceso",t_department=User.profile.u_department)| Ticket.objects.filter(t_state="En Espera",t_department=User.profile.u_department)| Ticket.objects.filter(t_state="Reabierto",t_department=User.profile.u_department)
+			tasks = Ticket.objects.exclude(t_state=state)
 		else:
-			tasks = Ticket.objects.filter(t_state="Asignado",t_usersolver=User)| Ticket.objects.filter(t_state="En Proceso",t_usersolver=User)| Ticket.objects.filter(t_state="En Espera",t_usersolver=User)| Ticket.objects.filter(t_state="Re-abierto",t_usersolver=User)
+			tasks = Ticket.objects.exclude(t_state=state)
 		
-		orderedtasks = tasks.order_by('-t_isincident','t_priority','-t_sla')
+		orderedtasks = tasks.order_by('-t_ttype','t_priority','-t_sla')
 		return orderedtasks
 
 	def task_count(User):
@@ -365,8 +448,16 @@ class Ticket(models.Model):
 		else:
 			return "Ticket vencido"
 
+	def notifications(user,firststateoncompany):
+		n = Ticket.objects.none()
+		for f in firststateoncompany:
+			n = n | Ticket.objects.filter(t_department=user.profile.u_department,t_state=f)
+		n = n.order_by('-t_reportmadeon')
+		return n[:10]
+
 	def pop(User):
-		tickets = Ticket.objects.filter(t_usersolver=User,t_state='Iniciado')| Ticket.objects.filter(t_usersolver=User,t_state='Asignado')| Ticket.objects.filter(t_usersolver=User,t_state='En Proceso')| Ticket.objects.filter(t_usersolver=User,t_state='Re-abierto')
+		state = State.objects.filter(s_name="Cerrado")		
+		tickets = Ticket.objects.filter(t_usersolver=User).exclude(t_state=state)
 		ticketsfiltered =[]
 		for ticket in tickets.all():
 			if (ticket.delta_life() > 50):

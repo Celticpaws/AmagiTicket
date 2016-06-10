@@ -32,25 +32,35 @@
                     <a href="{% url 'TicketsApp.views.ticket_assign' pk=ticketpk.pk %}" class="btn btn-default btn-dark">
                                         <i class="fa fa-edit"></i> Asignar Ticket
                     </a> 
-                    <a href="{% url 'TicketsApp.views.ticket_edit' pk=ticketpk.pk %}" class="btn btn-default btn-dark">
-                                        <i class="fa fa-edit"></i> Actualizar Estado
-                    </a> 
+                    <span id= "mod">
+                      <a href="{% url 'TicketsApp.views.ticket_edit' pk=ticketpk.pk %}" class="btn btn-default btn-dark">
+                                          <i class="fa fa-edit"></i> Actualizar Estado
+                      </a> 
+                    
+                      <a href="{% url 'TicketsApp.views.ticket_attach' pk=ticketpk.pk %}" class="btn btn-default btn-dark">
+                                          <i class="fa fa-paperclip"></i> Adjuntar Documento
+                      </a> 
                   
-                    <a href="{% url 'TicketsApp.views.ticket_attach' pk=ticketpk.pk %}" class="btn btn-default btn-dark">
-                                        <i class="fa fa-paperclip"></i> Adjuntar Documento
-                    </a> 
-                
-                   <a href="{% url 'TicketsApp.views.ticket_scale' pk=ticketpk.pk %}" class="btn btn-default btn-dark">
-                                        <i class="fa fa-bar-chart"></i> Escalar
-                   </a> 
-                
-                   <a href="{% url 'TicketsApp.views.ticket_transfer' pk=ticketpk.pk %}" class="btn btn-default btn-dark">
-                                        <i class="fa fa-mail-reply"></i> Transferir Ticket
-                   </a> 
+                     <a href="{% url 'TicketsApp.views.ticket_scale' pk=ticketpk.pk %}" class="btn btn-default btn-dark">
+                                          <i class="fa fa-bar-chart"></i> Escalar
+                     </a> 
                   
-                   <a href="{% url 'TicketsApp.views.ticket_print' pk=ticketpk.pk %}" target="_blank" class="btn btn-default btn-dark">
-                                        <i class="fa fa-print"></i> Imprimir Informe
-                   </a> 
+                     <a href="{% url 'TicketsApp.views.ticket_transfer' pk=ticketpk.pk %}" class="btn btn-default btn-dark">
+                                          <i class="fa fa-mail-reply"></i> Transferir Ticket
+                     </a> 
+                    
+                     <a href="{% url 'TicketsApp.views.ticket_print' pk=ticketpk.pk %}" target="_blank" class="btn btn-default btn-dark">
+                                          <i class="fa fa-print"></i> Imprimir Informe
+                     </a> 
+                 </span>
+                 <script>
+                      var solver = "{{ticketpk.t_usersolver.get_full_name}}";
+                      var creator = "{{ticketpk.t_userreporter.get_full_name}}"
+                      var actual = "{{user.get_full_name}}"
+                      if (solver==actual){
+                        document.getElementById("mod").style.display="None";
+                      }
+                 </script>
               </div>
         </div>
 
