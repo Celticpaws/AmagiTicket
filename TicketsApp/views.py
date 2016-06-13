@@ -36,17 +36,6 @@ def index(request):
     ttypes = Ctype.objects.filter(ct_company=request.user.profile.u_company)
 
     tctype = Ticket.ticket_counts(request.user,dephierarchy,ttypes)
-
-    tcgtype = ""#Ticket.ticket_count_deps(request.user,dephierarchy,False,ttypes)""
-   # psolicitude = Ticket.ticket_count(request.user,userdepartment,True,"Solicitude")
-   # asolicitude = Ticket.ticket_count(request.user,userdepartment,False,False)
-   # gsolicitude = Ticket.ticket_count_dep(request.user,dephierarchy,False,False)
-   # pincident = Ticket.ticket_count(request.user,userdepartment,True,True)
-   # aincident = Ticket.ticket_count(request.user,userdepartment,False,True)
-   # gincident = Ticket.ticket_count_dep(request.user,dephierarchy,False,True)
-   # prequisite = Ticket.ticket_count(request.user,userdepartment,True,None)
-   # arequisite = Ticket.ticket_count(request.user,userdepartment,False,None)
-   # grequisite = Ticket.ticket_count_dep(request.user,dephierarchy,False,None)
     types = []
     for ttype in ttypes:
         types += Ticket.count_types(request.user,dephierarchy,False,ttype)
@@ -54,9 +43,7 @@ def index(request):
     for ttype in ttypes:
         cake += [(UserProfile.get_UserProfile(request.user)).group_values(ttype)]
 
-    #ivalues = (UserProfile.get_UserProfile(request.user)).group_values(True)
-    #rvalues = (UserProfile.get_UserProfile(request.user)).group_values(None)
-    
+
     servers = Server.server_count()
     services = Service.service_count()
     taskcount = Ticket.task_count(request.user)
@@ -69,8 +56,7 @@ def index(request):
             {'userjob':userjob,'userdepartment':userdepartment,
               #'psolicitude':psolicitude,'arequisite':arequisite,'prequisite':prequisite,'grequisite':grequisite,
              'dephierarchy':dephierarchy,
-             'tctype':tctype,'tcgtype':tcgtype,
-             'cakes':cake,
+             'tctype':tctype,'cakes':cake,
              #'pincident':pincident,'gsolicitude':gsolicitude,'aincident':aincident,'asolicitude':asolicitude,'gincident':gincident,
              #'svalues': svalues,'ivalues': ivalues,'rvalues': rvalues,
              'bars': types,    

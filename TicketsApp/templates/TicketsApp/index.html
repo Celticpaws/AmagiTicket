@@ -36,7 +36,7 @@
 
             <div id="csolicitude" class="animated flipInY col-lg-3 col-md-3 col-sm-6 col-xs-12">
               <a href= "{% url 'solicitudg' pk=userdepartment.d_id %}" style="text-decoration:none">
-                <div class="tile-stats">
+                <div style ="height:100%" class="tile-stats">
                   <div class="icon"><i class="fa {{t.ty_icon}}"></i>
                   </div>
                   <span class="count"> {{p}}</span>
@@ -70,8 +70,30 @@
               <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
                 <script type="text/javascript">
                   google.charts.load('current', {'packages':['corechart']});
-                  google.charts.setOnLoadCallback(Cakes);
                   google.charts.setOnLoadCallback(Bars);
+                  google.charts.setOnLoadCallback(Cakes);
+                  function Bars() {
+                    var db = eval({{bars|safe}});
+                    var sb = db.length;
+                    var datab = new Array(sb);
+                    var chartb = new Array(sb);
+                    var ib = 0;
+                    var optionsb = {'chartArea':{left:10,top:10,width:'90%',height:'80%'},
+                                'colors': ['#1ABB9C','#22527B','#3B87C8','#2D6DA3','#337AB7','#4F93CE','#285F8F','#63A0D4'],
+                                'fontSize':15,
+                                'legend':{position:'none'},
+                                };
+                                
+                    while (ib < sb){
+                      datab[ib] = new google.visualization.DataTable();
+                      datab[ib].addColumn('string', 'Tipo');
+                      datab[ib].addColumn('number', 'Cantidad');
+                      datab[ib].addRows(db[ib]);
+                      chartb[ib] = new google.visualization.ColumnChart(document.getElementById('bar'+ib));
+                      chartb[ib].draw(datab[ib], optionsb);
+                      ib++;
+                    }
+                  }
                   function Cakes() {
                     var d = eval({{cakes|safe}});
                     var s = d.length;
@@ -84,7 +106,7 @@
                                 'legend':{position:'none'},
                                 'pieHole':0.4,
                                 'pieSliceTextStyle':{fontSize: 14},};
-                    while (i <= s+1){
+                    while (i <= s){
                       data[i] = new google.visualization.DataTable();
                       data[i].addColumn('string', 'Usuario');
                       data[i].addColumn('number', 'Cantidad');
@@ -95,25 +117,7 @@
                     }
                   }
                   
-                  function Bars() {
-                    var db = eval({{bars|safe}});
-                    var sb = db.length;
-                    var datab = new Array(sb);
-                    var chartb = new Array(sb);
-                    var ib = 0;
-                    var optionsb = {'title':'How Much Pizza Anthony Ate Last Night',
-                       'width':400,
-                       'height':300,};
-                    while (ib <= sb+1){
-                      datab[ib] = new google.visualization.DataTable();
-                      datab[ib].addColumn('string', 'Tipo');
-                      datab[ib].addColumn('number', 'Numero');
-                      datab[ib].addRows(db[ib]);
-                      chartb[ib] = new google.visualization.BarChart(document.getElementById('bar'+ib));
-                      chartb[ib].draw(datab[ib], optionsb);
-                      ib++;
-                    }
-                  }
+                  
                 </script>
 
 <div class="row top_tiles">
