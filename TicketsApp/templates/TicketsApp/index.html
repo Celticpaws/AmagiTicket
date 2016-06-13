@@ -39,9 +39,9 @@
                 <div class="tile-stats">
                   <div class="icon"><i class="fa {{t.ty_icon}}"></i>
                   </div>
-                  <div class="count">{{p}}</div>
-
-                  <h3>{{t.ty_name}} </h3>
+                  <span class="count"> {{p}}</span>
+                  <br>
+                  <h1 class ="label-{{t.ty_color}}" align ="center" style="color:white">{{t.ty_name}} </h1>
                   <p>
                   {% for e,d in g %} 
                     {{e}} - {{d}}<br>
@@ -57,21 +57,22 @@
                 </div>
             </div>
               
-            <div class="col-lg-6 col-md-3 col-sm-3 col-xs-12">
+            <div class="col-lg-6 col-md- col-sm-3 col-xs-12">
                 <div class ="tile-stats">
                   <p>Estado de {{t.ty_name}}</p>
-                        <div id="bars{{forloop.counter0|safe}}"></div>
+                        <div id="bar{{forloop.counter0|safe}}"></div>
                         <div class="clearfix"></div>
                 </div>
               </div>
+
             </div>
             {% endfor %}
               <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
                 <script type="text/javascript">
                   google.charts.load('current', {'packages':['corechart']});
-                  google.charts.setOnLoadCallback(drawChart);
-                  google.charts.setOnLoadCallback(drawBarChart);
-                  function drawChart() {
+                  google.charts.setOnLoadCallback(Cakes);
+                  google.charts.setOnLoadCallback(Bars);
+                  function Cakes() {
                     var d = eval({{cakes|safe}});
                     var s = d.length;
                     var data = new Array(s);
@@ -88,31 +89,28 @@
                       data[i].addColumn('string', 'Usuario');
                       data[i].addColumn('number', 'Cantidad');
                       data[i].addRows(d[i]);
-                      // Set chart options
-                      // Instantiate and draw our chart, passing in some options.
                       chart[i] = new google.visualization.PieChart(document.getElementById('cake'+i));
                       chart[i].draw(data[i], options);
                       i++;
                     }
                   }
-                  function drawBarChart() {
-                    var db = eval({{cakes|safe}});
+                  
+                  function Bars() {
+                    var db = eval({{bars|safe}});
                     var sb = db.length;
                     var datab = new Array(sb);
                     var chartb = new Array(sb);
                     var ib = 0;
-                    var optionsb = {'chartArea':{left:10,top:10,width:'90%',height:'90%'},
-                                'fontSize':15,
-                                'legend':{position:'none'},};
+                    var optionsb = {'title':'How Much Pizza Anthony Ate Last Night',
+                       'width':400,
+                       'height':300,};
                     while (ib <= sb+1){
                       datab[ib] = new google.visualization.DataTable();
-                      datab[ib].addColumn('string', 'Usuario');
-                      datab[ib].addColumn('number', 'Cantidad');
+                      datab[ib].addColumn('string', 'Tipo');
+                      datab[ib].addColumn('number', 'Numero');
                       datab[ib].addRows(db[ib]);
-                      // Set chart options
-                      // Instantiate and draw our chart, passing in some options.
-                      chartb[ib] = new google.visualization.BarChart(document.getElementById('bars'+ib));
-                      chartb[ib].draw(datab[i], optionsb);
+                      chartb[ib] = new google.visualization.BarChart(document.getElementById('bar'+ib));
+                      chartb[ib].draw(datab[ib], optionsb);
                       ib++;
                     }
                   }

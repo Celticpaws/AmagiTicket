@@ -47,8 +47,9 @@ def index(request):
    # prequisite = Ticket.ticket_count(request.user,userdepartment,True,None)
    # arequisite = Ticket.ticket_count(request.user,userdepartment,False,None)
    # grequisite = Ticket.ticket_count_dep(request.user,dephierarchy,False,None)
-   
-    types = Ticket.count_types(request.user,userdepartment,False,ttypes)
+    types = []
+    for ttype in ttypes:
+        types += Ticket.count_types(request.user,dephierarchy,False,ttype)
     cake = []
     for ttype in ttypes:
         cake += [(UserProfile.get_UserProfile(request.user)).group_values(ttype)]
@@ -72,7 +73,7 @@ def index(request):
              'cakes':cake,
              #'pincident':pincident,'gsolicitude':gsolicitude,'aincident':aincident,'asolicitude':asolicitude,'gincident':gincident,
              #'svalues': svalues,'ivalues': ivalues,'rvalues': rvalues,
-             'bvalues': types,    
+             'bars': types,    
              'servers': servers,'services' : services,'taskcount' : taskcount,
              'notifications':notifications,'activitiespop':activitiespop,'slaspop':slaspop,
              })

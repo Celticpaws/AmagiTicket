@@ -394,22 +394,26 @@ class Ticket(models.Model):
 		return sons
 
 	def count_types(User,dep,ispersonal,ttype):
+		final = []
+		tickets = Ticket.objects.none()
 		if ispersonal:
-			tickets = Ticket.objects.filter(t_usersolver=User)
+			tickets = Ticket.objects.filter(t_usersolver=User,t_ttype=ttype.ct_type)
 		else:
-			tickets = Ticket.objects.filter(t_department=dep)
-		for ty in ttype:
-			states = ty.ct_type.ty_workflow.states_of()
-			count=[0]*len(states)
-			for t in tickets:
-				position = [i for i,x in enumerate(states) if x==t.t_state][0]
-				count[position]+=1
-
-			arrayoftypes=[]
-			for i in range(len(count)):
-				if count[i]>0:
-					arrayoftypes+=[[states[0].s_name,count[i]]]
-		return arrayoftypes
+			for d in dep:
+				tickets = tickets | Ticket.objects.filter(t_department=d,t_ttype=ttype.ct_type)
+		states = ttype.ct_type.ty_workflow.states_of()
+		count=[0]*len(states)
+		for t in tickets:
+			position = [i for i,x in enumerate(states) if x==t.t_state][0]
+			count[position]+=1
+		arrayoftypes=[]
+		i=0
+		while i < len(count):
+			if count[i]>=0:
+				arrayoftypes+=[[states[i].s_name,count[i]]]
+			i+=1
+		final += [arrayoftypes]
+		return final
 
 	def tasks(User):
 		state = State.objects.filter(s_name="Cerrado")
