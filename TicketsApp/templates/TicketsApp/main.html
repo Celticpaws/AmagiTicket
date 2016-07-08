@@ -109,23 +109,23 @@
                 </li>
                 {%for t,p,g in tctype %}
                 <li id="solicitudes"><a><i class="fa {{t.ty_icon}}"></i> {{t}} <span class="fa fa-chevron-down"></span></a>
-                  <ul class="nav child_menu" style="display: none">
-                    <li id="createsolicitude"><a href="{% url 'TicketsApp.views.ticket_create' pk='solicitud' %}">Crear {{t}}
+                  <ul class="nav child_menu" style="display: block">
+                    <li id="type{{t}}"><a href="{% url 'TicketsApp.views.ticket_create' pk=t.ty_name %}">Crear {{t}}
                     </a>
                     </li>
                     <script>
                       var requisitos = "{{user.profile.u_cancreatetickets}}";
                       if (requisitos == "False"){
-                        document.getElementById("createsolicitude").style.display="None";
+                        document.getElementById("type{{t}}").style.display="None";
                         i +=1;
                       }
                     </script>  
-                    <li><a href="{% url 'TicketsApp.views.solicitudp' %}"> Personales
+                    <li><a href="{% url 'TicketsApp.views.personal' pk=t.id %}"> Personales
                       <span class="label label-{{t.ty_color}} pull-right">{{p}} </span>
                     </a>
                     </li>
                     {% for dep,depcount in g %}
-                      <li><a href="{% url 'TicketsApp.views.solicitudg' pk=dep.d_id %}">{{dep.d_name}}
+                      <li><a href="{% url 'TicketsApp.views.group'  pk2=t.id pk1=dep.d_id %}">{{dep.d_name}}
                         <span class="label label-{{t.ty_color}} pull-right">{{depcount}}</span>
                       </a>
                       </li>   
@@ -226,20 +226,8 @@
                                           <i class="fa fa-info-circle"></i>
                                       </span>
                         <span>
-                                          <span id="sol{{notification.t_id}}"></span>
-                                          <script>
-                                              var b = "{{notification.t_isincident}}" 
-                                              var text;  
-                                               if ( b=="True") {
-                                                  text = "<span class='label label-danger'>Ticket {{notification}}</span>"
-                                               }else if ( b=="None") {
-                                                  text = "<span class='label label-success'>Ticket {{notification}}</span>"
-                                               }else{
-                                                  text = "<span class='label label-info'>Ticket {{notification}}</span>"
-                                               }
-                                              document.getElementById("sol{{notification.t_id}}").innerHTML = text;
-                                        
-                                          </script>
+                                          <span class='label label-{{notification.t_ttype.ty_color}}'>Ticket {{notification}}</span>
+                                         
                         <span class="time"> {{notification.life_spawn}}</span>
                         </span>
                         <span class="message">

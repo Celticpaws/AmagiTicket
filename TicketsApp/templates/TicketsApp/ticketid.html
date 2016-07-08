@@ -11,20 +11,7 @@
           <div class="page-title">
             <div class="title_left">
               <h1>
-                  <span id="sol"></span>
-                  <script>
-                      var b = "{{ticketpk.t_isincident}}" 
-                      var text;  
-                       if ( b=="True") {
-                          text = "<span class='label label-danger'>Ticket # {{ticketpk.t_id}}</span>"
-                       }else if (b=="None"){
-                          text = "<span class='label label-success'>Ticket # {{ticketpk.t_id}}</span>"
-                       }else{
-                          text = "<span class='label label-info'>Ticket # {{ticketpk.t_id}}</span>"
-                       }
-                      document.getElementById("sol").innerHTML = text;
-                
-                  </script>                      
+                  <span class='label label-{{ticketpk.t_ttype.ty_color}}'>Ticket # {{ticketpk.t_id}}</span>                
               </h1>
             </div>
           </div>
@@ -57,7 +44,7 @@
                       var solver = "{{ticketpk.t_usersolver.get_full_name}}";
                       var creator = "{{ticketpk.t_userreporter.get_full_name}}"
                       var actual = "{{user.get_full_name}}"
-                      if (solver==actual){
+                      if (solver!=actual && creator!=actual){
                         document.getElementById("mod").style.display="None";
                       }
                  </script>
@@ -158,20 +145,7 @@
             <!-- info row -->
             <div class="row invoice-info">
               <div class="col-sm-4 invoice-col">
-                <strong>Tipo: </strong> <span id="sol2"></span>
-                  <script>
-                      var b = "{{ticketpk.t_isincident}}" 
-                      var text;  
-                       if ( b=="True") {
-                          text = "<span class='label label-danger'>Incidente</span>"
-                       }else if (b=="None"){
-                          text = "<span class='label label-success'>Requisito</span>"
-                       }else{
-                          text = "<span class='label label-info'>Solicitud"
-                       }
-                      document.getElementById("sol2").innerHTML = text;
-                
-                  </script>
+                <strong>Tipo: </strong> <span class='label label-{{ticketpk.t_ttype.ty_color}}'>{{ticketpk.t_ttype.ty_name}}</span>
                     <br>
                 <strong>Categoría: </strong> {{ticketpk.t_category}}<br>
                 <strong>Servidor afectado: </strong> {{ticketpk.t_server}}<br>
@@ -183,7 +157,7 @@
               <div class="col-sm-4 invoice-col">
                 <strong>Grupo solucionador: </strong> {{ticketpk.t_department}}<br>
                 <strong>Prioridad: </strong> {{ticketpk.t_priority}}<br>
-                <strong>Estado: </strong> {{ticketpk.t_state}}<br>
+                <strong>Estado: </strong> {{ticketpk.t_state.s_name}}<br>
                 <strong>Asignatario: </strong> {{ticketpk.t_usersolver.get_full_name}}<br>
               </div>
               <!-- /.col -->

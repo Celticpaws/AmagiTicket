@@ -35,7 +35,7 @@
           <div class="row top_tiles">
 
             <div id="csolicitude" class="animated flipInY col-lg-3 col-md-3 col-sm-6 col-xs-12">
-              <a href= "{% url 'solicitudg' pk=userdepartment.d_id %}" style="text-decoration:none">
+              <a href= "{% url 'group' pk2=t.id pk1=userdepartment.d_id %}" style="text-decoration:none">
                 <div style ="height:100%" class="tile-stats">
                   <div class="icon"><i class="fa {{t.ty_icon}}"></i>
                   </div>

@@ -1,7 +1,7 @@
 {% extends 'TicketsApp/main.html' %}
 
     {% block title %} 
-    Incidentes Grupales
+    Solicitudes Grupales
     {% endblock %}
  <script src="js/jquery.min.js"></script>
 
@@ -12,12 +12,12 @@
           <div class="page-title">
             <div class="title_left">
               <h3>
-                  <span class='label label-danger'>  Incidentes Grupales </span>
+                  <span class='label label-{{thistype.0.ty_color}}'>  {{thistype.0.ty_name}} de {{thisdepartment.0.d_name}} </span>
                     
                 </h3>
             </div>
 
-          
+           
             </div>
           </div>
           <div class="clearfix"></div>
@@ -27,7 +27,7 @@
             <div class="col-md-12 col-sm-12 col-xs-12">
               <div class="x_panel">
                 <div class="x_title">
-                  <h2>Lista de incidentes de {{depk.d_name}}</h2>
+                  <h2>Lista de solicitudes de {{depk.d_name}}</h2>
                   
                   <div class="clearfix"></div>
                 </div>
@@ -35,9 +35,9 @@
                   <table id="example" class="table table-striped responsive-utilities jambo_table sortable">
                     <thead>
                       <tr class="headings">
-                        
+                       
                         <th>Nº </th>
-                        <th>Fecha del Incidente </th>
+                        <th>Fecha de la Solicitud </th>
                         <th>Categoria </th>
                         <th>Prioridad </th>
                         <th>Resumen </th>
@@ -49,17 +49,17 @@
                     </thead>
 
                     <tbody>
-                    {% for gincident in gincidents %}
+                    {% for gsol in gsolicitudes %}
                       <tr class="even pointer">
-                       
-                        <td class=" "><a href="{% url 'TicketsApp.views.ticket' pk=gincident.pk %}">{{gincident.t_id}}</a></td>
-                        <td class=" ">{{gincident.t_reportmadeon}}</td>
-                        <td class=" ">{{gincident.t_category}}</td>
-                        <td class=" ">{{gincident.t_priority}}</td>
-                        <td class=" " style="width:10%"><div style="white-space: nowrap;text-overflow: ellipsis; width: 300px;display: block;overflow: hidden"> {{gincident.t_description}}</div></td>
-                        <td class="a-right a-right ">{{gincident.t_state}}</td>
-                        <td class="a-right a-right ">{{gincident.t_department}}</td>
-                        <td class=" last">{{gincident.t_usersolver}}</td>
+                        
+                        <td class=" "><a href="{% url 'TicketsApp.views.ticket' pk=gsol.pk %}">{{gsol.t_id}}</a></td>
+                        <td class=" ">{{gsol.t_reportmadeon}}</td>
+                        <td class=" ">{{gsol.t_category}}</td>
+                        <td class=" ">{{gsol.t_priority}}</td>
+                        <td class=" " style="width:10%"><div style="white-space: nowrap;text-overflow: ellipsis; width: 300px;display: block;overflow: hidden"> {{gsol.t_description}}</div></td>
+                        <td class="a-right a-right ">{{gsol.t_state}}</td>
+                        <td class="a-right a-right ">{{gsol.t_department}}</td>
+                        <td class=" last">{{gsol.t_usersolver}}</td>
                       </tr>
                     {% endfor %}
 
@@ -78,6 +78,7 @@
           </div>
         </div>
 
+  
 
       </div>
       <!-- /page content -->

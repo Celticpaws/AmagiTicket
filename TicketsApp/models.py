@@ -179,13 +179,13 @@ class UserProfile(models.Model):
 				for son in sons:
 					res += [[son.d_name,Ticket.ticket_count(None,son,False,ttype)]]
 			else:
-				none = Ticket.none_count(self,self.u_department,ttype)
+				none = Ticket.ticket_count(None,userdep,True,ttype)
 				res=[["No asignados",none]]
 				users = self.get_users_hierarchy()
 				for user in users:
 					res += [[user.u_user.get_full_name(),Ticket.ticket_count(user.u_user,user.u_department,True,ttype)]]
 		else: 
-			none = Ticket.none_count(self,self.u_department,ttype)
+			none = Ticket.ticket_count(None,userdep,False,ttype)
 			res=[["No asignados",none]]
 			group = Ticket.ticket_count(self.u_user,self.u_department,False,ttype)
 			res += [[self.u_user.get_full_name,personal]]
@@ -302,7 +302,7 @@ class Ticket(models.Model):
 	t_userreporter = models.ForeignKey('auth.User',related_name='t_userreporter',default=0)
 	t_reportmadeon = models.DateTimeField(default=datetime.now())
 	t_department = models.ForeignKey('Department')
-	t_usersolver = models.ForeignKey('auth.User',related_name='t_usersolver',default=0,null=True)
+	t_usersolver = models.ForeignKey('auth.User',related_name='t_usersolver',default=0,null=True,blank=True)
 	t_state = models.ForeignKey('State',null=True)
 	t_issolved = models.BooleanField(default=False)
 	t_viewers = models.CharField(max_length=1000,default="")

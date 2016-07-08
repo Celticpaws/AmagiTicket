@@ -34,7 +34,6 @@ def index(request):
     dephierarchy = request.user.profile.from_level_get_dep()
     userdepartment = UserProfile.get_department(request.user)
     ttypes = Ctype.objects.filter(ct_company=request.user.profile.u_company)
-
     tctype = Ticket.ticket_counts(request.user,dephierarchy,ttypes)
     types = []
     for ttype in ttypes:
@@ -42,8 +41,6 @@ def index(request):
     cake = []
     for ttype in ttypes:
         cake += [(UserProfile.get_UserProfile(request.user)).group_values(ttype)]
-
-
     servers = Server.server_count()
     services = Service.service_count()
     taskcount = Ticket.task_count(request.user)
@@ -200,171 +197,78 @@ def main(request):
 def register(request):
 	return render(request, 'TicketsApp/register.html', {})
 
-def solicitudp(request):
-    dephierarchy = request.user.profile.from_level_get_dep()
+def personal(request,pk):
+    thistype = Ttype.objects.filter(id=pk)
     userjob = UserProfile.get_jobtitle(request.user)
+    dephierarchy = request.user.profile.from_level_get_dep()
     userdepartment = UserProfile.get_department(request.user)
-    psolicitude = Ticket.ticket_count(request.user,userdepartment,True,False)
-    gsolicitude = Ticket.ticket_count_dep(request.user,dephierarchy,False,False)
-    pincident = Ticket.ticket_count(request.user,userdepartment,True,True)
-    gincident = Ticket.ticket_count_dep(request.user,dephierarchy,False,True)
-    prequisite = Ticket.ticket_count(request.user,userdepartment,True,None)
-    grequisite = Ticket.ticket_count_dep(request.user,dephierarchy,False,None)
-    psolicitudes = Ticket.tickets(request.user,userdepartment,True,False)
+    ttypes = Ctype.objects.filter(ct_company=request.user.profile.u_company)
+    tctype = Ticket.ticket_counts(request.user,dephierarchy,ttypes)
     servers = Server.server_count()
     services = Service.service_count()
-    notifications = Ticket.objects.filter(t_department=request.user.profile.u_department,t_state="Iniciado").order_by('-t_reportmadeon')[:8]
-    link ='TicketsApp/personal_solicitude.html'
-    return render(request, link, {'userjob':userjob,
-             'psolicitude':psolicitude,'dephierarchy':dephierarchy,'pincident':pincident,'gsolicitude':gsolicitude,'prequisite':prequisite,'grequisite':grequisite,
-             'gincident':gincident,'psolicitudes':psolicitudes,'servers':servers,
-             'services':services,'notifications':notifications,
-                 })
+    taskcount = Ticket.task_count(request.user)
+    firststateoncompany = request.user.profile.u_company.start_of_workflows_of()
+    notifications = Ticket.notifications(request.user,firststateoncompany)
+    psolicitudes = Ticket.tickets(request.user,userdepartment,True,thistype)
+    link ='TicketsApp/personal.html'
+    return render(request, link, {'userjob':userjob,'userdepartment':userdepartment,
+             'dephierarchy':dephierarchy,
+             'tctype':tctype,'thistype':thistype,
+             'psolicitudes':psolicitudes,    
+             'servers': servers,'services' : services,'taskcount' : taskcount,
+             'notifications':notifications,})
 
-def solicitudg(request,pk):
-    depk = Department.objects.get(d_id=pk)
-    dephierarchy = request.user.profile.from_level_get_dep()
+def group(request,pk2,pk1):
+    thistype = Ttype.objects.filter(id=pk2)
+    thisdepartment = Department.objects.filter(d_id=pk1)
     userjob = UserProfile.get_jobtitle(request.user)
+    dephierarchy = request.user.profile.from_level_get_dep()
     userdepartment = UserProfile.get_department(request.user)
-    psolicitude = Ticket.ticket_count(request.user,userdepartment,True,False)
-    gsolicitude = Ticket.ticket_count_dep(request.user,dephierarchy,False,False)
-    pincident = Ticket.ticket_count(request.user,userdepartment,True,True)
-    gincident = Ticket.ticket_count_dep(request.user,dephierarchy,False,True)
-    prequisite = Ticket.ticket_count(request.user,userdepartment,True,None)
-    grequisite = Ticket.ticket_count_dep(request.user,dephierarchy,False,None)
-    gsolicitudes = Ticket.tickets(request.user,depk,False,False)
+    ttypes = Ctype.objects.filter(ct_company=request.user.profile.u_company)
+    tctype = Ticket.ticket_counts(request.user,dephierarchy,ttypes)
     servers = Server.server_count()
     services = Service.service_count()
-    notifications = Ticket.objects.filter(t_department=request.user.profile.u_department,t_state="Iniciado").order_by('-t_reportmadeon')[:8]
-    link ='TicketsApp/group_solicitude.html'
-    return render(request, link,{'userjob':userjob,
-             'psolicitude':psolicitude,'dephierarchy':dephierarchy,'pincident':pincident,'gsolicitude':gsolicitude,'prequisite':prequisite,'grequisite':grequisite,
-             'gincident':gincident,'gsolicitudes':gsolicitudes,'servers':servers,
-             'services':services,'notifications':notifications,'depk':depk,
-                 })
-   
-def incidentp(request):
-    dephierarchy = request.user.profile.from_level_get_dep()
-    userjob = UserProfile.get_jobtitle(request.user)
-    userdepartment = UserProfile.get_department(request.user)
-    psolicitude = Ticket.ticket_count(request.user,userdepartment,True,False)
-    gsolicitude = Ticket.ticket_count_dep(request.user,dephierarchy,False,False)
-    pincident = Ticket.ticket_count(request.user,userdepartment,True,True)
-    gincident = Ticket.ticket_count_dep(request.user,dephierarchy,False,True)
-    prequisite = Ticket.ticket_count(request.user,userdepartment,True,None)
-    grequisite = Ticket.ticket_count_dep(request.user,dephierarchy,False,None)
-    pincidents = Ticket.tickets(request.user,userdepartment,True,True)
-    servers = Server.server_count()
-    services = Service.service_count()
-    notifications = Ticket.objects.filter(t_department=request.user.profile.u_department,t_state="Iniciado").order_by('-t_reportmadeon')[:8]
-    link ='TicketsApp/personal_incidents.html'
-    return render(request, link, {'userjob':userjob,
-         'psolicitude':psolicitude,'dephierarchy':dephierarchy,'pincident':pincident,'gsolicitude':gsolicitude,'prequisite':prequisite,'grequisite':grequisite,
-         'gincident':gincident,'pincidents':pincidents,'servers':servers,
-         'services':services,'notifications':notifications,
-             })
-
-def incidentg(request,pk):
-    depk = Department.objects.get(d_id=pk)
-    dephierarchy = request.user.profile.from_level_get_dep()
-    userjob = UserProfile.get_jobtitle(request.user)
-    userdepartment = UserProfile.get_department(request.user)
-    psolicitude = Ticket.ticket_count(request.user,userdepartment,True,False)
-    gsolicitude = Ticket.ticket_count_dep(request.user,dephierarchy,False,False)
-    pincident = Ticket.ticket_count(request.user,userdepartment,True,True)
-    gincident = Ticket.ticket_count_dep(request.user,dephierarchy,False,True)
-    prequisite = Ticket.ticket_count(request.user,userdepartment,True,None)
-    grequisite = Ticket.ticket_count_dep(request.user,dephierarchy,False,None)
-    gincidents = Ticket.tickets(request.user,depk,False,True)
-    servers = Server.server_count()
-    services = Service.service_count()
-    notifications = Ticket.objects.filter(t_department=request.user.profile.u_department,t_state="Iniciado").order_by('-t_reportmadeon')[:8]
-    link ='TicketsApp/group_incidents.html'
-    return render(request, link, {'userjob':userjob,
-         'psolicitude':psolicitude,'dephierarchy':dephierarchy,'pincident':pincident,'gsolicitude':gsolicitude,'prequisite':prequisite,'grequisite':grequisite,
-         'gincident':gincident,'gincidents':gincidents,'servers':servers,
-         'services':services,'notifications':notifications,'depk':depk,
-             })
-
-def requisitep(request):
-    dephierarchy = request.user.profile.from_level_get_dep()
-    userjob = UserProfile.get_jobtitle(request.user)
-    userdepartment = UserProfile.get_department(request.user)
-    psolicitude = Ticket.ticket_count(request.user,userdepartment,True,False)
-    gsolicitude = Ticket.ticket_count_dep(request.user,dephierarchy,False,False)
-    pincident = Ticket.ticket_count(request.user,userdepartment,True,True)
-    gincident = Ticket.ticket_count_dep(request.user,dephierarchy,False,True)
-    prequisite = Ticket.ticket_count(request.user,userdepartment,True,None)
-    grequisite = Ticket.ticket_count_dep(request.user,dephierarchy,False,None)
-    prequisites = Ticket.tickets(request.user,userdepartment,True,None)
-    servers = Server.server_count()
-    services = Service.service_count()
-    notifications = Ticket.objects.filter(t_department=request.user.profile.u_department,t_state="Iniciado").order_by('-t_reportmadeon')[:8]
-    link = ''
-    link ='TicketsApp/personal_requisites.html'
-    return render(request, link, {'userjob':userjob,
-         'psolicitude':psolicitude,'dephierarchy':dephierarchy,'pincident':pincident,'gsolicitude':gsolicitude,'prequisite':prequisite,'grequisite':grequisite,
-         'gincident':gincident,'prequisites':prequisites,'servers':servers,
-         'services':services,'notifications':notifications,
-             })
-
-def requisiteg(request,pk):
-    depk = Department.objects.get(d_id=pk)
-    dephierarchy = request.user.profile.from_level_get_dep()
-    userjob = UserProfile.get_jobtitle(request.user)
-    userdepartment = UserProfile.get_department(request.user)
-    psolicitude = Ticket.ticket_count(request.user,userdepartment,True,False)
-    gsolicitude = Ticket.ticket_count_dep(request.user,dephierarchy,False,False)
-    pincident = Ticket.ticket_count(request.user,userdepartment,True,True)
-    gincident = Ticket.ticket_count_dep(request.user,dephierarchy,False,True)
-    prequisite = Ticket.ticket_count(request.user,userdepartment,True,None)
-    grequisite = Ticket.ticket_count_dep(request.user,dephierarchy,False,None)
-    grequisites = Ticket.tickets(request.user,depk,False,None)
-    servers = Server.server_count()
-    services = Service.service_count()
-    notifications = Ticket.objects.filter(t_department=request.user.profile.u_department,t_state="Iniciado").order_by('-t_reportmadeon')[:8]
-    link = 'TicketsApp/group_requisites.html'
-    return render(request, link, {'userjob':userjob,
-         'psolicitude':psolicitude,'dephierarchy':dephierarchy,'pincident':pincident,'gsolicitude':gsolicitude,'prequisite':prequisite,'grequisite':grequisite,
-         'gincident':gincident,'grequisites':grequisites,'servers':servers,
-         'services':services,'notifications':notifications,'depk':depk,
-             })
+    taskcount = Ticket.task_count(request.user)
+    firststateoncompany = request.user.profile.u_company.start_of_workflows_of()
+    notifications = Ticket.notifications(request.user,firststateoncompany)
+    gsolicitudes = Ticket.objects.filter(t_department=thisdepartment,t_ttype=thistype)
+    link ='TicketsApp/group.html'
+    return render(request, link, {'userjob':userjob,'userdepartment':userdepartment,
+             'dephierarchy':dephierarchy,
+             'tctype':tctype,'thistype':thistype,'thisdepartment':thisdepartment,'gsolicitudes':gsolicitudes,    
+             'servers': servers,'services' : services,'taskcount' : taskcount,
+             'notifications':notifications,})
 
 def ptasks(request):
-    dephierarchy = request.user.profile.from_level_get_dep()
     userjob = UserProfile.get_jobtitle(request.user)
+    dephierarchy = request.user.profile.from_level_get_dep()
     userdepartment = UserProfile.get_department(request.user)
-    psolicitude = Ticket.ticket_count(request.user,userdepartment,True,False)
-    gsolicitude = Ticket.ticket_count_dep(request.user,dephierarchy,False,False)
-    pincident = Ticket.ticket_count(request.user,userdepartment,True,True)
-    gincident = Ticket.ticket_count_dep(request.user,dephierarchy,False,True)
-    prequisite = Ticket.ticket_count(request.user,userdepartment,True,None)
-    grequisite = Ticket.ticket_count_dep(request.user,dephierarchy,False,None)
-    ptasks = Ticket.tasks(request.user)
+    ttypes = Ctype.objects.filter(ct_company=request.user.profile.u_company)
+    tctype = Ticket.ticket_counts(request.user,dephierarchy,ttypes)
     servers = Server.server_count()
     services = Service.service_count()
-    notifications = Ticket.objects.filter(t_department=request.user.profile.u_department,t_state="Iniciado").order_by('-t_reportmadeon')[:8]
+    taskcount = Ticket.task_count(request.user)
+    firststateoncompany = request.user.profile.u_company.start_of_workflows_of()
+    notifications = Ticket.notifications(request.user,firststateoncompany)
+    ptasks = Ticket.tasks(request.user)
     link ='TicketsApp/tasks.html'
-    return render(request, link, {'userjob':userjob,
-         'psolicitude':psolicitude,'dephierarchy':dephierarchy,'pincident':pincident,'gsolicitude':gsolicitude,'prequisite':prequisite,'grequisite':grequisite,
-         'gincident':gincident,'ptasks':ptasks,'servers':servers,
-         'services':services,
-         'notifications':notifications,
-             })
+    return render(request, link, {'userjob':userjob,'userdepartment':userdepartment,
+             'dephierarchy':dephierarchy,
+             'tctype':tctype,'ptasks':ptasks,    
+             'servers': servers,'services' : services,'taskcount' : taskcount,
+             'notifications':notifications,})
 
 def ticket(request,pk):
-    dephierarchy = request.user.profile.from_level_get_dep()
     userjob = UserProfile.get_jobtitle(request.user)
+    dephierarchy = request.user.profile.from_level_get_dep()
     userdepartment = UserProfile.get_department(request.user)
-    psolicitude = Ticket.ticket_count(request.user,userdepartment,True,False)
-    gsolicitude = Ticket.ticket_count_dep(request.user,dephierarchy,False,False)
-    pincident = Ticket.ticket_count(request.user,userdepartment,True,True)
-    gincident = Ticket.ticket_count_dep(request.user,dephierarchy,False,True)
-    prequisite = Ticket.ticket_count(request.user,userdepartment,True,None)
-    grequisite = Ticket.ticket_count_dep(request.user,dephierarchy,False,None)
+    ttypes = Ctype.objects.filter(ct_company=request.user.profile.u_company)
+    tctype = Ticket.ticket_counts(request.user,dephierarchy,ttypes)
     servers = Server.server_count()
     services = Service.service_count()
-    notifications = Ticket.objects.filter(t_department=request.user.profile.u_department,t_state="Iniciado").order_by('-t_reportmadeon')[:8]
+    taskcount = Ticket.task_count(request.user)
+    firststateoncompany = request.user.profile.u_company.start_of_workflows_of()
+    notifications = Ticket.notifications(request.user,firststateoncompany)
     try:
         ticketpk = Ticket.objects.get(pk=pk)
     except:
@@ -391,14 +295,16 @@ def ticket(request,pk):
         dateclosed = Activity.date_of_event(ticketpk,'Cerrado')
         link ='TicketsApp/ticketid.html'
         return render(request,link,{
-             'userjob':userjob,'dephierarchy':dephierarchy,'psolicitude':psolicitude,'pincident':pincident,'prequisite':prequisite,'grequisite':grequisite,
-             'gsolicitude':gsolicitude,'gincident':gincident,'ticketpk':ticketpk,
+             'userjob':userjob,'userdepartment':userdepartment,
+             'dephierarchy':dephierarchy,
+             'tctype':tctype,'ptasks':ptasks,    
+             'servers': servers,'services' : services,'taskcount' : taskcount,
+             'notifications':notifications,'ticketpk':ticketpk,
             'useraffected':useraffected,'usersolver':usersolver,'sla':sla,
             'slahour':slahour,'slaminute':slaminute,'attacheds':attacheds,
             'sons':sons,'activities':activities,'lastactivity':lastactivity,
             'datesolved':datesolved,'dateclosed':dateclosed,'servers':servers,
-            'services':services,'dateopen':dateopen,'notifications':notifications,
-             })
+            'services':services,'dateopen':dateopen,})
     else: return render(request,'TicketsApp/page_404.html')
 
 def ticket_create(request,pk):
