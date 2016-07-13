@@ -263,6 +263,7 @@ class State(models.Model):
 	def __str__(self):
 		return self.s_workflow.w_name+" - "+self.s_name
 
+
 class Action(models.Model):
 	ac_name = models.CharField (max_length=50)
 	ac_state_apply = models.ForeignKey('State',related_name='ac_s_actual')
@@ -270,6 +271,13 @@ class Action(models.Model):
 
 	def __str__(self):
 		return self.ac_name
+
+	def posible_states (state):
+		actions = Action.objects.filter(ac_state_apply=state)
+		states = State.objects.none()
+		for action in actions:
+			states = states | State.objects.filter(s_name=action.ac_next_state.s_name)
+		return states
 
 class Ttype(models.Model):
 	ty_name = models.CharField(max_length=100)

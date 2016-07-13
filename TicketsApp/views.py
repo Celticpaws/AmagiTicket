@@ -66,16 +66,13 @@ def departments(request):
     dephierarchy = request.user.profile.from_level_get_dep()
     userjob = UserProfile.get_jobtitle(request.user)
     userdepartment = UserProfile.get_department(request.user)
-    psolicitude = Ticket.ticket_count(request.user,userdepartment,True,False)
-    gsolicitude = Ticket.ticket_count_dep(request.user,dephierarchy,False,False)
-    pincident = Ticket.ticket_count(request.user,userdepartment,True,True)
-    gincident = Ticket.ticket_count_dep(request.user,dephierarchy,False,True)
-    prequisite = Ticket.ticket_count(request.user,userdepartment,True,None)
-    grequisite = Ticket.ticket_count_dep(request.user,dephierarchy,False,None)
+    ttypes = Ctype.objects.filter(ct_company=request.user.profile.u_company)
+    tctype = Ticket.ticket_counts(request.user,dephierarchy,ttypes)
     servers = Server.server_count()
     services = Service.service_count()
     usershierarchy = request.user.profile.from_level_get_dep()
-    notifications = Ticket.objects.filter(t_department=request.user.profile.u_department,t_state="Iniciado").order_by('-t_reportmadeon')[:8]
+    firststateoncompany = request.user.profile.u_company.start_of_workflows_of()
+    notifications = Ticket.notifications(request.user,firststateoncompany)
     link ='TicketsApp/departments_list.html'
     return render(request, link, 
             {'userjob':userjob,'dephierarchy':dephierarchy,'psolicitude':psolicitude,'pincident':pincident,
@@ -105,7 +102,8 @@ def department_id(request,pk):
     usershierarchy = request.user.profile.get_users_hierarchy()
     lastten = Activity.last_ten_of_user(userp)
     usertickets = Ticket.objects.filter(t_usersolver=userp)
-    notifications = Ticket.objects.filter(t_department=request.user.profile.u_department,t_state="Iniciado").order_by('-t_reportmadeon')[:8]
+    firststateoncompany = request.user.profile.u_company.start_of_workflows_of()
+    notifications = Ticket.notifications(request.user,firststateoncompany)
     link = ''
     link ='TicketsApp/users_id.html'
     return render(request, link, 
@@ -121,16 +119,13 @@ def users(request,pk):
     department = Department.objects.get(d_id=pk)
     userjob = UserProfile.get_jobtitle(request.user)
     userdepartment = UserProfile.get_department(request.user)
-    psolicitude = Ticket.ticket_count(request.user,userdepartment,True,False)
-    gsolicitude = Ticket.ticket_count_dep(request.user,dephierarchy,False,False)
-    pincident = Ticket.ticket_count(request.user,userdepartment,True,True)
-    gincident = Ticket.ticket_count_dep(request.user,dephierarchy,False,True)
-    prequisite = Ticket.ticket_count(request.user,userdepartment,True,None)
-    grequisite = Ticket.ticket_count_dep(request.user,dephierarchy,False,None)
+    ttypes = Ctype.objects.filter(ct_company=request.user.profile.u_company)
+    tctype = Ticket.ticket_counts(request.user,dephierarchy,ttypes)
     servers = Server.server_count()
     services = Service.service_count()
     usershierarchy = department.from_did_get_depusers()
-    notifications = Ticket.objects.filter(t_department=request.user.profile.u_department,t_state="Iniciado").order_by('-t_reportmadeon')[:8]
+    firststateoncompany = request.user.profile.u_company.start_of_workflows_of()
+    notifications = Ticket.notifications(request.user,firststateoncompany)
     link ='TicketsApp/users_list.html'
     return render(request, link, 
             {'userjob':userjob,'dephierarchy':dephierarchy,'psolicitude':psolicitude,'pincident':pincident,'department':department,
@@ -160,7 +155,8 @@ def users_id(request,pk):
     usershierarchy = request.user.profile.get_users_hierarchy()
     lastten = Activity.last_ten_of_user(userp)
     usertickets = Ticket.objects.filter(t_usersolver=userp)
-    notifications = Ticket.objects.filter(t_department=request.user.profile.u_department,t_state="Iniciado").order_by('-t_reportmadeon')[:8]
+    firststateoncompany = request.user.profile.u_company.start_of_workflows_of()
+    notifications = Ticket.notifications(request.user,firststateoncompany)
     link = ''
     link ='TicketsApp/users_id.html'
     return render(request, link, 
@@ -308,25 +304,22 @@ def ticket(request,pk):
     else: return render(request,'TicketsApp/page_404.html')
 
 def ticket_create(request,pk):
-    ttype = State.find(pk)
+    ttype = Ttype.objects.get(ty_name=pk)
     dephierarchy = request.user.profile.from_level_get_dep()
     userjob = UserProfile.get_jobtitle(request.user)
     userdepartment = UserProfile.get_department(request.user)
-    psolicitude = Ticket.ticket_count(request.user,userdepartment,True,False)
-    gsolicitude = Ticket.ticket_count_dep(request.user,dephierarchy,False,False)
-    pincident = Ticket.ticket_count(request.user,userdepartment,True,True)
-    gincident = Ticket.ticket_count_dep(request.user,dephierarchy,False,True)
-    prequisite = Ticket.ticket_count(request.user,userdepartment,True,None)
-    grequisite = Ticket.ticket_count_dep(request.user,dephierarchy,False,None)
+    ttypes = Ctype.objects.filter(ct_company=request.user.profile.u_company)
+    tctype = Ticket.ticket_counts(request.user,dephierarchy,ttypes)
     servers = Server.server_count()
     services = Service.service_count()
     usersofdep = userdepartment.from_did_get_depusers()
-    notifications = Ticket.objects.filter(t_department=request.user.profile.u_department,t_state="Iniciado").order_by('-t_reportmadeon')[:8]
+    firststateoncompany = request.user.profile.u_company.start_of_workflows_of()
+    notifications = Ticket.notifications(request.user,firststateoncompany)
     if request.method =="POST":
         formTicket = CreateTicketForm(request.POST)
         ticketpk = formTicket.save(commit=False)
         ticketpk.t_userreporter = request.user
-        ticketpk.t_state = "Iniciado"
+        ticketpk.t_state = ttype.ty_workflow.w_start
         ticketpk.t_ttype = ttype    
         ticketpk.t_reportmadeon = datetime.now()
         ticketpk.t_usersolver = None
@@ -345,8 +338,7 @@ def ticket_create(request,pk):
     else:
         formTicket = CreateTicketForm()
         return render(request,'TicketsApp/ticketid_create.html',{
-        'userjob':userjob,'dephierarchy':dephierarchy,'psolicitude':psolicitude,'pincident':pincident,'prequisite':prequisite,'grequisite':grequisite,
-        'gsolicitude':gsolicitude,'gincident':gincident,'servers':servers, 
+        'userjob':userjob,'dephierarchy':dephierarchy,'tctype':tctype,'ttypes':ttypes,'servers':servers, 
         'services':services,'usersofdep':usersofdep,'formTicket':formTicket,'notifications':notifications,
         'ttype':ttype,
              })
@@ -355,12 +347,8 @@ def ticket_edit(request,pk):
     dephierarchy = request.user.profile.from_level_get_dep()
     userjob = UserProfile.get_jobtitle(request.user)
     userdepartment = UserProfile.get_department(request.user)
-    psolicitude = Ticket.ticket_count(request.user,userdepartment,True,False)
-    gsolicitude = Ticket.ticket_count_dep(request.user,dephierarchy,False,False)
-    pincident = Ticket.ticket_count(request.user,userdepartment,True,True)
-    gincident = Ticket.ticket_count_dep(request.user,dephierarchy,False,True)
-    prequisite = Ticket.ticket_count(request.user,userdepartment,True,None)
-    grequisite = Ticket.ticket_count_dep(request.user,dephierarchy,False,None)
+    ttypes = Ctype.objects.filter(ct_company=request.user.profile.u_company)
+    tctype = Ticket.ticket_counts(request.user,dephierarchy,ttypes)
     servers = Server.server_count()
     services = Service.service_count()
     ticketpk = Ticket.objects.get(pk=pk)
@@ -376,22 +364,24 @@ def ticket_edit(request,pk):
     dateclosed = Activity.date_of_event(ticketpk,'Cerrado')
     usersofdep = userdepartment.from_did_get_depusers()
     useraffected = UserProfile.get_UserProfile(ticketpk.t_useraffected)
-    notifications = Ticket.objects.filter(t_department=request.user.profile.u_department,t_state="Iniciado").order_by('-t_reportmadeon')[:8]
+    firststateoncompany = request.user.profile.u_company.start_of_workflows_of()
+    notifications = Ticket.notifications(request.user,firststateoncompany)
     link ='TicketsApp/'
     if request.method =="POST":
         formTicket = EditTicketStateForm(request.POST, instance = ticketpk)
+        formTicket.fields['t_state'].queryset = Action.posible_states(ticketpk.t_state)
+        final = State.objects.get(pk=request.POST.get('t_state')) 
         newactivity = Activity.insert(ticketpk,
-            request.POST.get('t_state'),
+            final.s_name,
             request.user,datetime.now(),
-            "El estado ha sido cambiado de "+ticketpk.t_state+" a "+request.POST.get('t_state'))
+            "El estado ha sido cambiado de "+ticketpk.t_state.s_name+" a "+str(final.s_name))
         newactivity.save()
         ticketpk = formTicket.save(commit=False)
         ticketpk.usersolver=request.user
         ticketpk.save()
         return render(request, link+'ticketid.html',{
-        'userjob':userjob,'dephierarchy':dephierarchy,'psolicitude':psolicitude,'pincident':pincident,'prequisite':prequisite,'grequisite':grequisite,
-        'gsolicitude':gsolicitude,'gincident':gincident,'ticketpk':ticketpk,
-        'useraffected':useraffected,'usersolver':usersolver,'sla':sla,
+        'userjob':userjob,'dephierarchy':dephierarchy,'ticketpk':ticketpk,
+        'useraffected':useraffected,'usersolver':usersolver,'sla':sla,'ttypes':ttypes,'tctype':tctype,
         'slahour':slahour,'slaminute':slaminute,'attacheds':attacheds,
         'sons':sons,'activities':activities,'lastactivity':lastactivity,
         'datesolved':datesolved,'dateclosed':dateclosed,'servers':servers,   
@@ -399,9 +389,9 @@ def ticket_edit(request,pk):
          })
     else:
         formTicket = EditTicketStateForm(instance=ticketpk)
+        formTicket.fields['t_state'].queryset = Action.posible_states(ticketpk.t_state)
         return render(request,link+'ticketid_edit.html',{
-        'userjob':userjob,'dephierarchy':dephierarchy,'psolicitude':psolicitude,'pincident':pincident,'prequisite':prequisite,'grequisite':grequisite,
-        'gsolicitude':gsolicitude,'gincident':gincident,'ticketpk':ticketpk,
+        'userjob':userjob,'dephierarchy':dephierarchy,'ttypes':ttypes,'tctype':tctype,'ticketpk':ticketpk,
         'useraffected':useraffected,'usersolver':usersolver,'sla':sla,
         'slahour':slahour,'slaminute':slaminute,'attacheds':attacheds,    
         'sons':sons,'activities':activities,'lastactivity':lastactivity,
@@ -413,12 +403,8 @@ def ticket_attach(request,pk):
     dephierarchy = request.user.profile.from_level_get_dep()
     userjob = UserProfile.get_jobtitle(request.user)
     userdepartment = UserProfile.get_department(request.user)
-    psolicitude = Ticket.ticket_count(request.user,userdepartment,True,False)
-    gsolicitude = Ticket.ticket_count_dep(request.user,dephierarchy,False,False)
-    pincident = Ticket.ticket_count(request.user,userdepartment,True,True)
-    gincident = Ticket.ticket_count_dep(request.user,dephierarchy,False,True)
-    prequisite = Ticket.ticket_count(request.user,userdepartment,True,None)
-    grequisite = Ticket.ticket_count_dep(request.user,dephierarchy,False,None)
+    ttypes = Ctype.objects.filter(ct_company=request.user.profile.u_company)
+    tctype = Ticket.ticket_counts(request.user,dephierarchy,ttypes)
     servers = Server.server_count()
     services = Service.service_count()
     ticketpk = Ticket.objects.get(pk=pk)
@@ -434,7 +420,8 @@ def ticket_attach(request,pk):
     dateclosed = Activity.date_of_event(ticketpk,'Cerrado')
     usersofdep = userdepartment.from_did_get_depusers()
     useraffected = UserProfile.get_UserProfile(ticketpk.t_useraffected)
-    notifications = Ticket.objects.filter(t_department=request.user.profile.u_department,t_state="Iniciado").order_by('-t_reportmadeon')[:8]
+    firststateoncompany = request.user.profile.u_company.start_of_workflows_of()
+    notifications = Ticket.notifications(request.user,firststateoncompany)
     link = 'TicketsApp/'  
     if request.method =="POST":
         formArchive = AddArchiveForm(request.POST,request.FILES)
@@ -451,8 +438,7 @@ def ticket_attach(request,pk):
         archiveattached.save()
         newactivity.save()
         return render(request,link+'ticketid.html',{
-         'userjob':userjob,'dephierarchy':dephierarchy,'psolicitude':psolicitude,'pincident':pincident,'prequisite':prequisite,'grequisite':grequisite,
-         'gsolicitude':gsolicitude,'gincident':gincident,'ticketpk':ticketpk,
+         'userjob':userjob,'dephierarchy':dephierarchy,'ttypes':ttypes,'tctype':tctype,'ticketpk':ticketpk,
         'useraffected':useraffected,'usersolver':usersolver,'sla':sla,
         'slahour':slahour,'slaminute':slaminute,'attacheds':attacheds,
         'sons':sons,'activities':activities,'lastactivity':lastactivity,
@@ -462,8 +448,7 @@ def ticket_attach(request,pk):
     else:
         formArchive = AddArchiveForm(instance=ticketpk)
         return render(request,link+'ticketid_attach.html',{
-         'userjob':userjob,'dephierarchy':dephierarchy,'psolicitude':psolicitude,'pincident':pincident,'prequisite':prequisite,'grequisite':grequisite,
-         'gsolicitude':gsolicitude,'gincident':gincident,'ticketpk':ticketpk,
+         'userjob':userjob,'dephierarchy':dephierarchy,'ttypes':ttypes,'tctype':tctype,'ticketpk':ticketpk,
         'useraffected':useraffected,'usersolver':usersolver,'sla':sla,
         'slahour':slahour,'slaminute':slaminute,'attacheds':attacheds,
         'sons':sons,'activities':activities,'lastactivity':lastactivity,
@@ -474,13 +459,8 @@ def ticket_attach(request,pk):
 def ticket_scale(request,pk):
     dephierarchy = request.user.profile.from_level_get_dep()
     userjob = UserProfile.get_jobtitle(request.user)
-    userdepartment = UserProfile.get_department(request.user)
-    psolicitude = Ticket.ticket_count(request.user,userdepartment,True,False)
-    gsolicitude = Ticket.ticket_count_dep(request.user,dephierarchy,False,False)
-    pincident = Ticket.ticket_count(request.user,userdepartment,True,True)
-    gincident = Ticket.ticket_count_dep(request.user,dephierarchy,False,True)
-    prequisite = Ticket.ticket_count(request.user,userdepartment,True,None)
-    grequisite = Ticket.ticket_count_dep(request.user,dephierarchy,False,None)
+    ttypes = Ctype.objects.filter(ct_company=request.user.profile.u_company)
+    tctype = Ticket.ticket_counts(request.user,dephierarchy,ttypes)
     servers = Server.server_count()
     services = Service.service_count()
     ticketpk = Ticket.objects.get(pk=pk)
@@ -494,9 +474,10 @@ def ticket_scale(request,pk):
     lastactivity = Activity.last_modified(ticketpk)
     datesolved = Activity.date_of_event(ticketpk,'Resuelto')
     dateclosed = Activity.date_of_event(ticketpk,'Cerrado')
-    usersofdep = userdepartment.from_did_get_depusers()
+    usersofdep = request.user.profile.u_department.from_did_get_depusers()
     useraffected = UserProfile.get_UserProfile(ticketpk.t_useraffected)
-    notifications = Ticket.objects.filter(t_department=request.user.profile.u_department,t_state="Iniciado").order_by('-t_reportmadeon')[:8]
+    firststateoncompany = request.user.profile.u_company.start_of_workflows_of()
+    notifications = Ticket.notifications(request.user,firststateoncompany)
     link = 'TicketsApp/'
     if request.method =="POST":
         formTicket = EditScaleForm(request.POST, instance = ticketpk)
@@ -508,8 +489,7 @@ def ticket_scale(request,pk):
         ticketpk = formTicket.save(commit=False)
         ticketpk.save()
         return render(request,link+'ticketid.html',{
-        'userjob':userjob,'dephierarchy':dephierarchy,'psolicitude':psolicitude,'pincident':pincident,
-        'gsolicitude':gsolicitude,'gincident':gincident,'ticketpk':ticketpk,
+        'userjob':userjob,'dephierarchy':dephierarchy,'ttypes':ttypes,'tctype':tctype,'ticketpk':ticketpk,
         'useraffected':useraffected,'usersolver':usersolver,'sla':sla,
         'slahour':slahour,'slaminute':slaminute,'attacheds':attacheds,
         'sons':sons,'activities':activities,'lastactivity':lastactivity,
@@ -519,8 +499,7 @@ def ticket_scale(request,pk):
     else:
         formTicket = EditScaleForm(instance=ticketpk)
         return render(request,link+'ticketid_scale.html',{
-        'userjob':userjob,'dephierarchy':dephierarchy,'psolicitude':psolicitude,'pincident':pincident,
-        'gsolicitude':gsolicitude,'gincident':gincident,'ticketpk':ticketpk,
+        'userjob':userjob,'dephierarchy':dephierarchy,'ttypes':ttypes,'tctype':tctype,'ticketpk':ticketpk,
         'useraffected':useraffected,'usersolver':usersolver,'sla':sla,
         'slahour':slahour,'slaminute':slaminute,'attacheds':attacheds,    
         'sons':sons,'activities':activities,'lastactivity':lastactivity,
@@ -532,12 +511,8 @@ def ticket_transfer(request,pk):
     dephierarchy = request.user.profile.from_level_get_dep()
     userjob = UserProfile.get_jobtitle(request.user)
     userdepartment = UserProfile.get_department(request.user)
-    psolicitude = Ticket.ticket_count(request.user,userdepartment,True,False)
-    gsolicitude = Ticket.ticket_count_dep(request.user,dephierarchy,False,False)
-    pincident = Ticket.ticket_count(request.user,userdepartment,True,True)
-    gincident = Ticket.ticket_count_dep(request.user,dephierarchy,False,True)
-    prequisite = Ticket.ticket_count(request.user,userdepartment,True,None)
-    grequisite = Ticket.ticket_count_dep(request.user,dephierarchy,False,None)
+    ttypes = Ctype.objects.filter(ct_company=request.user.profile.u_company)
+    tctype = Ticket.ticket_counts(request.user,dephierarchy,ttypes)
     servers = Server.server_count()
     services = Service.service_count()
     ticketpk = Ticket.objects.get(pk=pk)
@@ -553,7 +528,8 @@ def ticket_transfer(request,pk):
     dateclosed = Activity.date_of_event(ticketpk,'Cerrado')
     usersofdep = userdepartment.from_did_get_depusers()
     useraffected = UserProfile.get_UserProfile(ticketpk.t_useraffected)
-    notifications = Ticket.objects.filter(t_department=request.user.profile.u_department,t_state="Iniciado").order_by('-t_reportmadeon')[:8]
+    firststateoncompany = request.user.profile.u_company.start_of_workflows_of()
+    notifications = Ticket.notifications(request.user,firststateoncompany)
     link ='TicketsApp/'  
     if request.method =="POST":
         formActivity = TransferForm(request.POST, instance = ticketpk)
@@ -562,12 +538,11 @@ def ticket_transfer(request,pk):
             request.user,datetime.now(),
             "El ticket ha sido transferido de "+ticketpk.t_usersolver.get_full_name()+" a \'  \' \n a razon de: \n"+str(request.POST.get('at_description')))
         newactivity.save()
-        ticketpk.t_usersolver = None
+        ticketpk.t_usersolver = ticketpk.t_userreporter
         ticketpk.t_department = UserProfile.get_department(ticketpk.t_userreporter)
         ticketpk.save()
         return render(request,'TicketsApp/ticketid.html',{
-            'userjob':userjob,'dephierarchy':dephierarchy,'psolicitude':psolicitude,'pincident':pincident,'prequisite':prequisite,'grequisite':grequisite,
-            'gsolicitude':gsolicitude,'gincident':gincident,'ticketpk':ticketpk,
+            'userjob':userjob,'dephierarchy':dephierarchy,'ttypes':ttypes,'tctype':tctype,'ticketpk':ticketpk,
             'useraffected':useraffected,'usersolver':usersolver,'sla':sla,
             'slahour':slahour,'slaminute':slaminute,'attacheds':attacheds,
             'sons':sons,'activities':activities,'lastactivity':lastactivity,
@@ -577,8 +552,7 @@ def ticket_transfer(request,pk):
     else:
         formTicket = TransferForm(instance=ticketpk)
         return render(request,'TicketsApp/ticketid_transfer.html',{
-            'userjob':userjob,'dephierarchy':dephierarchy,'psolicitude':psolicitude,'pincident':pincident,'prequisite':prequisite,'grequisite':grequisite,
-            'gsolicitude':gsolicitude,'gincident':gincident,'ticketpk':ticketpk,
+            'userjob':userjob,'dephierarchy':dephierarchy,'ttypes':ttypes,'tctype':tctype,'ticketpk':ticketpk,
             'useraffected':useraffected,'usersolver':usersolver,'sla':sla,
             'slahour':slahour,'slaminute':slaminute,'attacheds':attacheds,    
             'sons':sons,'activities':activities,'lastactivity':lastactivity,
@@ -590,12 +564,8 @@ def ticket_assign(request,pk):
     dephierarchy = request.user.profile.from_level_get_dep()
     userjob = UserProfile.get_jobtitle(request.user)
     userdepartment = UserProfile.get_department(request.user)
-    psolicitude = Ticket.ticket_count(request.user,userdepartment,True,False)
-    gsolicitude = Ticket.ticket_count_dep(request.user,dephierarchy,False,False)
-    pincident = Ticket.ticket_count(request.user,userdepartment,True,True)
-    gincident = Ticket.ticket_count_dep(request.user,dephierarchy,False,True)
-    prequisite = Ticket.ticket_count(request.user,userdepartment,True,None)
-    grequisite = Ticket.ticket_count_dep(request.user,dephierarchy,False,None)
+    ttypes = Ctype.objects.filter(ct_company=request.user.profile.u_company)
+    tctype = Ticket.ticket_counts(request.user,dephierarchy,ttypes)
     servers = Server.server_count()
     services = Service.service_count()
     ticketpk = Ticket.objects.get(pk=pk)
@@ -611,41 +581,39 @@ def ticket_assign(request,pk):
     dateclosed = Activity.date_of_event(ticketpk,'Cerrado')
     usersofdep = userdepartment.from_did_get_depusers()
     useraffected = UserProfile.get_UserProfile(ticketpk.t_useraffected)
-    notifications = Ticket.objects.filter(t_department=request.user.profile.u_department,t_state="Iniciado").order_by('-t_reportmadeon')[:8]
+    firststateoncompany = request.user.profile.u_company.start_of_workflows_of()
+    notifications = Ticket.notifications(request.user,firststateoncompany)
+    hierarchy = UserProfile.get_users_hierarchy(request.user.profile)
     link ='TicketsApp/'  
     if request.method =="POST":
         formActivity = AsignateSolverTicketForm(request.POST, instance = ticketpk)
-        formActivity.fields['t_usersolver'].queryset = UserProfile.get_users_hierarchy(request.user.profile)
         if ticketpk.t_usersolver == None :
             newactivity = Activity.insert(ticketpk,
                 "Asignado",
                 request.user,datetime.now(),
-                "El ticket ha sido asignado de \' \' a "+str(User.objects.get(pk=request.POST.get('t_usersolver')).get_full_name()) +" \n")
+                "El ticket ha sido asignado a "+str(User.objects.get(username=request.POST.get('t_usersolver')).get_full_name()) +" \n")
         else:
             newactivity = Activity.insert(ticketpk,
                 "Asignado",
                 request.user,datetime.now(),
-                "El ticket ha sido asignado de "+ticketpk.t_usersolver.get_full_name()+" a "+str(User.objects.get(pk=request.POST.get('t_usersolver')).get_full_name()) +" \n")
+                "El ticket ha sido asignado de "+ticketpk.t_usersolver.get_full_name()+" a "+str(User.objects.get(username=request.POST.get('t_usersolver')).get_full_name()) +" \n")
         newactivity.save()
-        ticketpk.t_usersolver = User.objects.get(pk=request.POST.get('t_usersolver'))
-        ticketpk.t_department = UserProfile.get_department(request.POST.get('t_usersolver'))
-        ticketpk.t_state = "Asignado"
+        ticketpk.t_usersolver = User.objects.get(username=request.POST.get('t_usersolver'))
+        ticketpk.t_department = UserProfile.get_department(ticketpk.t_usersolver)
         ticketpk.save()
         return render(request,link+'ticketid.html',{
-            'userjob':userjob,'dephierarchy':dephierarchy,'psolicitude':psolicitude,'pincident':pincident,'prequisite':prequisite,'grequisite':grequisite,
-            'gsolicitude':gsolicitude,'gincident':gincident,'ticketpk':ticketpk,
+            'userjob':userjob,'dephierarchy':dephierarchy,'ttypes':ttypes,'tctype':tctype,'ticketpk':ticketpk,
             'useraffected':useraffected,'usersolver':usersolver,'sla':sla,
             'slahour':slahour,'slaminute':slaminute,'attacheds':attacheds,
             'sons':sons,'activities':activities,'lastactivity':lastactivity,
-            'datesolved':datesolved,'dateclosed':dateclosed,'servers':servers,   
+            'datesolved':datesolved,'dateclosed':dateclosed,'servers':servers, 'hierarchy': hierarchy,
             'services':services,'notifications':notifications,
                  })
     else:
         formTicket = AsignateSolverTicketForm(instance=ticketpk)
-        formTicket.fields['t_usersolver'].queryset = UserProfile.get_users_hierarchy(request.user.profile)
+        formTicket.fields['t_usersolver'].queryset = UserProfile.get_users_hierarchy(request.user.profile).values_list('u_user__username',flat=True)
         return render(request,link+'ticketid_assign.html',{
-            'userjob':userjob,'dephierarchy':dephierarchy,'psolicitude':psolicitude,'pincident':pincident,'prequisite':prequisite,'grequisite':grequisite,
-            'gsolicitude':gsolicitude,'gincident':gincident,'ticketpk':ticketpk,
+            'userjob':userjob,'dephierarchy':dephierarchy,'ttypes':ttypes,'tctype':tctype,'ticketpk':ticketpk,
             'useraffected':useraffected,'usersolver':usersolver,'sla':sla,
             'slahour':slahour,'slaminute':slaminute,'attacheds':attacheds,    
             'sons':sons,'activities':activities,'lastactivity':lastactivity,

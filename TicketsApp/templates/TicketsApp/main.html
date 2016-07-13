@@ -110,7 +110,7 @@
                 {%for t,p,g in tctype %}
                 <li id="solicitudes"><a><i class="fa {{t.ty_icon}}"></i> {{t}} <span class="fa fa-chevron-down"></span></a>
                   <ul class="nav child_menu" style="display: block">
-                    <li id="type{{t}}"><a href="{% url 'TicketsApp.views.ticket_create' pk=t.ty_name %}">Crear {{t}}
+                    <li id="type{{t}}"><a href="{% url 'TicketsApp.views.ticket_create' pk=t %}">Crear {{t}}
                     </a>
                     </li>
                     <script>

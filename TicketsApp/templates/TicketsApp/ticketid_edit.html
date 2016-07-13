@@ -11,20 +11,7 @@
 
           <div class="page-title">
             <div class="title_left">
-                  <h1><span id="sol"></span>
-                  <script>
-                      var b = "{{ticketpk.t_isincident}}" 
-                      var text;  
-                       if ( b=="True") {
-                          text = "<span class='label label-danger'>Ticket # {{ticketpk.t_id}}</span>"
-                       }else if (b=="None"){
-                          text = "<span class='label label-success'>Ticket # {{ticketpk.t_id}}</span>"
-                       }else{
-                          text = "<span class='label label-info'>Ticket # {{ticketpk.t_id}}</span>"
-                       }
-                      document.getElementById("sol").innerHTML = text;
-                
-                  </script>                        
+                  <h1> <span class='label label-{{ticketpk.t_ttype.ty_color}}'>Ticket # {{ticketpk.t_id}}</span>                      
               </h1>
             </div>
           </div>

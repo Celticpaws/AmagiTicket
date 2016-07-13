@@ -4,20 +4,13 @@ from .models import *
 
 class EditTicketStateForm(forms.ModelForm):
     class Meta:
-        CHOICES_STATE = (('Iniciado','Iniciado'),
-                         ('Asignado','Asignado'),
-                         ('En Proceso','En Proceso'),
-                         ('En Espera','En Espera'),
-                         ('Resuelto','Resuelto'),
-                         ('Cerrado','Cerrado'),
-                         ('Re-abierto','Re-abierto'))
         model = Ticket
         fields = ('t_state',)
         labels = {
             't_state': (''),
         }    
         widgets = {
-            't_state': forms.Select(choices=CHOICES_STATE,attrs={'class':'form-control'}),
+            't_state': forms.Select(attrs={'class':'form-control'}),
         }
 
 class AddArchiveForm(forms.ModelForm):
@@ -81,7 +74,7 @@ class CreateTicketForm(forms.ModelForm):
         widgets = {
             't_mother': forms.Select(attrs={'class':'form-control'}),
             't_useraffected': forms.Select(attrs={'class':'form-control'}),
-            't_category': forms.TextInput(attrs={'class':'form-control'}),
+            't_category': forms.Select(attrs={'class':'form-control'}),
             't_title': forms.TextInput(attrs={'class':'form-control'}),
             't_description': forms.Textarea(attrs={'class':'form-control'}),
             't_server': forms.Select(attrs={'class':'form-control'}),

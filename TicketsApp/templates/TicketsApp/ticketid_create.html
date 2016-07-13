@@ -11,20 +11,7 @@
 
           <div class="page-title">
             <div class="title_left">
-                  <h1><span id="sol"></span>
-                  <script>
-                      var b = "{{isincident}}" 
-                      var text;  
-                       if ( b=="True") {
-                          text = "<span class='label label-danger'>Crear un incidente</span>"
-                       }else if (b=="None"){
-                          text = "<span class='label label-success'>Crear un requisito</span>"
-                       }else{
-                          text = "<span class='label label-info'>Crear una solicitud</span>"
-                       }
-                      document.getElementById("sol").innerHTML = text;
-                
-                  </script>                      
+                  <h1><span class='label label-{{ttype.ty_color}}'>Crear {{ttype}}</span>
               </h1>
             </div>
           </div>
