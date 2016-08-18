@@ -204,10 +204,16 @@ class UserProfile(models.Model):
 			enpres += Activity.time_between_activities(ticket,"En Proceso","Resuelto")
 			rescer += Activity.time_between_activities(ticket,"Resuelto","Cerrado")
 			reares += Activity.time_between_activities(ticket,"Re-abierto","Resuelto")
-		asienp = asienp /len(tickets)
-		enpres = enpres /len(tickets)
-		rescer = rescer /len(tickets)
-		reares = reares /len(tickets)
+		if(len(tickets)>0):
+			asienp = asienp /len(tickets)
+			enpres = enpres /len(tickets)
+			rescer = rescer /len(tickets)
+			reares = reares /len(tickets)
+		else:
+			asienp = 0
+			enpres = 0
+			rescer = 0
+			reares = 0
 		return [[['Tiempo de procesamiento'],[asienp]],
 				  [['Tiempo de resolución'],[enpres]],
 				  [['Tiempo de cierre'],[rescer]],

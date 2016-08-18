@@ -75,8 +75,7 @@ def departments(request):
     notifications = Ticket.notifications(request.user,firststateoncompany)
     link ='TicketsApp/departments_list.html'
     return render(request, link, 
-            {'userjob':userjob,'dephierarchy':dephierarchy,'psolicitude':psolicitude,'pincident':pincident,
-             'gsolicitude':gsolicitude,'gincident':gincident,'prequisite':prequisite,'grequisite':grequisite,'servers': servers,
+            {'userjob':userjob,'dephierarchy':dephierarchy,'tctype':tctype,'servers': servers,
              'services' : services,'usershierarchy':usershierarchy,'notifications':notifications,
              })
 
@@ -85,13 +84,8 @@ def department_id(request,pk):
     userp= User.objects.get(pk=pk)
     userjob = UserProfile.get_jobtitle(request.user)
     userdepartment = UserProfile.get_department(request.user)
-    psolicitude = Ticket.ticket_count(request.user,userdepartment,True,False)
-    gsolicitude = Ticket.ticket_count_dep(request.user,dephierarchy,False,False)
-    psolicitudea = Ticket.ticket_count_active(userp,False)
-    pincidenta = Ticket.ticket_count_active(userp,True)
-    prequisitea = Ticket.ticket_count_active(userp,None)
-    pincident = Ticket.ticket_count(request.user,userdepartment,True,True)
-    gincident = Ticket.ticket_count_dep(request.user,dephierarchy,False,True)
+    ttypes = Ctype.objects.filter(ct_company=request.user.profile.u_company)
+    tctype = Ticket.ticket_counts(request.user,dephierarchy,ttypes)
     prequisite = Ticket.ticket_count(request.user,userdepartment,True,None)
     grequisite = Ticket.ticket_count_dep(request.user,dephierarchy,False,None)
     servers = Server.server_count()
@@ -107,9 +101,7 @@ def department_id(request,pk):
     link = ''
     link ='TicketsApp/users_id.html'
     return render(request, link, 
-            {'userjob':userjob,'dephierarchy':dephierarchy,'psolicitude':psolicitude,'pincident':pincident,
-             'psolicitudea':psolicitudea,'pincidenta':pincidenta,'prequisitea':prequisitea,'gsolicitude':gsolicitude,'prequisite':prequisite,'grequisite':grequisite,
-             'gincident':gincident,'servers': servers,'services' : services,'usershierarchy':usershierarchy,'userp':userp,
+            {'userjob':userjob,'dephierarchy':dephierarchy,'servers': servers,'tctype':tctype,'services' : services,'usershierarchy':usershierarchy,'userp':userp,
              'lastten':lastten,'usertickets':usertickets,'notifications':notifications,'bars':bars,'ivalues':ivalues,'bvalues': types,
              })
 
@@ -128,8 +120,7 @@ def users(request,pk):
     notifications = Ticket.notifications(request.user,firststateoncompany)
     link ='TicketsApp/users_list.html'
     return render(request, link, 
-            {'userjob':userjob,'dephierarchy':dephierarchy,'psolicitude':psolicitude,'pincident':pincident,'department':department,
-             'gsolicitude':gsolicitude,'gincident':gincident,'prequisite':prequisite,'grequisite':grequisite,'servers': servers,
+            {'userjob':userjob,'department':department,'dephierarchy':dephierarchy,'tctype':tctype,'servers': servers,
              'services' : services,'usershierarchy':usershierarchy,'notifications':notifications,
              })
 
@@ -138,19 +129,16 @@ def users_id(request,pk):
     userp= User.objects.get(pk=pk)
     userjob = UserProfile.get_jobtitle(request.user)
     userdepartment = UserProfile.get_department(request.user)
-    psolicitude = Ticket.ticket_count(request.user,userdepartment,True,False)
-    gsolicitude = Ticket.ticket_count_dep(request.user,dephierarchy,False,False)
-    psolicitudea = Ticket.ticket_count_active(userp,False)
-    pincidenta = Ticket.ticket_count_active(userp,True)
-    prequisitea = Ticket.ticket_count_active(userp,None)
-    pincident = Ticket.ticket_count(request.user,userdepartment,True,True)
-    gincident = Ticket.ticket_count_dep(request.user,dephierarchy,False,True)
-    prequisite = Ticket.ticket_count(request.user,userdepartment,True,None)
-    grequisite = Ticket.ticket_count_dep(request.user,dephierarchy,False,None)
+    ttypes = Ctype.objects.filter(ct_company=request.user.profile.u_company)
+    tctype = Ticket.ticket_counts(request.user,dephierarchy,ttypes)
     servers = Server.server_count()
     services = Service.service_count()
-    types = Ticket.count_types(userp,userp.profile.u_department,True)
-    ivalues = (UserProfile.get_UserProfile(request.user)).group_values(True)
+    types = []
+    for ttype in ttypes:
+        types += Ticket.count_types(request.user,dephierarchy,False,ttype)
+    cake = []
+    for ttype in ttypes:
+        cake += [(UserProfile.get_UserProfile(request.user)).group_values(ttype)]
     bars = UserProfile.resume_in_time(userp,datetime.now()-timedelta(days=30),datetime.now())
     usershierarchy = request.user.profile.get_users_hierarchy()
     lastten = Activity.last_ten_of_user(userp)
@@ -160,10 +148,8 @@ def users_id(request,pk):
     link = ''
     link ='TicketsApp/users_id.html'
     return render(request, link, 
-            {'userjob':userjob,'dephierarchy':dephierarchy,'psolicitude':psolicitude,'pincident':pincident,
-             'psolicitudea':psolicitudea,'pincidenta':pincidenta,'prequisitea':prequisitea,'gsolicitude':gsolicitude,'prequisite':prequisite,'grequisite':grequisite,
-             'gincident':gincident,'servers': servers,'services' : services,'usershierarchy':usershierarchy,'userp':userp,
-             'lastten':lastten,'usertickets':usertickets,'notifications':notifications,'bars':bars,'ivalues':ivalues,'bvalues': types,
+            {'userjob':userjob,'dephierarchy':dephierarchy,'tctype':tctype,'servers': servers,'services' : services,'usershierarchy':usershierarchy,'userp':userp,
+             'lastten':lastten,'usertickets':usertickets,'notifications':notifications,
              })
 
 def auth(request):

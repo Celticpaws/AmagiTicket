@@ -132,7 +132,7 @@ def ticket_printed(request,pk):
     p.drawString(300, j+49, "Teléfono:")
     p.drawString(300, j+73, "Correo: ")
     p.setFont("Helvetica", 10)
-    p.drawString(80, j+25+12, str(useraffected.u_management))
+    p.drawString(80, j+25+12, str(useraffected.u_department.d_management))
     p.drawString(80, j+49+12, str(useraffected.u_department))
     p.drawString(80, j+73+12, useraffected.u_user.get_full_name())
     p.drawString(310, j+25+12, str(useraffected.u_user.username))
@@ -167,16 +167,13 @@ def ticket_printed(request,pk):
     p.drawString(420, j+97, "Tiempo de vida: ")
 
     p.setFont("Helvetica", 10)
-    if ticketpk.t_isincident:
-        p.drawString(80, j+25+12, "Incidente")
-    else:
-        p.drawString(80, j+25+12, "Solicitud")   
-    p.drawString(80, j+49+12, ticketpk.t_category)
+    p.drawString(80, j+25+12, ticketpk.t_ttype.ty_name)
+    p.drawString(80, j+49+12, ticketpk.t_category.ca_name)
     p.drawString(80, j+73+12, str(ticketpk.t_server))
     p.drawString(80, j+97+12, str(ticketpk.t_service))
 
     p.drawString(250, j+25+12, str(ticketpk.t_priority))
-    p.drawString(250, j+49+12, ticketpk.t_state)
+    p.drawString(250, j+49+12, ticketpk.t_state.s_name)
     p.drawString(250, j+73+12, str(ticketpk.t_department))
     if ticketpk.t_usersolver == None :
         p.drawString(250, j+97+12, "El ticket no ha sido asignado")
@@ -251,7 +248,7 @@ def ticket_printed(request,pk):
             p.setFont("Helvetica", 8)
             p.drawString(80, j+25+12, str(son))
             p.drawString(150, j+25+12, son.t_reportmadeon.strftime("%d de %b del %Y a las %I:%M:%S %p"))
-            p.drawString(300, j+25+12, son.t_state)
+            p.drawString(300, j+25+12, son.t_state.s_name)
             if son.t_usersolver == None:
                 p.drawString(420, j+25+12, "Ticket no asignado")
             else:
